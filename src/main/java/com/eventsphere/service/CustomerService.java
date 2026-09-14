@@ -14,6 +14,7 @@ import java.util.Optional;
  * Handles business logic for customer profiles.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class CustomerService {
 
     private final CustomerDAO customerDAO;

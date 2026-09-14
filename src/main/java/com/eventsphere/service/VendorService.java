@@ -15,6 +15,7 @@ import java.util.Optional;
  * Contains vendor business logic and scheduling conflict detection.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class VendorService {
 
     private final VendorDAO vendorDAO;
@@ -70,11 +71,16 @@ public class VendorService {
      *
      * @return null on success, error message if conflict
      */
+    @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignVendorToEvent(EventVendor ev) {
+        if (vendorDAO.findById(ev.getVendorId()).filter(v -> v.isActive()).isEmpty()) return "Selected entry is unavailable.";
         if (ev.getServiceDate() == null) {
             return "Service date is required.";
         }
 
+        if (vendorDAO.findAssignmentsByEventId(ev.getEventId()).stream().anyMatch(a ->
+                a.getVendorId() == ev.getVendorId() && a.getServiceDate().equals(ev.getServiceDate())))
+            return "This assignment already exists.";
         int conflicts = vendorDAO.countVendorConflicts(
                 ev.getVendorId(),
                 ev.getServiceDate(),

@@ -1,12 +1,13 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login â€“ EventSphere</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/eventsphere.css">
+    <title>Login – EventSphere</title>
+    <link rel="stylesheet" href="${fn:escapeXml(pageContext.request.contextPath)}/static/css/eventsphere.css">
 </head>
 <body>
 <div class="auth-page">
@@ -19,10 +20,10 @@
         <h2>Sign In</h2>
 
         <c:if test="${not empty error}">
-            <div class="es-alert es-alert-error">${error}</div>
+            <div class="es-alert es-alert-error">${fn:escapeXml(error)}</div>
         </c:if>
         <c:if test="${not empty message}">
-            <div class="es-alert es-alert-success">${message}</div>
+            <div class="es-alert es-alert-success">${fn:escapeXml(message)}</div>
         </c:if>
         <c:if test="${not empty param.error}">
             <div class="es-alert es-alert-error">Invalid username or password, or account is inactive.</div>
@@ -31,7 +32,8 @@
             <div class="es-alert es-alert-success">You have been logged out successfully.</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/login" method="post" class="es-validate">
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/login" method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-group">
                 <label class="required">Username</label>
                 <input type="text" name="username" class="es-input"
@@ -51,7 +53,7 @@
 
         <div style="text-align:center;margin-top:18px;font-size:13px;color:#718096;">
             New customer?
-            <a href="${pageContext.request.contextPath}/register" style="color:#E8A020;font-weight:600;">
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/register" style="color:#E8A020;font-weight:600;">
                 Create an account
             </a>
         </div>

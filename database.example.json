@@ -1,0 +1,9 @@
+{
+  "Host": "localhost",
+  "Port": 1433,
+  "Database": "EventSphereDB",
+  "Authentication": "Windows",
+  "Username": "",
+  "TrustServerCertificate": true,
+  "SeedDemo": true
+}

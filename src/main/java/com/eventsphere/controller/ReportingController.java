@@ -248,6 +248,7 @@ public class ReportingController {
         if (optEvent.isEmpty()) return "redirect:/customer/bookings";
 
         Event event = optEvent.get();
+        if (event.getCustomerId() != resolveCustomerId(user)) return "redirect:/access-denied";
         if (!"Completed".equals(event.getStatus())) {
             model.addAttribute("error",
                 "Feedback can only be submitted for completed events.");
@@ -283,6 +284,7 @@ public class ReportingController {
             return "redirect:/customer/bookings";
         }
 
+        if (optEvent.get().getCustomerId() != customerId) return "redirect:/access-denied";
         Feedback feedback = new Feedback();
         feedback.setEventId(eventId);
         feedback.setCustomerId(customerId);   // ← from session, not form
@@ -409,6 +411,11 @@ public class ReportingController {
             return "redirect:/customer/dashboard";
         }
 
+        if (complaint.getEventId() != null && eventService.getEventById(complaint.getEventId())
+                .filter(e -> e.getCustomerId() == customerId).isEmpty()) return "redirect:/access-denied";
+        complaint.setStatus("Submitted");
+        complaint.setEscalated(false);
+        complaint.setResponse(null);
         complaint.setCustomerId(customerId);   // ← from session, not form
 
         String error = reportingService.submitComplaint(complaint);
@@ -449,7 +456,7 @@ public class ReportingController {
     @GetMapping("/cro/dashboard")
     public String croDashboard(HttpSession session, Model model) {
         User user = getUser(session);
-        if (user == null) return "redirect:/login";
+        if (!hasStaffAccess(user)) return "redirect:/access-denied";
 
         model.addAttribute("customers",        customerService.getAllCustomers());
         model.addAttribute("recentComplaints", reportingService.getAllComplaints());
@@ -465,7 +472,7 @@ public class ReportingController {
     @GetMapping("/director/dashboard")
     public String directorDashboard(HttpSession session, Model model) {
         User user = getUser(session);
-        if (user == null) return "redirect:/login";
+        if (!hasStaffAccess(user)) return "redirect:/access-denied";
 
         model.addAttribute("totalEvents",         eventService.getTotalEvents());
         model.addAttribute("upcomingEvents",       eventService.getUpcomingEvents());

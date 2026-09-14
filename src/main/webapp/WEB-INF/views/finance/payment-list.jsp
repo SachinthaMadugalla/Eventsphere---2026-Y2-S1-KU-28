@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Payments"/>
@@ -17,14 +18,14 @@
                 <tbody>
                 <c:forEach var="p" items="${payments}">
                     <tr>
-                        <td>${p.invoiceNumber}</td>
-                        <td>${p.eventName}</td>
-                        <td>${p.customerName}</td>
+                        <td>${fn:escapeXml(p.invoiceNumber)}</td>
+                        <td>${fn:escapeXml(p.eventName)}</td>
+                        <td>${fn:escapeXml(p.customerName)}</td>
                         <td><strong><fmt:formatNumber value="${p.amount}" type="number" groupingUsed="true"/></strong></td>
-                        <td>${p.paymentDate}</td>
-                        <td>${p.paymentType}</td>
-                        <td>${empty p.referenceNo ? 'â€”' : p.referenceNo}</td>
-                        <td>${empty p.recordedByName ? 'â€”' : p.recordedByName}</td>
+                        <td>${fn:escapeXml(p.paymentDate)}</td>
+                        <td>${fn:escapeXml(p.paymentType)}</td>
+                        <td>${fn:escapeXml(empty p.referenceNo ? '—' : p.referenceNo)}</td>
+                        <td>${fn:escapeXml(empty p.recordedByName ? '—' : p.recordedByName)}</td>
                     </tr>
                 </c:forEach>
                 </tbody>

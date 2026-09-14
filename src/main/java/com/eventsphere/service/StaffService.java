@@ -14,6 +14,7 @@ import java.util.Optional;
  * Handles staff CRUD, assignment and conflict detection.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class StaffService {
 
     private final StaffDAO staffDAO;
@@ -69,11 +70,16 @@ public class StaffService {
      *
      * @return null on success, error message if conflict
      */
+    @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignStaffToEvent(StaffAssignment sa) {
+        if (staffDAO.findById(sa.getStaffId()).filter(v -> v.isActive()).isEmpty()) return "Selected entry is unavailable.";
         if (sa.getAssignedDate() == null) {
             return "Assignment date is required.";
         }
 
+        if (staffDAO.findAssignmentsByEventId(sa.getEventId()).stream().anyMatch(a ->
+                a.getStaffId() == sa.getStaffId() && a.getAssignedDate().equals(sa.getAssignedDate())))
+            return "This assignment already exists.";
         int conflicts = staffDAO.countStaffConflicts(
                 sa.getStaffId(),
                 sa.getAssignedDate(),

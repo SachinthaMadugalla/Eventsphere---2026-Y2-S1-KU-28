@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Finance Report"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#128176; Finance Report</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/reports">Reports</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Finance
         </div>
     </div>
@@ -23,7 +24,7 @@
     <!-- Summary stats -->
     <div class="stat-cards">
         <div class="stat-card green">
-            <div class="stat-label">Total Revenue (Paid)</div>
+            <div class="stat-label">Total Invoiced</div>
             <div class="stat-value" style="font-size:16px;">
                 LKR <fmt:formatNumber value="${totalRevenue}" type="number" groupingUsed="true"/>
             </div>
@@ -54,7 +55,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Budget vs Actual Cost</h3>
-            <span style="font-size:12px;color:#718096;">${budgets.size()} budget(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(budgets.size())} budget(s)</span>
         </div>
         <div class="es-table-wrap">
             <table class="es-table">
@@ -70,11 +71,11 @@
                 <tbody>
                 <c:forEach var="b" items="${budgets}">
                     <tr>
-                        <td><strong>${b.eventName}</strong></td>
+                        <td><strong>${fn:escapeXml(b.eventName)}</strong></td>
                         <td><fmt:formatNumber value="${b.totalBudget}" type="number" groupingUsed="true"/></td>
                         <td><fmt:formatNumber value="${b.estimatedCost}" type="number" groupingUsed="true"/></td>
                         <td><fmt:formatNumber value="${b.actualCost}" type="number" groupingUsed="true"/></td>
-                        <td style="${b.variance < 0 ? 'color:#E53E3E;' : 'color:#38A169;'}font-weight:600;">
+                        <td style="${fn:escapeXml(b.variance < 0 ? 'color:#E53E3E;' : 'color:#38A169;')}font-weight:600;">
                             <fmt:formatNumber value="${b.variance}" type="number" groupingUsed="true"/>
                         </td>
                     </tr>
@@ -88,7 +89,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Invoices Summary</h3>
-            <span style="font-size:12px;color:#718096;">${invoices.size()} invoice(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(invoices.size())} invoice(s)</span>
         </div>
         <div class="es-table-wrap">
             <table class="es-table">
@@ -101,15 +102,15 @@
                 <tbody>
                 <c:forEach var="inv" items="${invoices}">
                     <tr>
-                        <td>${inv.invoiceNumber}</td>
-                        <td>${inv.eventName}</td>
-                        <td>${inv.customerName}</td>
+                        <td>${fn:escapeXml(inv.invoiceNumber)}</td>
+                        <td>${fn:escapeXml(inv.eventName)}</td>
+                        <td>${fn:escapeXml(inv.customerName)}</td>
                         <td><fmt:formatNumber value="${inv.totalAmount}" type="number" groupingUsed="true"/></td>
-                        <td>${inv.issuedDate}</td>
-                        <td>${inv.dueDate}</td>
+                        <td>${fn:escapeXml(inv.issuedDate)}</td>
+                        <td>${fn:escapeXml(inv.dueDate)}</td>
                         <td>
                             <c:set var="is" value="${inv.status.toLowerCase().replace(' ','')}"/>
-                            <span class="es-badge badge-${is}">${inv.status}</span>
+                            <span class="es-badge badge-${fn:escapeXml(is)}">${fn:escapeXml(inv.status)}</span>
                         </td>
                     </tr>
                 </c:forEach>
@@ -122,7 +123,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Payments Summary</h3>
-            <span style="font-size:12px;color:#718096;">${payments.size()} payment(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(payments.size())} payment(s)</span>
         </div>
         <div class="es-table-wrap">
             <table class="es-table">
@@ -135,12 +136,12 @@
                 <tbody>
                 <c:forEach var="p" items="${payments}">
                     <tr>
-                        <td>${p.paymentDate}</td>
-                        <td>${p.eventName}</td>
-                        <td>${p.customerName}</td>
+                        <td>${fn:escapeXml(p.paymentDate)}</td>
+                        <td>${fn:escapeXml(p.eventName)}</td>
+                        <td>${fn:escapeXml(p.customerName)}</td>
                         <td><strong><fmt:formatNumber value="${p.amount}" type="number" groupingUsed="true"/></strong></td>
-                        <td>${p.paymentType}</td>
-                        <td>${empty p.referenceNo ? 'â€”' : p.referenceNo}</td>
+                        <td>${fn:escapeXml(p.paymentType)}</td>
+                        <td>${fn:escapeXml(empty p.referenceNo ? '—' : p.referenceNo)}</td>
                     </tr>
                 </c:forEach>
                 </tbody>

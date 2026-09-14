@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Notifications"/>
@@ -18,7 +19,8 @@
     <div class="es-card">
         <div class="card-header">
             <h3>All Notifications</h3>
-            <form action="${pageContext.request.contextPath}/notifications/read-all" method="post">
+            <form action="${fn:escapeXml(pageContext.request.contextPath)}/notifications/read-all" method="post">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                 <button type="submit" class="btn btn-secondary btn-sm">Mark All as Read</button>
             </form>
         </div>
@@ -32,17 +34,18 @@
             </c:when>
             <c:otherwise>
                 <c:forEach var="notif" items="${notifications}">
-                    <div class="notif-item ${notif.read ? '' : 'unread'}">
+                    <div class="notif-item ${fn:escapeXml(notif.read ? '' : 'unread')}">
                         <div class="notif-icon">&#128276;</div>
                         <div class="notif-body" style="flex:1;">
-                            <div class="notif-title">${notif.title}</div>
-                            <div class="notif-msg">${notif.message}</div>
+                            <div class="notif-title">${fn:escapeXml(notif.title)}</div>
+                            <div class="notif-msg">${fn:escapeXml(notif.message)}</div>
                             <div class="notif-time">
-                                ${notif.createdAt}
+                                ${fn:escapeXml(notif.createdAt)}
                             </div>
                         </div>
-                        <form action="${pageContext.request.contextPath}/notifications/delete/${notif.notificationId}"
+                        <form action="${fn:escapeXml(pageContext.request.contextPath)}/notifications/delete/${fn:escapeXml(notif.notificationId)}"
                               method="post" style="display:inline;">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                             <button type="submit" class="btn btn-secondary btn-xs"
                                     title="Dismiss">&#10005;</button>
                         </form>

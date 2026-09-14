@@ -1,11 +1,12 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Error â€“ EventSphere</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/eventsphere.css">
+    <title>Error – EventSphere</title>
+    <link rel="stylesheet" href="${fn:escapeXml(pageContext.request.contextPath)}/static/css/eventsphere.css">
 </head>
 <body>
 <div style="display:flex;align-items:center;justify-content:center;
@@ -15,13 +16,13 @@
         <h2 style="color:#2C3E6B;font-size:22px;margin-bottom:12px;">Something went wrong</h2>
         <c:if test="${not empty errorMessage}">
             <div class="es-alert es-alert-error" style="text-align:left;margin-bottom:20px;">
-                ${errorMessage}
+                ${fn:escapeXml(errorMessage)}
             </div>
         </c:if>
         <p style="color:#718096;margin-bottom:24px;">
             Please go back and try again. If the problem persists, contact your system administrator.
         </p>
-        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/dashboard" class="btn btn-primary">
             &#8592; Back to Dashboard
         </a>
         &nbsp;

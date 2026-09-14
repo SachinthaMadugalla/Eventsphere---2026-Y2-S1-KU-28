@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Event Dashboard"/>
@@ -17,12 +18,12 @@
 
     <!-- Stats -->
     <div class="stat-cards">
-        <div class="stat-card"><div class="stat-label">Total Events</div><div class="stat-value">${totalEvents}</div></div>
-        <div class="stat-card gold"><div class="stat-label">Upcoming</div><div class="stat-value">${upcomingCount}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Events</div><div class="stat-value">${fn:escapeXml(totalEvents)}</div></div>
+        <div class="stat-card gold"><div class="stat-label">Upcoming</div><div class="stat-value">${fn:escapeXml(upcomingCount)}</div></div>
         <div class="stat-card blue"><div class="stat-label">Pending Requests</div>
-            <div class="stat-value">${requestedEvents.size()}</div></div>
+            <div class="stat-value">${fn:escapeXml(requestedEvents.size())}</div></div>
         <div class="stat-card green"><div class="stat-label">Confirmed</div>
-            <div class="stat-value">${confirmedEvents.size()}</div></div>
+            <div class="stat-value">${fn:escapeXml(confirmedEvents.size())}</div></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
@@ -33,7 +34,7 @@
         </div>
         <!-- Monthly chart -->
         <div class="es-card">
-            <div class="card-header"><h3>Events by Month (${pageContext.request.contextPath})</h3></div>
+            <div class="card-header"><h3>Events by Month (${fn:escapeXml(pageContext.request.contextPath)})</h3></div>
             <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
         </div>
     </div>
@@ -42,7 +43,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>&#128276; Pending Booking Requests</h3>
-            <a href="${pageContext.request.contextPath}/event/list?status=Requested" class="btn btn-secondary btn-sm">View All</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/list?status=Requested" class="btn btn-secondary btn-sm">View All</a>
         </div>
         <c:choose>
             <c:when test="${empty requestedEvents}">
@@ -56,15 +57,15 @@
                         <c:forEach var="e" items="${requestedEvents}" varStatus="st">
                             <c:if test="${st.index < 5}">
                             <tr>
-                                <td><strong>${e.eventName}</strong></td>
-                                <td>${e.customerName}</td>
-                                <td>${e.categoryName}</td>
-                                <td>${e.eventDate}</td>
-                                <td>${e.guestCount}</td>
+                                <td><strong>${fn:escapeXml(e.eventName)}</strong></td>
+                                <td>${fn:escapeXml(e.customerName)}</td>
+                                <td>${fn:escapeXml(e.categoryName)}</td>
+                                <td>${fn:escapeXml(e.eventDate)}</td>
+                                <td>${fn:escapeXml(e.guestCount)}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/event/detail/${e.eventId}" class="btn btn-secondary btn-xs">Review</a>
-                                    <form action="${pageContext.request.contextPath}/event/confirm/${e.eventId}" method="post" style="display:inline;">
-                                        <input type="hidden" name="customerUserId" value="${e.customerId}">
+                                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/detail/${fn:escapeXml(e.eventId)}" class="btn btn-secondary btn-xs">Review</a>
+                                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/event/confirm/${fn:escapeXml(e.eventId)}" method="post" style="display:inline;">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                                         <button type="submit" class="btn btn-success btn-xs">Confirm</button>
                                     </form>
                                 </td>
@@ -82,7 +83,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>&#128336; Upcoming Events</h3>
-            <a href="${pageContext.request.contextPath}/event/list" class="btn btn-secondary btn-sm">All Events</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/list" class="btn btn-secondary btn-sm">All Events</a>
         </div>
         <c:choose>
             <c:when test="${empty upcomingEvents}">
@@ -96,12 +97,12 @@
                         <c:forEach var="e" items="${upcomingEvents}" varStatus="st">
                             <c:if test="${st.index < 8}">
                             <tr>
-                                <td><strong>${e.eventName}</strong></td>
-                                <td>${e.eventDate}</td>
-                                <td>${e.customerName}</td>
-                                <td>${e.guestCount}</td>
-                                <td><c:set var="s" value="${e.status.toLowerCase().replace(' ','')}"/><span class="es-badge badge-${s}">${e.status}</span></td>
-                                <td><a href="${pageContext.request.contextPath}/event/detail/${e.eventId}" class="btn btn-secondary btn-xs">View</a></td>
+                                <td><strong>${fn:escapeXml(e.eventName)}</strong></td>
+                                <td>${fn:escapeXml(e.eventDate)}</td>
+                                <td>${fn:escapeXml(e.customerName)}</td>
+                                <td>${fn:escapeXml(e.guestCount)}</td>
+                                <td><c:set var="s" value="${e.status.toLowerCase().replace(' ','')}"/><span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(e.status)}</span></td>
+                                <td><a href="${fn:escapeXml(pageContext.request.contextPath)}/event/detail/${fn:escapeXml(e.eventId)}" class="btn btn-secondary btn-xs">View</a></td>
                             </tr>
                             </c:if>
                         </c:forEach>

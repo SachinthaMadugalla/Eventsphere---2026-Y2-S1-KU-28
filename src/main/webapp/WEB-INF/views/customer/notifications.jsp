@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Notifications"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#128276; My Notifications</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard">Dashboard</a>
             &rsaquo; Notifications
         </div>
     </div>
@@ -19,7 +20,8 @@
     <div class="es-card">
         <div class="card-header">
             <h3>All Notifications</h3>
-            <form action="${pageContext.request.contextPath}/notifications/read-all" method="post">
+            <form action="${fn:escapeXml(pageContext.request.contextPath)}/notifications/read-all" method="post">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                 <button type="submit" class="btn btn-secondary btn-sm">Mark All Read</button>
             </form>
         </div>
@@ -32,13 +34,13 @@
             </c:when>
             <c:otherwise>
                 <c:forEach var="n" items="${notifications}">
-                    <div class="notif-item ${n.read ? '' : 'unread'}">
+                    <div class="notif-item ${fn:escapeXml(n.read ? '' : 'unread')}">
                         <div class="notif-icon">&#128276;</div>
                         <div class="notif-body" style="flex:1;">
-                            <div class="notif-title">${n.title}</div>
-                            <div class="notif-msg">${n.message}</div>
+                            <div class="notif-title">${fn:escapeXml(n.title)}</div>
+                            <div class="notif-msg">${fn:escapeXml(n.message)}</div>
                             <div class="notif-time">
-                                ${n.createdAt}
+                                ${fn:escapeXml(n.createdAt)}
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Reports"/>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -22,7 +23,7 @@
 
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/events"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/events"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #2C3E6B;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(44,62,107,0.12)'"
@@ -33,7 +34,7 @@
                 </div>
             </a>
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/finance"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/finance"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #38A169;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(56,161,105,0.12)'"
@@ -44,7 +45,7 @@
                 </div>
             </a>
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/venues"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/venues"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #E8A020;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(232,160,32,0.12)'"
@@ -55,7 +56,7 @@
                 </div>
             </a>
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/vendors"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/vendors"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #805AD5;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(128,90,213,0.12)'"
@@ -66,7 +67,7 @@
                 </div>
             </a>
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/staff"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/staff"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #3182CE;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(49,130,206,0.12)'"
@@ -77,7 +78,7 @@
                 </div>
             </a>
 
-            <a href="${pageContext.request.contextPath}/reporting/reports/resources"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/resources"
                style="text-decoration:none;">
                 <div class="es-card" style="margin-bottom:0;border-left:4px solid #DD6B20;
                      transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(221,107,32,0.12)'"
@@ -95,9 +96,9 @@
     <div class="es-card">
         <div class="card-header"><h3>Feedback &amp; Complaints</h3></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;">
-            <a href="${pageContext.request.contextPath}/reporting/feedback/list"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/list"
                class="btn btn-secondary">&#11088; View Feedback</a>
-            <a href="${pageContext.request.contextPath}/reporting/complaint/list"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/list"
                class="btn btn-secondary">&#9888; View Complaints</a>
         </div>
     </div>

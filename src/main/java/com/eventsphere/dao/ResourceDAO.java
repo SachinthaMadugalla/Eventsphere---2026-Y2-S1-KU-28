@@ -77,6 +77,11 @@ public class ResourceDAO {
      * and reduces available_quantity accordingly.
      */
     public int allocateResource(ResourceAllocation allocation) {
+        int reserved = jdbcTemplate.update(
+                "UPDATE resources SET available_quantity = available_quantity - ? " +
+                "WHERE resource_id = ? AND is_active = 1 AND status = 'Available' AND available_quantity >= ?",
+                allocation.getQuantity(), allocation.getResourceId(), allocation.getQuantity());
+        if (reserved == 0) return 0;
         // Insert the allocation record
         String insertSql =
             "INSERT INTO resource_allocations (event_id, resource_id, quantity, allocated_on, notes) " +
@@ -87,11 +92,6 @@ public class ResourceDAO {
                 allocation.getQuantity(),
                 allocation.getNotes());
 
-        // Reduce the available quantity
-        String updateSql =
-            "UPDATE resources SET available_quantity = available_quantity - ? " +
-            "WHERE resource_id = ?";
-        jdbcTemplate.update(updateSql, allocation.getQuantity(), allocation.getResourceId());
 
         return rows;
     }
@@ -179,15 +179,17 @@ public class ResourceDAO {
     public int updateResource(Resource resource) {
         String sql =
             "UPDATE resources SET resource_name = ?, category = ?, " +
-            "                     total_quantity = ?, status = ?, description = ? " +
-            "WHERE resource_id = ?";
+            "available_quantity = available_quantity + ? - total_quantity, " +
+            "total_quantity = ?, status = ?, description = ? " +
+            "WHERE resource_id = ? AND total_quantity - available_quantity <= ?";
         return jdbcTemplate.update(sql,
                 resource.getResourceName(),
                 resource.getCategory(),
                 resource.getTotalQuantity(),
+                resource.getTotalQuantity(),
                 resource.getStatus(),
                 resource.getDescription(),
-                resource.getResourceId());
+                resource.getResourceId(), resource.getTotalQuantity());
     }
 
     /**
@@ -219,7 +221,8 @@ public class ResourceDAO {
                 (rs, rowNum) -> new int[]{rs.getInt("resource_id"), rs.getInt("quantity")},
                 allocationId);
 
-        if (!rows.isEmpty()) {
+        int deleted = jdbcTemplate.update("DELETE FROM resource_allocations WHERE allocation_id = ?", allocationId);
+        if (deleted == 1 && !rows.isEmpty()) {
             int resourceId = rows.get(0)[0];
             int quantity   = rows.get(0)[1];
 
@@ -230,8 +233,6 @@ public class ResourceDAO {
             jdbcTemplate.update(restoreSql, quantity, resourceId);
         }
 
-        // Delete the allocation record
-        String deleteSql = "DELETE FROM resource_allocations WHERE allocation_id = ?";
-        return jdbcTemplate.update(deleteSql, allocationId);
+        return deleted;
     }
 }

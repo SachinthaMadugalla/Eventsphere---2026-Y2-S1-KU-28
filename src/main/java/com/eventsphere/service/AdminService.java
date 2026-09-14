@@ -15,9 +15,11 @@ import java.util.Optional;
 @Service
 public class AdminService {
 
+    private final com.eventsphere.dao.CustomerDAO customerDAO;
     private final UserDAO userDAO;
 
-    public AdminService(UserDAO userDAO) {
+    public AdminService(UserDAO userDAO, com.eventsphere.dao.CustomerDAO customerDAO) {
+        this.customerDAO = customerDAO;
         this.userDAO = userDAO;
     }
 
@@ -43,7 +45,16 @@ public class AdminService {
     /**
      * Changes the role of a user (e.g., promotes a user to Event Manager).
      */
+    @org.springframework.transaction.annotation.Transactional
     public void changeUserRole(int userId, int roleId) {
+        if (roleId < 1 || roleId > 7) throw new IllegalArgumentException("Invalid role");
+        User user = userDAO.findById(userId).orElseThrow();
+        if (roleId == 1 && customerDAO.findByUserId(userId).isEmpty()) {
+            com.eventsphere.model.Customer customer = new com.eventsphere.model.Customer();
+            customer.setUserId(userId); customer.setFullName(user.getFullName());
+            customer.setEmail(user.getEmail()); customer.setPhone(user.getPhone());
+            customerDAO.addCustomer(customer);
+        }
         userDAO.updateRole(userId, roleId);
     }
 

@@ -98,6 +98,26 @@ public class EventController {
 
     // ── DETAIL ─────────────────────────────────────────────────
 
+    @GetMapping("/archive")
+    public String archivedEvents(HttpSession session, Model model) {
+        User user = getUser(session);
+        if (!hasAccess(user)) return "redirect:/access-denied";
+        model.addAttribute("events", eventService.getArchivedEvents());
+        model.addAttribute("archiveView", true);
+        model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
+        return "event/list";
+    }
+
+    @PostMapping("/archive/{eventId}")
+    public String archiveEvent(@PathVariable int eventId, @RequestParam boolean archived,
+                               HttpSession session, RedirectAttributes flash) {
+        if (!hasAccess(getUser(session))) return "redirect:/access-denied";
+        String error = eventService.setArchived(eventId, archived);
+        flash.addFlashAttribute(error == null ? "success" : "error",
+                error == null ? (archived ? "Event archived. History is preserved." : "Event restored.") : error);
+        return archived ? "redirect:/event/list" : "redirect:/event/archive";
+    }
+
     @GetMapping("/detail/{eventId}")
     public String eventDetail(@PathVariable int eventId,
                               HttpSession session, Model model) {
@@ -203,13 +223,12 @@ public class EventController {
 
     @PostMapping("/confirm/{eventId}")
     public String confirmBooking(@PathVariable int eventId,
-                                 @RequestParam int customerUserId,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes) {
         User user = getUser(session);
         if (!hasAccess(user)) return "redirect:/access-denied";
 
-        eventService.confirmBooking(eventId, customerUserId);
+        eventService.confirmBooking(eventId, 0);
         redirectAttributes.addFlashAttribute("success", "Booking confirmed and customer notified.");
         return "redirect:/event/detail/" + eventId;
     }

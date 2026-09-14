@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Complaints"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#9888; Complaints</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/reports">Reports</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Complaints
         </div>
     </div>
@@ -51,16 +52,16 @@
                         <tbody>
                         <c:forEach var="c" items="${complaints}" varStatus="st">
                             <tr>
-                                <td>${st.count}</td>
-                                <td><strong>${c.subject}</strong></td>
-                                <td>${c.customerName}</td>
-                                <td>${empty c.eventName ? 'â€”' : c.eventName}</td>
+                                <td>${fn:escapeXml(st.count)}</td>
+                                <td><strong>${fn:escapeXml(c.subject)}</strong></td>
+                                <td>${fn:escapeXml(c.customerName)}</td>
+                                <td>${fn:escapeXml(empty c.eventName ? '—' : c.eventName)}</td>
                                 <td>
-                                    ${c.submittedDate}
+                                    ${fn:escapeXml(c.submittedDate)}
                                 </td>
                                 <td>
                                     <c:set var="cs" value="${c.status.toLowerCase().replace(' ','')}"/>
-                                    <span class="es-badge badge-${cs}">${c.status}</span>
+                                    <span class="es-badge badge-${fn:escapeXml(cs)}">${fn:escapeXml(c.status)}</span>
                                 </td>
                                 <td>
                                     <c:choose>
@@ -73,20 +74,22 @@
                                     </c:choose>
                                 </td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/reporting/complaint/detail/${c.complaintId}"
+                                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/detail/${fn:escapeXml(c.complaintId)}"
                                        class="btn btn-secondary btn-xs">View</a>
                                     <c:if test="${not c.escalated and (c.status == 'Submitted' or c.status == 'Under Review')}">
-                                        <form action="${pageContext.request.contextPath}/reporting/complaint/escalate/${c.complaintId}"
+                                        <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/escalate/${fn:escapeXml(c.complaintId)}"
                                               method="post" style="display:inline;"
                                               onsubmit="return confirmAction('Escalate this complaint to the Managing Director?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                                             <button type="submit" class="btn btn-warning btn-xs">
                                                 Escalate
                                             </button>
                                         </form>
                                     </c:if>
-                                    <form action="${pageContext.request.contextPath}/reporting/complaint/delete/${c.complaintId}"
+                                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/delete/${fn:escapeXml(c.complaintId)}"
                                           method="post" style="display:inline;"
                                           onsubmit="return confirmDelete('this complaint')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                                         <button type="submit" class="btn btn-danger btn-xs">Delete</button>
                                     </form>
                                 </td>

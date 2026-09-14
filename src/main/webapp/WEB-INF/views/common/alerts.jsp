@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%--
   Reusable flash alert block.
@@ -6,22 +7,22 @@
 --%>
 <c:if test="${not empty success}">
     <div class="es-alert es-alert-success auto-dismiss">
-        &#10003; ${success}
+        &#10003; ${fn:escapeXml(success)}
     </div>
 </c:if>
 <c:if test="${not empty error}">
     <div class="es-alert es-alert-error auto-dismiss">
-        &#9888; ${error}
+        &#9888; ${fn:escapeXml(error)}
     </div>
 </c:if>
 <c:if test="${not empty warning}">
     <div class="es-alert es-alert-warning auto-dismiss">
-        &#9888; ${warning}
+        &#9888; ${fn:escapeXml(warning)}
     </div>
 </c:if>
 <c:if test="${not empty info}">
     <div class="es-alert es-alert-info">
-        &#8505; ${info}
+        &#8505; ${fn:escapeXml(info)}
     </div>
 </c:if>
 

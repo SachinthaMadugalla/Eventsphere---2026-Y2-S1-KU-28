@@ -35,15 +35,15 @@ public class NotificationService {
         notificationDAO.addNotification(userId, title, message);
     }
 
-    public void markAsRead(int notificationId) {
-        notificationDAO.markAsRead(notificationId);
+    public void markAsRead(int notificationId, int userId) {
+        notificationDAO.markAsRead(notificationId, userId);
     }
 
     public void markAllAsRead(int userId) {
         notificationDAO.markAllAsRead(userId);
     }
 
-    public void deleteNotification(int notificationId) {
-        notificationDAO.deleteNotification(notificationId);
+    public void deleteNotification(int notificationId, int userId) {
+        notificationDAO.deleteNotification(notificationId, userId);
     }
 }

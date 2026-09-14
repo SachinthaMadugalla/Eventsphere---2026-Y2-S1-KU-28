@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Complaint Detail"/>
@@ -11,8 +12,8 @@
     <div class="page-header">
         <h2>&#9888; Complaint Detail</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/complaint/list">Complaints</a>
-            &rsaquo; #${complaint.complaintId}
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/list">Complaints</a>
+            &rsaquo; #${fn:escapeXml(complaint.complaintId)}
         </div>
     </div>
 
@@ -20,10 +21,10 @@
 
     <div class="es-card" style="max-width:760px;">
         <div class="card-header">
-            <h3>${complaint.subject}</h3>
+            <h3>${fn:escapeXml(complaint.subject)}</h3>
             <div style="display:flex;gap:8px;align-items:center;">
                 <c:set var="cs" value="${complaint.status.toLowerCase().replace(' ','')}"/>
-                <span class="es-badge badge-${cs}">${complaint.status}</span>
+                <span class="es-badge badge-${fn:escapeXml(cs)}">${fn:escapeXml(complaint.status)}</span>
                 <c:if test="${complaint.escalated}">
                     <span class="es-badge badge-escalated">Escalated</span>
                 </c:if>
@@ -33,22 +34,22 @@
         <div class="detail-grid">
             <div class="detail-item">
                 <div class="detail-label">Customer</div>
-                <div class="detail-value">${complaint.customerName}</div>
+                <div class="detail-value">${fn:escapeXml(complaint.customerName)}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Related Event</div>
-                <div class="detail-value">${empty complaint.eventName ? 'Not linked to event' : complaint.eventName}</div>
+                <div class="detail-value">${fn:escapeXml(empty complaint.eventName ? 'Not linked to event' : complaint.eventName)}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Submitted</div>
                 <div class="detail-value">
-                    ${complaint.submittedDate}
+                    ${fn:escapeXml(complaint.submittedDate)}
                 </div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Last Updated</div>
                 <div class="detail-value">
-                    ${complaint.updatedDate}
+                    ${fn:escapeXml(complaint.updatedDate)}
                 </div>
             </div>
         </div>
@@ -56,7 +57,7 @@
         <div class="detail-item" style="margin-top:16px;">
             <div class="detail-label">Description</div>
             <div class="detail-value" style="margin-top:6px;line-height:1.6;">
-                ${complaint.description}
+                ${fn:escapeXml(complaint.description)}
             </div>
         </div>
 
@@ -64,7 +65,7 @@
             <div class="detail-item" style="margin-top:12px;background:#F0FFF4;border-color:#9AE6B4;">
                 <div class="detail-label" style="color:#276749;">Response</div>
                 <div class="detail-value" style="margin-top:6px;line-height:1.6;">
-                    ${complaint.response}
+                    ${fn:escapeXml(complaint.response)}
                 </div>
             </div>
         </c:if>
@@ -74,24 +75,25 @@
     <c:if test="${sessionScope.userRole != 'Customer'}">
     <div class="es-card" style="max-width:760px;">
         <div class="card-header"><h3>Update Complaint</h3></div>
-        <form action="${pageContext.request.contextPath}/reporting/complaint/update/${complaint.complaintId}"
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/update/${fn:escapeXml(complaint.complaintId)}"
               method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
 
             <div class="es-form-row">
                 <div class="es-form-group">
                     <label class="required">Status</label>
                     <select name="status" class="es-select" required>
                         <c:forEach var="s" items="${['Submitted','Under Review','Resolved','Closed']}">
-                            <option value="${s}"
-                                ${complaint.status == s ? 'selected' : ''}>${s}</option>
+                            <option value="${fn:escapeXml(s)}"
+                                ${fn:escapeXml(complaint.status == s ? 'selected' : '')}>${fn:escapeXml(s)}</option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="es-form-group">
                     <label>Escalate to Managing Director</label>
                     <select name="escalated" class="es-select">
-                        <option value="false" ${!complaint.escalated ? 'selected' : ''}>No</option>
-                        <option value="true"  ${complaint.escalated  ? 'selected' : ''}>Yes</option>
+                        <option value="false" ${fn:escapeXml(!complaint.escalated ? 'selected' : '')}>No</option>
+                        <option value="true"  ${fn:escapeXml(complaint.escalated  ? 'selected' : '')}>Yes</option>
                     </select>
                 </div>
             </div>
@@ -99,15 +101,16 @@
             <div class="es-form-group">
                 <label>Response to Customer</label>
                 <textarea name="response" class="es-textarea" rows="4"
-                          placeholder="Enter your response to the customer...">${complaint.response}</textarea>
+                          placeholder="Enter your response to the customer...">${fn:escapeXml(complaint.response)}</textarea>
             </div>
 
             <div style="display:flex;gap:10px;">
                 <button type="submit" class="btn btn-primary">Save Update</button>
                 <c:if test="${not complaint.escalated}">
-                    <form action="${pageContext.request.contextPath}/reporting/complaint/escalate/${complaint.complaintId}"
+                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/escalate/${fn:escapeXml(complaint.complaintId)}"
                           method="post" style="display:inline;"
                           onsubmit="return confirmAction('Escalate to Managing Director?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                         <button type="submit" class="btn btn-warning">
                             &#9650; Escalate to Director
                         </button>
@@ -119,11 +122,12 @@
     </c:if>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="${pageContext.request.contextPath}/reporting/complaint/list"
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/list"
            class="btn btn-secondary">&#8592; Back to Complaints</a>
         <c:if test="${sessionScope.userRole != 'Customer'}">
-            <form action="${pageContext.request.contextPath}/reporting/complaint/delete/${complaint.complaintId}"
+            <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/delete/${fn:escapeXml(complaint.complaintId)}"
                   method="post" onsubmit="return confirmDelete('this complaint')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                 <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </c:if>

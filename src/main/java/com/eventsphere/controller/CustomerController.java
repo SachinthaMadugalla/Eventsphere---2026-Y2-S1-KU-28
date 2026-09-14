@@ -84,6 +84,9 @@ public class CustomerController {
         User user = getLoggedInUser(session);
         if (user == null) return "redirect:/login";
 
+        Optional<Customer> ownProfile = customerService.getCustomerByUserId(user.getUserId());
+        if (!isCustomer(user) || ownProfile.isEmpty()) return "redirect:/access-denied";
+        customer.setCustomerId(ownProfile.get().getCustomerId());
         customer.setUserId(user.getUserId());
         String error = customerService.updateCustomer(customer);
         if (error != null) {
@@ -117,6 +120,8 @@ public class CustomerController {
         Optional<Customer> optCustomer = customerService.getCustomerByUserId(user.getUserId());
         if (optCustomer.isEmpty()) return "redirect:/login";
 
+        event.setManagerUserId(null);
+        event.setNotes(null);
         event.setCustomerId(optCustomer.get().getCustomerId());
         String error = eventService.createEvent(event);
         if (error != null) {
@@ -157,6 +162,7 @@ public class CustomerController {
         Optional<Event> opt = eventService.getEventById(eventId);
         if (opt.isEmpty()) return "redirect:/customer/bookings";
 
+        if (!ownsEvent(user, opt.get())) return "redirect:/access-denied";
         model.addAttribute("event",      opt.get());
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "customer/booking-detail";
@@ -173,6 +179,7 @@ public class CustomerController {
 
         Optional<Event> opt = eventService.getEventById(eventId);
         if (opt.isPresent()) {
+            if (!ownsEvent(user, opt.get())) return "redirect:/access-denied";
             String status = opt.get().getStatus();
             if ("Requested".equals(status) || "Pending".equals(status)) {
                 eventService.cancelEvent(eventId, user.getUserId());
@@ -183,6 +190,11 @@ public class CustomerController {
             }
         }
         return "redirect:/customer/bookings";
+    }
+
+    private boolean ownsEvent(User user, Event event) {
+        return customerService.getCustomerByUserId(user.getUserId())
+                .map(c -> c.getCustomerId() == event.getCustomerId()).orElse(false);
     }
 
     // ── NOTIFICATIONS ─────────────────────────────────────────

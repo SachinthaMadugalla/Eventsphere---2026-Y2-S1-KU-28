@@ -53,6 +53,7 @@ public class AuthController {
     public String processLogin(@RequestParam String username,
                                @RequestParam String password,
                                HttpSession session,
+                               jakarta.servlet.http.HttpServletRequest request,
                                RedirectAttributes redirectAttributes) {
         User user = authService.login(username, password);
         if (user == null) {
@@ -60,6 +61,7 @@ public class AuthController {
                     "Invalid username or password, or account is inactive.");
             return "redirect:/login?error";
         }
+        request.changeSessionId();
         session.setAttribute("loggedInUser", user);
         session.setAttribute("userId",       user.getUserId());
         session.setAttribute("userRole",     user.getRoleName());
@@ -69,7 +71,7 @@ public class AuthController {
 
     // ── LOGOUT ─────────────────────────────────────────────────
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login?logout";
@@ -109,9 +111,9 @@ public class AuthController {
             case "Customer"                  -> "redirect:/customer/dashboard";
             case "Event Manager"             -> "redirect:/event/dashboard";
             case "Operations Coordinator"    -> "redirect:/operations/dashboard";
-            case "Customer Relations Officer"-> "redirect:/cro/dashboard";
+            case "Customer Relations Officer"-> "redirect:/reporting/cro/dashboard";
             case "Finance Manager"           -> "redirect:/finance/dashboard";
-            case "Managing Director"         -> "redirect:/director/dashboard";
+            case "Managing Director"         -> "redirect:/reporting/director/dashboard";
             case "System Administrator"      -> "redirect:/admin/dashboard";
             default                          -> "redirect:/login";
         };

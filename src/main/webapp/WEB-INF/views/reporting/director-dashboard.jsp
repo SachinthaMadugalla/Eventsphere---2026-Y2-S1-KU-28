@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Managing Director Dashboard"/>
@@ -19,14 +20,14 @@
     <div class="stat-cards">
         <div class="stat-card">
             <div class="stat-label">Total Events</div>
-            <div class="stat-value">${totalEvents}</div>
+            <div class="stat-value">${fn:escapeXml(totalEvents)}</div>
         </div>
         <div class="stat-card gold">
             <div class="stat-label">Upcoming Events</div>
-            <div class="stat-value">${upcomingEvents.size()}</div>
+            <div class="stat-value">${fn:escapeXml(upcomingEvents.size())}</div>
         </div>
         <div class="stat-card green">
-            <div class="stat-label">Total Revenue (Paid)</div>
+            <div class="stat-label">Total Invoiced</div>
             <div class="stat-value" style="font-size:16px;">
                 LKR <fmt:formatNumber value="${totalRevenue}" type="number" groupingUsed="true"/>
             </div>
@@ -45,7 +46,7 @@
         </div>
         <div class="stat-card red">
             <div class="stat-label">Open Complaints</div>
-            <div class="stat-value">${openComplaints}</div>
+            <div class="stat-value">${fn:escapeXml(openComplaints)}</div>
         </div>
     </div>
 
@@ -72,7 +73,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>&#128336; Upcoming Events</h3>
-            <a href="${pageContext.request.contextPath}/event/list" class="btn btn-secondary btn-sm">
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/list" class="btn btn-secondary btn-sm">
                 View All
             </a>
         </div>
@@ -97,16 +98,16 @@
                         <c:forEach var="e" items="${upcomingEvents}" varStatus="st">
                             <c:if test="${st.index < 8}">
                             <tr>
-                                <td><strong>${e.eventName}</strong></td>
-                                <td>${e.categoryName}</td>
+                                <td><strong>${fn:escapeXml(e.eventName)}</strong></td>
+                                <td>${fn:escapeXml(e.categoryName)}</td>
                                 <td>
-                                    ${e.eventDate}
+                                    ${fn:escapeXml(e.eventDate)}
                                 </td>
-                                <td>${e.guestCount}</td>
-                                <td>${empty e.managerName ? 'â€”' : e.managerName}</td>
+                                <td>${fn:escapeXml(e.guestCount)}</td>
+                                <td>${fn:escapeXml(empty e.managerName ? '—' : e.managerName)}</td>
                                 <td>
                                     <c:set var="s" value="${e.status.toLowerCase().replace(' ','')}"/>
-                                    <span class="es-badge badge-${s}">${e.status}</span>
+                                    <span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(e.status)}</span>
                                 </td>
                             </tr>
                             </c:if>
@@ -122,7 +123,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>&#9888; Escalated Complaints Requiring Attention</h3>
-            <a href="${pageContext.request.contextPath}/reporting/complaint/list"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/list"
                class="btn btn-secondary btn-sm">All Complaints</a>
         </div>
         <c:choose>
@@ -134,7 +135,7 @@
             </c:when>
             <c:otherwise>
                 <div class="es-alert es-alert-error">
-                    &#9888; <strong>${escalatedComplaints.size()} complaint(s)</strong>
+                    &#9888; <strong>${fn:escapeXml(escalatedComplaints.size())} complaint(s)</strong>
                     have been escalated and require your review.
                 </div>
                 <div class="es-table-wrap">
@@ -152,18 +153,18 @@
                         <tbody>
                         <c:forEach var="comp" items="${escalatedComplaints}">
                             <tr>
-                                <td><strong>${comp.subject}</strong></td>
-                                <td>${comp.customerName}</td>
-                                <td>${empty comp.eventName ? 'â€”' : comp.eventName}</td>
+                                <td><strong>${fn:escapeXml(comp.subject)}</strong></td>
+                                <td>${fn:escapeXml(comp.customerName)}</td>
+                                <td>${fn:escapeXml(empty comp.eventName ? '—' : comp.eventName)}</td>
                                 <td>
                                     <c:set var="cs" value="${comp.status.toLowerCase().replace(' ','')}"/>
-                                    <span class="es-badge badge-${cs}">${comp.status}</span>
+                                    <span class="es-badge badge-${fn:escapeXml(cs)}">${fn:escapeXml(comp.status)}</span>
                                 </td>
                                 <td>
-                                    ${comp.submittedDate}
+                                    ${fn:escapeXml(comp.submittedDate)}
                                 </td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/reporting/complaint/detail/${comp.complaintId}"
+                                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/detail/${fn:escapeXml(comp.complaintId)}"
                                        class="btn btn-danger btn-xs">Review</a>
                                 </td>
                             </tr>
@@ -179,17 +180,17 @@
     <div class="es-card">
         <div class="card-header"><h3>&#128200; Reports</h3></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;">
-            <a href="${pageContext.request.contextPath}/reporting/reports/events"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/events"
                class="btn btn-secondary">Event Report</a>
-            <a href="${pageContext.request.contextPath}/reporting/reports/finance"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/finance"
                class="btn btn-secondary">Finance Report</a>
-            <a href="${pageContext.request.contextPath}/reporting/reports/venues"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/venues"
                class="btn btn-secondary">Venue Usage</a>
-            <a href="${pageContext.request.contextPath}/reporting/reports/vendors"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/vendors"
                class="btn btn-secondary">Vendor Usage</a>
-            <a href="${pageContext.request.contextPath}/reporting/reports/staff"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/staff"
                class="btn btn-secondary">Staff Allocation</a>
-            <a href="${pageContext.request.contextPath}/reporting/reports/resources"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports/resources"
                class="btn btn-secondary">Resource Usage</a>
         </div>
     </div>
@@ -206,9 +207,7 @@
             </div>
             <div>
                 <span style="color:#E8A020;font-size:28px;">
-                    <c:set var="ratingRounded"
-                           value="${Math.round(averageRating)}"
-                           xmlns:Math="http://java.sun.com/jsp/jstl/functions"/>
+
                     <c:forEach begin="1" end="5" varStatus="i">
                         <c:choose>
                             <c:when test="${i.index <= averageRating}">&#9733;</c:when>
@@ -218,7 +217,7 @@
                 </span>
             </div>
         </div>
-        <a href="${pageContext.request.contextPath}/reporting/feedback/list"
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/list"
            class="btn btn-secondary btn-sm">View All Feedback</a>
     </div>
 

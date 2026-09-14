@@ -195,8 +195,8 @@ public class VenueDAO {
             "  AND ev.assigned_date = ? " +
             "  AND ev.event_venue_id <> ? " +
             "  AND e.status NOT IN ('Cancelled') " +
-            "  AND ev.start_time < ? " +
-            "  AND ev.end_time   > ?";
+            "  AND (ev.start_time IS NULL OR ev.start_time < ?) " +
+            "  AND (ev.end_time IS NULL OR ev.end_time > ?)";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
                 venueId, date, excludeEventVenueId, endTime, startTime);
         return count != null ? count : 0;

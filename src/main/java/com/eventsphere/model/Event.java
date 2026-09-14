@@ -10,6 +10,10 @@ import java.time.LocalTime;
  */
 public class Event {
 
+    private boolean archived;
+    public boolean isArchived() { return archived; }
+    public void setArchived(boolean archived) { this.archived = archived; }
+
     private int eventId;
     private String eventName;
     private int categoryId;

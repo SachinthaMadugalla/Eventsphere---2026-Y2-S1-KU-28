@@ -85,9 +85,9 @@ public class NotificationDAO {
     /**
      * Marks a single notification as read.
      */
-    public int markAsRead(int notificationId) {
-        String sql = "UPDATE notifications SET is_read = 1 WHERE notification_id = ?";
-        return jdbcTemplate.update(sql, notificationId);
+    public int markAsRead(int notificationId, int userId) {
+        String sql = "UPDATE notifications SET is_read = 1 WHERE notification_id = ? AND user_id = ?";
+        return jdbcTemplate.update(sql, notificationId, userId);
     }
 
     /**
@@ -103,8 +103,8 @@ public class NotificationDAO {
     /**
      * Deletes a notification by ID.
      */
-    public int deleteNotification(int notificationId) {
-        String sql = "DELETE FROM notifications WHERE notification_id = ?";
-        return jdbcTemplate.update(sql, notificationId);
+    public int deleteNotification(int notificationId, int userId) {
+        String sql = "DELETE FROM notifications WHERE notification_id = ? AND user_id = ?";
+        return jdbcTemplate.update(sql, notificationId, userId);
     }
 }

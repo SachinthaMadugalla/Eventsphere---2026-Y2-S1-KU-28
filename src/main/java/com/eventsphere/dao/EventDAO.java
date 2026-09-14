@@ -27,6 +27,7 @@ public class EventDAO {
     private final RowMapper<Event> eventRowMapper = (rs, rowNum) -> {
         Event e = new Event();
         e.setEventId(rs.getInt("event_id"));
+        e.setArchived(rs.getBoolean("is_archived"));
         e.setEventName(rs.getString("event_name"));
         e.setCategoryId(rs.getInt("category_id"));
         e.setCategoryName(rs.getString("category_name"));
@@ -68,7 +69,7 @@ public class EventDAO {
         "       e.manager_user_id, u.full_name AS manager_name, " +
         "       e.event_date, e.start_time, e.end_time, e.location, " +
         "       e.guest_count, e.requirements, e.status, e.notes, " +
-        "       e.created_at, e.updated_at " +
+        "       e.created_at, e.updated_at, e.is_archived " +
         "FROM events e " +
         "JOIN event_categories ec ON e.category_id = ec.category_id " +
         "JOIN customers c         ON e.customer_id  = c.customer_id " +
@@ -117,7 +118,7 @@ public class EventDAO {
      * Returns all events.
      */
     public List<Event> findAll() {
-        String sql = BASE_SELECT + "ORDER BY e.event_date DESC";
+        String sql = BASE_SELECT + "WHERE e.is_archived = 0 ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, eventRowMapper);
     }
 
@@ -130,12 +131,20 @@ public class EventDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
+    public List<Event> findArchived() {
+        return jdbcTemplate.query(BASE_SELECT + "WHERE e.is_archived = 1 ORDER BY e.event_date DESC", eventRowMapper);
+    }
+
+    public int setArchived(int eventId, boolean archived) {
+        return jdbcTemplate.update("UPDATE events SET is_archived=?, updated_at=GETDATE() WHERE event_id=? AND status IN ('Completed','Cancelled')", archived, eventId);
+    }
+
     /**
      * Returns all events belonging to a specific customer.
      */
     public List<Event> findByCustomerId(int customerId) {
         String sql = BASE_SELECT +
-            "WHERE e.customer_id = ? ORDER BY e.event_date DESC";
+            "WHERE e.is_archived = 0 AND e.customer_id = ? ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, eventRowMapper, customerId);
     }
 
@@ -144,7 +153,7 @@ public class EventDAO {
      */
     public List<Event> findByManagerId(int managerUserId) {
         String sql = BASE_SELECT +
-            "WHERE e.manager_user_id = ? ORDER BY e.event_date DESC";
+            "WHERE e.is_archived = 0 AND e.manager_user_id = ? ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, eventRowMapper, managerUserId);
     }
 
@@ -153,7 +162,7 @@ public class EventDAO {
      */
     public List<Event> findByStatus(String status) {
         String sql = BASE_SELECT +
-            "WHERE e.status = ? ORDER BY e.event_date ASC";
+            "WHERE e.is_archived = 0 AND e.status = ? ORDER BY e.event_date ASC";
         return jdbcTemplate.query(sql, eventRowMapper, status);
     }
 
@@ -162,7 +171,7 @@ public class EventDAO {
      */
     public List<Event> findUpcoming() {
         String sql = BASE_SELECT +
-            "WHERE e.event_date >= CAST(GETDATE() AS DATE) " +
+            "WHERE e.is_archived = 0 AND e.event_date >= CAST(GETDATE() AS DATE) " +
             "  AND e.status NOT IN ('Cancelled', 'Completed') " +
             "ORDER BY e.event_date ASC";
         return jdbcTemplate.query(sql, eventRowMapper);
@@ -173,7 +182,7 @@ public class EventDAO {
      */
     public List<Event> search(String keyword) {
         String sql = BASE_SELECT +
-            "WHERE e.event_name LIKE ? OR c.full_name LIKE ? " +
+            "WHERE e.is_archived = 0 AND (e.event_name LIKE ? OR c.full_name LIKE ?) " +
             "ORDER BY e.event_date DESC";
         String pattern = "%" + keyword + "%";
         return jdbcTemplate.query(sql, eventRowMapper, pattern, pattern);
@@ -185,7 +194,7 @@ public class EventDAO {
      */
     public List<Object[]> countByStatus() {
         String sql =
-            "SELECT status, COUNT(*) AS cnt FROM events GROUP BY status";
+            "SELECT status, COUNT(*) AS cnt FROM events WHERE is_archived = 0 GROUP BY status";
         return jdbcTemplate.query(sql,
                 (rs, rowNum) -> new Object[]{rs.getString("status"), rs.getInt("cnt")});
     }
@@ -197,7 +206,7 @@ public class EventDAO {
         String sql =
             "SELECT MONTH(event_date) AS month_num, COUNT(*) AS cnt " +
             "FROM events " +
-            "WHERE YEAR(event_date) = ? " +
+            "WHERE is_archived = 0 AND YEAR(event_date) = ? " +
             "GROUP BY MONTH(event_date) " +
             "ORDER BY MONTH(event_date)";
         return jdbcTemplate.query(sql,
@@ -267,14 +276,14 @@ public class EventDAO {
     // ── COUNT ──────────────────────────────────────────────────
 
     public int countAll() {
-        String sql = "SELECT COUNT(*) FROM events";
+        String sql = "SELECT COUNT(*) FROM events WHERE is_archived = 0";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
     public int countUpcoming() {
         String sql =
             "SELECT COUNT(*) FROM events " +
-            "WHERE event_date >= CAST(GETDATE() AS DATE) " +
+            "WHERE is_archived = 0 AND event_date >= CAST(GETDATE() AS DATE) " +
             "  AND status NOT IN ('Cancelled','Completed')";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
