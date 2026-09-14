@@ -14,6 +14,7 @@ import java.util.Optional;
  * Contains venue business logic and conflict detection.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class VenueService {
 
     private final VenueDAO venueDAO;
@@ -67,10 +68,16 @@ public class VenueService {
      *
      * @return null on success, error message if conflict or invalid
      */
+    @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignVenueToEvent(EventVenue ev, int eventGuestCount) {
+        if (ev.getAssignedDate() == null) return "Assignment date is required.";
+        if (ev.getStartTime() == null) ev.setStartTime(java.time.LocalTime.MIN);
+        if (ev.getEndTime() == null) ev.setEndTime(java.time.LocalTime.of(23, 59, 59));
+        if (!ev.getEndTime().isAfter(ev.getStartTime())) return "End time must be after start time.";
 
         // Capacity check
         Optional<Venue> optVenue = venueDAO.findById(ev.getVenueId());
+        if (optVenue.isEmpty() || !optVenue.get().isActive()) return "Venue is unavailable.";
         if (optVenue.isPresent()) {
             Venue venue = optVenue.get();
             if (venue.getCapacity() < eventGuestCount) {

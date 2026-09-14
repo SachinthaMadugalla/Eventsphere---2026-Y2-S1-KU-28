@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Access Denied"/>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -12,7 +13,7 @@
         <p style="color:#718096;margin-bottom:24px;">
             You do not have permission to view this page.
         </p>
-        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/dashboard" class="btn btn-primary">
             &#8592; Back to Dashboard
         </a>
     </div>

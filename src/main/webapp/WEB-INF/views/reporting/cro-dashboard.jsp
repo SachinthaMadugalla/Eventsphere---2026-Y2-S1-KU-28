@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="CRO Dashboard"/>
@@ -19,15 +20,15 @@
     <div class="stat-cards">
         <div class="stat-card">
             <div class="stat-label">Total Customers</div>
-            <div class="stat-value">${customers.size()}</div>
+            <div class="stat-value">${fn:escapeXml(customers.size())}</div>
         </div>
         <div class="stat-card gold">
             <div class="stat-label">Total Feedback</div>
-            <div class="stat-value">${feedbackList.size()}</div>
+            <div class="stat-value">${fn:escapeXml(feedbackList.size())}</div>
         </div>
         <div class="stat-card red">
             <div class="stat-label">Open Complaints</div>
-            <div class="stat-value">${openComplaints}</div>
+            <div class="stat-value">${fn:escapeXml(openComplaints)}</div>
         </div>
         <div class="stat-card green">
             <div class="stat-label">Avg. Rating</div>
@@ -43,7 +44,7 @@
         <div class="es-card">
             <div class="card-header">
                 <h3>&#9888; Recent Complaints</h3>
-                <a href="${pageContext.request.contextPath}/reporting/complaint/list"
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/list"
                    class="btn btn-secondary btn-sm">View All</a>
             </div>
             <c:choose>
@@ -69,20 +70,20 @@
                             <c:forEach var="c" items="${recentComplaints}" varStatus="st">
                                 <c:if test="${st.index < 6}">
                                 <tr>
-                                    <td>${c.subject}</td>
-                                    <td>${c.customerName}</td>
+                                    <td>${fn:escapeXml(c.subject)}</td>
+                                    <td>${fn:escapeXml(c.customerName)}</td>
                                     <td>
                                         <c:set var="cs" value="${c.status.toLowerCase().replace(' ','')}"/>
-                                        <span class="es-badge badge-${cs}">${c.status}</span>
+                                        <span class="es-badge badge-${fn:escapeXml(cs)}">${fn:escapeXml(c.status)}</span>
                                         <c:if test="${c.escalated}">
                                             <span class="es-badge badge-escalated" style="margin-left:4px;">Escalated</span>
                                         </c:if>
                                     </td>
                                     <td>
-                                        ${c.submittedDate}
+                                        ${fn:escapeXml(c.submittedDate)}
                                     </td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/reporting/complaint/detail/${c.complaintId}"
+                                        <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/detail/${fn:escapeXml(c.complaintId)}"
                                            class="btn btn-secondary btn-xs">View</a>
                                     </td>
                                 </tr>
@@ -99,7 +100,7 @@
         <div class="es-card">
             <div class="card-header">
                 <h3>&#11088; Recent Feedback</h3>
-                <a href="${pageContext.request.contextPath}/reporting/feedback/list"
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/list"
                    class="btn btn-secondary btn-sm">View All</a>
             </div>
             <c:choose>
@@ -125,8 +126,8 @@
                             <c:forEach var="f" items="${feedbackList}" varStatus="st">
                                 <c:if test="${st.index < 6}">
                                 <tr>
-                                    <td>${f.eventName}</td>
-                                    <td>${f.customerName}</td>
+                                    <td>${fn:escapeXml(f.eventName)}</td>
+                                    <td>${fn:escapeXml(f.customerName)}</td>
                                     <td>
                                         <span style="color:#E8A020;font-size:13px;">
                                             <c:forEach begin="1" end="${f.rating}">&#9733;</c:forEach>
@@ -136,10 +137,10 @@
                                         </span>
                                     </td>
                                     <td>
-                                        ${f.submittedDate}
+                                        ${fn:escapeXml(f.submittedDate)}
                                     </td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/reporting/feedback/detail/${f.feedbackId}"
+                                        <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/detail/${fn:escapeXml(f.feedbackId)}"
                                            class="btn btn-secondary btn-xs">View</a>
                                     </td>
                                 </tr>
@@ -175,13 +176,13 @@
                 <tbody>
                 <c:forEach var="cust" items="${customers}" varStatus="st">
                     <tr>
-                        <td>${st.count}</td>
-                        <td><strong>${cust.fullName}</strong></td>
-                        <td>${cust.email}</td>
-                        <td>${empty cust.phone ? 'â€”' : cust.phone}</td>
-                        <td>${empty cust.address ? 'â€”' : cust.address}</td>
+                        <td>${fn:escapeXml(st.count)}</td>
+                        <td><strong>${fn:escapeXml(cust.fullName)}</strong></td>
+                        <td>${fn:escapeXml(cust.email)}</td>
+                        <td>${fn:escapeXml(empty cust.phone ? '—' : cust.phone)}</td>
+                        <td>${fn:escapeXml(empty cust.address ? '—' : cust.address)}</td>
                         <td>
-                            ${cust.registeredAt}
+                            ${fn:escapeXml(cust.registeredAt)}
                         </td>
                     </tr>
                 </c:forEach>

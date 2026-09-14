@@ -21,19 +21,24 @@ import java.util.Optional;
  * Handles budgets, expenses, invoices, and payments.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class FinanceService {
 
+    private final com.eventsphere.dao.EventDAO eventDAO;
+    private final com.eventsphere.dao.CustomerDAO customerDAO;
     private final BudgetDAO budgetDAO;
     private final ExpenseDAO expenseDAO;
     private final InvoiceDAO invoiceDAO;
     private final PaymentDAO paymentDAO;
     private final NotificationDAO notificationDAO;
 
-    public FinanceService(BudgetDAO budgetDAO,
+    public FinanceService(com.eventsphere.dao.EventDAO eventDAO, com.eventsphere.dao.CustomerDAO customerDAO, BudgetDAO budgetDAO,
                           ExpenseDAO expenseDAO,
                           InvoiceDAO invoiceDAO,
                           PaymentDAO paymentDAO,
                           NotificationDAO notificationDAO) {
+        this.eventDAO = eventDAO;
+        this.customerDAO = customerDAO;
         this.budgetDAO        = budgetDAO;
         this.expenseDAO       = expenseDAO;
         this.invoiceDAO       = invoiceDAO;
@@ -65,6 +70,8 @@ public class FinanceService {
         if (budgetDAO.findByEventId(budget.getEventId()).isPresent()) {
             return "A budget already exists for this event.";
         }
+        if (budget.getEstimatedCost() == null) budget.setEstimatedCost(BigDecimal.ZERO);
+        budget.setActualCost(expenseDAO.getTotalByEventId(budget.getEventId()));
         budgetDAO.addBudget(budget);
         return null;
     }
@@ -76,6 +83,10 @@ public class FinanceService {
         if (budget.getTotalBudget() == null || budget.getTotalBudget().compareTo(BigDecimal.ZERO) < 0) {
             return "Budget amount cannot be negative.";
         }
+        Budget existing = budgetDAO.findById(budget.getBudgetId()).orElseThrow();
+        budget.setEventId(existing.getEventId());
+        if (budget.getEstimatedCost() == null) budget.setEstimatedCost(BigDecimal.ZERO);
+        budget.setActualCost(expenseDAO.getTotalByEventId(existing.getEventId()));
         budgetDAO.updateBudget(budget);
         return null;
     }
@@ -113,12 +124,18 @@ public class FinanceService {
         if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             return "Expense amount must be greater than zero.";
         }
+        if (expense.getExpenseDate() == null || expense.getDescription() == null || expense.getDescription().isBlank())
+            return "Description and expense date are required.";
+        expense.setEventId(expenseDAO.findById(expense.getExpenseId()).orElseThrow().getEventId());
         expenseDAO.updateExpense(expense);
         budgetDAO.recalculateActualCost(expense.getEventId());
         return null;
     }
 
     public void deleteExpense(int expenseId, int eventId) {
+        Optional<Expense> existing = expenseDAO.findById(expenseId);
+        if (existing.isEmpty()) return;
+        eventId = existing.get().getEventId();
         expenseDAO.deleteExpense(expenseId);
         budgetDAO.recalculateActualCost(eventId);
     }
@@ -141,13 +158,18 @@ public class FinanceService {
         if (invoice.getTotalAmount() == null || invoice.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0) {
             return "Invoice total must be greater than zero.";
         }
+        if (eventDAO.findById(invoice.getEventId()).filter(e -> e.getCustomerId() == invoice.getCustomerId()).isEmpty())
+            return "Select the customer who owns this event.";
+        if (invoice.getDueDate() != null && invoice.getIssuedDate() != null && invoice.getDueDate().isBefore(invoice.getIssuedDate()))
+            return "Due date cannot be before the invoice date.";
         // Auto-generate invoice number if not set
         if (invoice.getInvoiceNumber() == null || invoice.getInvoiceNumber().trim().isEmpty()) {
-            invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
+            invoice.setInvoiceNumber("INV-" + java.util.UUID.randomUUID());
         }
         if (invoice.getIssuedDate() == null) {
             invoice.setIssuedDate(LocalDate.now());
         }
+        invoice.setStatus("Pending");
         invoiceDAO.addInvoice(invoice);
         return null;
     }
@@ -156,6 +178,14 @@ public class FinanceService {
         if (invoice.getTotalAmount() == null || invoice.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0) {
             return "Invoice total must be greater than zero.";
         }
+        Optional<Invoice> existing = invoiceDAO.findById(invoice.getInvoiceId());
+        if (existing.isEmpty()) return "Invoice not found.";
+        if (invoice.getDueDate() != null && existing.get().getIssuedDate() != null
+                && invoice.getDueDate().isBefore(existing.get().getIssuedDate()))
+            return "Due date cannot be before the invoice date.";
+        BigDecimal paid = invoiceDAO.getTotalPaid(invoice.getInvoiceId());
+        if (invoice.getTotalAmount().compareTo(paid) < 0) return "Invoice total cannot be less than payments received.";
+        invoice.setStatus(paymentStatus(paid, invoice.getTotalAmount()));
         invoiceDAO.updateInvoice(invoice);
         return null;
     }
@@ -186,6 +216,7 @@ public class FinanceService {
     /**
      * Records a payment and automatically updates the invoice status.
      */
+    @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String recordPayment(Payment payment, int customerUserId) {
         if (payment.getAmount() == null || payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             return "Payment amount must be greater than zero.";
@@ -196,6 +227,7 @@ public class FinanceService {
 
         // Check total paid + new payment doesn't exceed invoice total
         Optional<Invoice> optInvoice = invoiceDAO.findById(payment.getInvoiceId());
+        if (optInvoice.isEmpty()) return "Invoice not found.";
         if (optInvoice.isPresent()) {
             Invoice invoice = optInvoice.get();
             BigDecimal alreadyPaid = invoiceDAO.getTotalPaid(payment.getInvoiceId());
@@ -206,6 +238,9 @@ public class FinanceService {
                        invoice.getTotalAmount().subtract(alreadyPaid);
             }
 
+            payment.setEventId(invoice.getEventId());
+            payment.setCustomerId(invoice.getCustomerId());
+            customerUserId = customerDAO.findById(invoice.getCustomerId()).orElseThrow().getUserId();
             paymentDAO.addPayment(payment);
 
             // Update invoice status
@@ -226,7 +261,17 @@ public class FinanceService {
     }
 
     public void deletePayment(int paymentId) {
+        Optional<Payment> payment = paymentDAO.findById(paymentId);
+        if (payment.isEmpty()) return;
+        int invoiceId = payment.get().getInvoiceId();
         paymentDAO.deletePayment(paymentId);
+        Invoice invoice = invoiceDAO.findById(invoiceId).orElseThrow();
+        invoiceDAO.updateStatus(invoiceId, paymentStatus(invoiceDAO.getTotalPaid(invoiceId), invoice.getTotalAmount()));
+    }
+
+    private String paymentStatus(BigDecimal paid, BigDecimal total) {
+        if (paid.signum() == 0) return "Pending";
+        return paid.compareTo(total) >= 0 ? "Paid" : "Partially Paid";
     }
 
     // ── SUMMARY ────────────────────────────────────────────────

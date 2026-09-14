@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Resource Usage Report"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#128230; Resource Usage Report</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/reports">Reports</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Resource Usage
         </div>
     </div>
@@ -24,7 +25,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Resource Availability</h3>
-            <span style="font-size:12px;color:#718096;">${resources.size()} resource(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(resources.size())} resource(s)</span>
         </div>
         <div class="es-table-wrap">
             <table class="es-table">
@@ -43,17 +44,17 @@
                 <c:forEach var="r" items="${resources}" varStatus="st">
                     <c:set var="allocated" value="${r.totalQuantity - r.availableQuantity}"/>
                     <tr>
-                        <td>${st.count}</td>
-                        <td><strong>${r.resourceName}</strong></td>
-                        <td>${empty r.category ? 'â€”' : r.category}</td>
-                        <td>${r.totalQuantity}</td>
-                        <td style="${r.availableQuantity <= 0 ? 'color:#E53E3E;font-weight:700;' : ''}">
-                            ${r.availableQuantity}
+                        <td>${fn:escapeXml(st.count)}</td>
+                        <td><strong>${fn:escapeXml(r.resourceName)}</strong></td>
+                        <td>${fn:escapeXml(empty r.category ? '—' : r.category)}</td>
+                        <td>${fn:escapeXml(r.totalQuantity)}</td>
+                        <td style="${fn:escapeXml(r.availableQuantity <= 0 ? 'color:#E53E3E;font-weight:700;' : '')}">
+                            ${fn:escapeXml(r.availableQuantity)}
                         </td>
-                        <td>${allocated}</td>
+                        <td>${fn:escapeXml(allocated)}</td>
                         <td>
-                            <span class="es-badge ${r.active ? 'badge-active' : 'badge-inactive'}">
-                                ${r.active ? 'Active' : 'Inactive'}
+                            <span class="es-badge ${fn:escapeXml(r.active ? 'badge-active' : 'badge-inactive')}">
+                                ${fn:escapeXml(r.active ? 'Active' : 'Inactive')}
                             </span>
                         </td>
                     </tr>
@@ -67,7 +68,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Allocation History</h3>
-            <span style="font-size:12px;color:#718096;">${allocations.size()} allocation(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(allocations.size())} allocation(s)</span>
         </div>
         <c:choose>
             <c:when test="${empty allocations}">
@@ -92,14 +93,14 @@
                         <tbody>
                         <c:forEach var="a" items="${allocations}" varStatus="st">
                             <tr>
-                                <td>${st.count}</td>
-                                <td><strong>${a.resourceName}</strong></td>
-                                <td>${a.eventName}</td>
-                                <td>${a.quantity}</td>
+                                <td>${fn:escapeXml(st.count)}</td>
+                                <td><strong>${fn:escapeXml(a.resourceName)}</strong></td>
+                                <td>${fn:escapeXml(a.eventName)}</td>
+                                <td>${fn:escapeXml(a.quantity)}</td>
                                 <td>
-                                    ${a.allocatedOn}
+                                    ${fn:escapeXml(a.allocatedOn)}
                                 </td>
-                                <td>${empty a.notes ? 'â€”' : a.notes}</td>
+                                <td>${fn:escapeXml(empty a.notes ? '—' : a.notes)}</td>
                             </tr>
                         </c:forEach>
                         </tbody>

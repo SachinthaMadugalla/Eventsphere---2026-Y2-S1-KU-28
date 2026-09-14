@@ -16,6 +16,7 @@ import java.util.Optional;
  * Handles BCrypt hashing and simple role-based account setup.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class AuthService {
 
     private final UserDAO userDAO;
@@ -106,6 +107,7 @@ public class AuthService {
      * @return the User object if login succeeds, null otherwise
      */
     public User login(String username, String password) {
+        if (username == null || password == null) return null;
         Optional<User> optUser = userDAO.findByUsername(username.trim());
         if (optUser.isEmpty()) {
             return null;  // User not found

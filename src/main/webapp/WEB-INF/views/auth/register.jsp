@@ -1,12 +1,13 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register â€“ EventSphere</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/eventsphere.css">
+    <title>Register – EventSphere</title>
+    <link rel="stylesheet" href="${fn:escapeXml(pageContext.request.contextPath)}/static/css/eventsphere.css">
 </head>
 <body>
 <div class="auth-page">
@@ -17,42 +18,43 @@
         </div>
 
         <c:if test="${not empty error}">
-            <div class="es-alert es-alert-error">${error}</div>
+            <div class="es-alert es-alert-error">${fn:escapeXml(error)}</div>
         </c:if>
         <c:if test="${not empty success}">
-            <div class="es-alert es-alert-success">${success}</div>
+            <div class="es-alert es-alert-success">${fn:escapeXml(success)}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/register" method="post" class="es-validate">
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/register" method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-row">
                 <div class="es-form-group">
                     <label class="required">Full Name</label>
                     <input type="text" name="fullName" class="es-input"
-                           value="${registration.fullName}" placeholder="Your full name" required>
+                           value="${fn:escapeXml(registration.fullName)}" placeholder="Your full name" required>
                 </div>
                 <div class="es-form-group">
                     <label class="required">Username</label>
                     <input type="text" name="username" class="es-input"
-                           value="${registration.username}" placeholder="Choose a username" required>
+                           value="${fn:escapeXml(registration.username)}" placeholder="Choose a username" required>
                 </div>
             </div>
 
             <div class="es-form-group">
                 <label class="required">Email Address</label>
                 <input type="email" name="email" class="es-input"
-                       value="${registration.email}" placeholder="your@email.com" required>
+                       value="${fn:escapeXml(registration.email)}" placeholder="your@email.com" required>
             </div>
 
             <div class="es-form-group">
                 <label>Phone Number</label>
                 <input type="text" name="phone" class="es-input"
-                       value="${registration.phone}" placeholder="07XXXXXXXX">
+                       value="${fn:escapeXml(registration.phone)}" placeholder="07XXXXXXXX">
             </div>
 
             <div class="es-form-group">
                 <label>Address</label>
                 <input type="text" name="address" class="es-input"
-                       value="${registration.address}" placeholder="Your address">
+                       value="${fn:escapeXml(registration.address)}" placeholder="Your address">
             </div>
 
             <div class="es-form-row">
@@ -77,7 +79,7 @@
 
         <div style="text-align:center;margin-top:16px;font-size:13px;color:#718096;">
             Already have an account?
-            <a href="${pageContext.request.contextPath}/login" style="color:#E8A020;font-weight:600;">
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/login" style="color:#E8A020;font-weight:600;">
                 Sign in
             </a>
         </div>

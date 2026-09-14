@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Resources"/>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -11,7 +12,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>All Resources</h3>
-            <a href="${pageContext.request.contextPath}/resource/create" class="btn btn-accent btn-sm">+ Add Resource</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/resource/create" class="btn btn-accent btn-sm">+ Add Resource</a>
         </div>
         <div class="es-table-wrap">
             <table class="es-table">
@@ -19,25 +20,27 @@
                 <tbody>
                 <c:forEach var="r" items="${resources}" varStatus="st">
                     <tr>
-                        <td>${st.count}</td>
-                        <td><strong>${r.resourceName}</strong></td>
-                        <td>${empty r.category ? 'â€”' : r.category}</td>
-                        <td>${r.totalQuantity}</td>
+                        <td>${fn:escapeXml(st.count)}</td>
+                        <td><strong>${fn:escapeXml(r.resourceName)}</strong></td>
+                        <td>${fn:escapeXml(empty r.category ? '—' : r.category)}</td>
+                        <td>${fn:escapeXml(r.totalQuantity)}</td>
                         <td>
                             <c:choose>
                                 <c:when test="${r.availableQuantity <= 0}"><span style="color:#E53E3E;font-weight:600;">0</span></c:when>
-                                <c:otherwise>${r.availableQuantity}</c:otherwise>
+                                <c:otherwise>${fn:escapeXml(r.availableQuantity)}</c:otherwise>
                             </c:choose>
                         </td>
-                        <td><span class="es-badge ${r.active ? 'badge-active' : 'badge-inactive'}">${r.active ? 'Active' : 'Inactive'}</span></td>
+                        <td><span class="es-badge ${fn:escapeXml(r.active ? 'badge-active' : 'badge-inactive')}">${fn:escapeXml(r.active ? 'Active' : 'Inactive')}</span></td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/resource/detail/${r.resourceId}" class="btn btn-secondary btn-xs">View</a>
-                            <a href="${pageContext.request.contextPath}/resource/edit/${r.resourceId}" class="btn btn-primary btn-xs">Edit</a>
-                            <form action="${pageContext.request.contextPath}/resource/toggle/${r.resourceId}" method="post" style="display:inline;">
-                                <input type="hidden" name="active" value="${!r.active}">
-                                <button type="submit" class="btn btn-warning btn-xs">${r.active ? 'Deactivate' : 'Activate'}</button>
+                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/resource/detail/${fn:escapeXml(r.resourceId)}" class="btn btn-secondary btn-xs">View</a>
+                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/resource/edit/${fn:escapeXml(r.resourceId)}" class="btn btn-primary btn-xs">Edit</a>
+                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/resource/toggle/${fn:escapeXml(r.resourceId)}" method="post" style="display:inline;">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
+                                <input type="hidden" name="active" value="${fn:escapeXml(!r.active)}">
+                                <button type="submit" class="btn btn-warning btn-xs">${fn:escapeXml(r.active ? 'Deactivate' : 'Activate')}</button>
                             </form>
-                            <form action="${pageContext.request.contextPath}/resource/delete/${r.resourceId}" method="post" style="display:inline;" onsubmit="return confirmDelete('${r.resourceName}')">
+                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/resource/delete/${fn:escapeXml(r.resourceId)}" method="post" style="display:inline;" onsubmit="return confirmAction('Proceed with this change?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                                 <button type="submit" class="btn btn-danger btn-xs">Delete</button>
                             </form>
                         </td>

@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Venue Usage Report"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#127968; Venue Usage Report</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/reports">Reports</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Venue Usage
         </div>
     </div>
@@ -27,7 +28,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Venue Assignments</h3>
-            <span style="font-size:12px;color:#718096;">${assignments.size()} assignment(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(assignments.size())} assignment(s)</span>
         </div>
         <c:choose>
             <c:when test="${empty assignments}">
@@ -53,15 +54,15 @@
                         <tbody>
                         <c:forEach var="a" items="${assignments}" varStatus="st">
                             <tr>
-                                <td>${st.count}</td>
-                                <td><strong>${a.venueName}</strong></td>
-                                <td>${a.eventName}</td>
+                                <td>${fn:escapeXml(st.count)}</td>
+                                <td><strong>${fn:escapeXml(a.venueName)}</strong></td>
+                                <td>${fn:escapeXml(a.eventName)}</td>
                                 <td>
-                                    ${a.assignedDate}
+                                    ${fn:escapeXml(a.assignedDate)}
                                 </td>
-                                <td>${empty a.startTime ? 'â€”' : a.startTime}</td>
-                                <td>${empty a.endTime   ? 'â€”' : a.endTime}</td>
-                                <td>${empty a.notes     ? 'â€”' : a.notes}</td>
+                                <td>${fn:escapeXml(empty a.startTime ? '—' : a.startTime)}</td>
+                                <td>${fn:escapeXml(empty a.endTime   ? '—' : a.endTime)}</td>
+                                <td>${fn:escapeXml(empty a.notes     ? '—' : a.notes)}</td>
                             </tr>
                         </c:forEach>
                         </tbody>

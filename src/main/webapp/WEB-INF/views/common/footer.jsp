@@ -1,6 +1,7 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%--
-  Common footer â€” included at the bottom of every authenticated page.
+  Common footer — included at the bottom of every authenticated page.
   Also closes the .es-main, .es-wrapper divs and includes JS.
 --%>
         <div class="es-footer">

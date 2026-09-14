@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Feedback Detail"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#11088; Feedback Detail</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/feedback/list">Feedback</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/list">Feedback</a>
             &rsaquo; Detail
         </div>
     </div>
@@ -20,7 +21,7 @@
 
     <div class="es-card" style="max-width:680px;">
         <div class="card-header">
-            <h3>Feedback #${feedback.feedbackId}</h3>
+            <h3>Feedback #${fn:escapeXml(feedback.feedbackId)}</h3>
             <c:choose>
                 <c:when test="${feedback.status == 'Moderated'}">
                     <span class="es-badge badge-moderated">Moderated</span>
@@ -34,11 +35,11 @@
         <div class="detail-grid">
             <div class="detail-item">
                 <div class="detail-label">Event</div>
-                <div class="detail-value">${feedback.eventName}</div>
+                <div class="detail-value">${fn:escapeXml(feedback.eventName)}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Customer</div>
-                <div class="detail-value">${feedback.customerName}</div>
+                <div class="detail-value">${fn:escapeXml(feedback.customerName)}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Rating</div>
@@ -50,14 +51,14 @@
                         </c:forEach>
                     </span>
                     <span style="color:#718096;font-size:13px;margin-left:6px;">
-                        ${feedback.rating} out of 5
+                        ${fn:escapeXml(feedback.rating)} out of 5
                     </span>
                 </div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Submitted</div>
                 <div class="detail-value">
-                    ${feedback.submittedDate}
+                    ${fn:escapeXml(feedback.submittedDate)}
                 </div>
             </div>
         </div>
@@ -65,14 +66,14 @@
         <div class="detail-item" style="margin-top:16px;">
             <div class="detail-label">Comment</div>
             <div class="detail-value" style="margin-top:6px;line-height:1.6;">
-                ${empty feedback.comment ? 'No comment provided.' : feedback.comment}
+                ${fn:escapeXml(empty feedback.comment ? 'No comment provided.' : feedback.comment)}
             </div>
         </div>
 
         <c:if test="${feedback.status == 'Moderated' and not empty feedback.modReason}">
             <div class="detail-item" style="margin-top:12px;background:#FFF5F5;border-color:#FEB2B2;">
                 <div class="detail-label" style="color:#E53E3E;">Moderation Reason</div>
-                <div class="detail-value">${feedback.modReason}</div>
+                <div class="detail-value">${fn:escapeXml(feedback.modReason)}</div>
             </div>
         </c:if>
 
@@ -83,11 +84,12 @@
                     &#9888; Moderate This Feedback
                 </button>
             </c:if>
-            <form action="${pageContext.request.contextPath}/reporting/feedback/delete/${feedback.feedbackId}"
+            <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/delete/${fn:escapeXml(feedback.feedbackId)}"
                   method="post" onsubmit="return confirmDelete('this feedback entry')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                 <button type="submit" class="btn btn-danger">Delete</button>
             </form>
-            <a href="${pageContext.request.contextPath}/reporting/feedback/list"
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/list"
                class="btn btn-secondary">&#8592; Back to Feedback</a>
         </div>
     </div>
@@ -99,8 +101,9 @@
 <div class="es-modal-overlay" id="moderateModal">
     <div class="es-modal">
         <h3>&#9888; Moderate Feedback</h3>
-        <form action="${pageContext.request.contextPath}/reporting/feedback/moderate/${feedback.feedbackId}"
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/moderate/${fn:escapeXml(feedback.feedbackId)}"
               method="post">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-group">
                 <label class="required">Moderation Reason</label>
                 <textarea name="reason" class="es-textarea" rows="3" required

@@ -14,6 +14,7 @@ import java.util.Optional;
  * Handles task lifecycle, assignment and overdue detection.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class TaskService {
 
     private final TaskDAO taskDAO;
@@ -67,6 +68,7 @@ public class TaskService {
         String error = validateTask(task);
         if (error != null) return error;
         taskDAO.updateTask(task);
+        taskDAO.updateStatus(task.getTaskId(), task.getStatus());
         return null;
     }
 
@@ -74,6 +76,7 @@ public class TaskService {
      * Updates only a task's status.
      */
     public void updateStatus(int taskId, String status) {
+        if (status == null || !java.util.Set.of("Not Started", "In Progress", "Completed", "Cancelled").contains(status)) throw new IllegalArgumentException("Invalid task status");
         taskDAO.updateStatus(taskId, status);
     }
 
@@ -105,6 +108,10 @@ public class TaskService {
         if (task.getStartDate() != null && task.getDueDate().isBefore(task.getStartDate())) {
             return "Due date cannot be before the start date.";
         }
+        if (task.getStatus() != null && !java.util.Set.of("Not Started", "In Progress", "Completed", "Cancelled").contains(task.getStatus()))
+            return "Invalid task status.";
+        if (task.getPriority() != null && !task.getPriority().isBlank() && !java.util.Set.of("Low", "Medium", "High").contains(task.getPriority()))
+            return "Invalid task priority.";
         if (task.getPriority() == null || task.getPriority().trim().isEmpty()) {
             task.setPriority("Medium");
         }

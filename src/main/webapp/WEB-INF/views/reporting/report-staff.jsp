@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Staff Allocation Report"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#128100; Staff Allocation Report</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/reporting/reports">Reports</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Staff Allocation
         </div>
     </div>
@@ -23,7 +24,7 @@
     <div class="es-card">
         <div class="card-header">
             <h3>Staff Assignments</h3>
-            <span style="font-size:12px;color:#718096;">${assignments.size()} assignment(s)</span>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(assignments.size())} assignment(s)</span>
         </div>
         <c:choose>
             <c:when test="${empty assignments}">
@@ -49,17 +50,17 @@
                         <tbody>
                         <c:forEach var="a" items="${assignments}" varStatus="st">
                             <tr>
-                                <td>${st.count}</td>
-                                <td><strong>${a.staffName}</strong></td>
-                                <td>${a.eventName}</td>
+                                <td>${fn:escapeXml(st.count)}</td>
+                                <td><strong>${fn:escapeXml(a.staffName)}</strong></td>
+                                <td>${fn:escapeXml(a.eventName)}</td>
                                 <td>
-                                    ${a.eventDate}
+                                    ${fn:escapeXml(a.eventDate)}
                                 </td>
-                                <td>${empty a.roleAtEvent ? 'â€”' : a.roleAtEvent}</td>
+                                <td>${fn:escapeXml(empty a.roleAtEvent ? '—' : a.roleAtEvent)}</td>
                                 <td>
-                                    ${a.assignedDate}
+                                    ${fn:escapeXml(a.assignedDate)}
                                 </td>
-                                <td>${empty a.notes ? 'â€”' : a.notes}</td>
+                                <td>${fn:escapeXml(empty a.notes ? '—' : a.notes)}</td>
                             </tr>
                         </c:forEach>
                         </tbody>

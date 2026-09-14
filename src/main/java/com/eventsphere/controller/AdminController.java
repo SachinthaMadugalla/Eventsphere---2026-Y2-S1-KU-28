@@ -113,6 +113,10 @@ public class AdminController {
         User user = getUser(session);
         if (!isAdmin(user)) return "redirect:/access-denied";
 
+        if (userId == user.getUserId() && roleId != 7) {
+            redirectAttributes.addFlashAttribute("error", "You cannot remove your own administrator role.");
+            return "redirect:/admin/users";
+        }
         adminService.changeUserRole(userId, roleId);
         redirectAttributes.addFlashAttribute("success", "User role updated.");
         return "redirect:/admin/users";

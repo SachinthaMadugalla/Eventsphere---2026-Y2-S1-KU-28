@@ -16,6 +16,7 @@ import java.util.Optional;
  * and assembled in the controller.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class ReportingService {
 
     private final FeedbackDAO feedbackDAO;
@@ -93,6 +94,7 @@ public class ReportingService {
         if (complaint.getStatus() == null || complaint.getStatus().trim().isEmpty()) {
             return "Status is required.";
         }
+        if (!java.util.Set.of("Submitted", "Under Review", "Resolved", "Closed").contains(complaint.getStatus())) return "Invalid complaint status.";
         complaintDAO.updateComplaint(complaint);
         return null;
     }

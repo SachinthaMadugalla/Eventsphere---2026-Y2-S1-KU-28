@@ -57,6 +57,7 @@ CREATE TABLE events (
     guest_count       INT NOT NULL DEFAULT 0,
     requirements      NVARCHAR(MAX),
     status            NVARCHAR(50) NOT NULL DEFAULT 'Requested',
+    is_archived       BIT NOT NULL DEFAULT 0,
     -- Statuses: Requested, Pending, Confirmed, Planning, In Progress, Completed, Cancelled
     notes             NVARCHAR(MAX),
     created_at        DATETIME2 NOT NULL DEFAULT GETDATE(),

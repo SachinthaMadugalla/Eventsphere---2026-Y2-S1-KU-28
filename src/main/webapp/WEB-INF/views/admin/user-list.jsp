@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Manage Users"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#128101; Manage Users</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/admin/dashboard">Admin</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/admin/dashboard">Admin</a>
             &rsaquo; Users
         </div>
     </div>
@@ -25,7 +26,7 @@
 
     <div class="es-card">
         <div class="card-header">
-            <h3>All Accounts (${users.size()})</h3>
+            <h3>All Accounts (${fn:escapeXml(users.size())})</h3>
             <!-- Client-side search -->
             <input type="text" class="es-input" style="max-width:240px;"
                    placeholder="Search users..." oninput="filterTable('userTable', this.value)">
@@ -49,46 +50,48 @@
                 <tbody>
                 <c:forEach var="u" items="${users}" varStatus="st">
                     <tr>
-                        <td>${st.count}</td>
-                        <td><strong>${u.username}</strong></td>
-                        <td>${u.fullName}</td>
-                        <td>${u.email}</td>
-                        <td>${empty u.phone ? 'â€”' : u.phone}</td>
+                        <td>${fn:escapeXml(st.count)}</td>
+                        <td><strong>${fn:escapeXml(u.username)}</strong></td>
+                        <td>${fn:escapeXml(u.fullName)}</td>
+                        <td>${fn:escapeXml(u.email)}</td>
+                        <td>${fn:escapeXml(empty u.phone ? '—' : u.phone)}</td>
                         <td>
-                            <span class="es-badge badge-pending">${u.roleName}</span>
+                            <span class="es-badge badge-pending">${fn:escapeXml(u.roleName)}</span>
                         </td>
                         <td>
-                            <span class="es-badge ${u.active ? 'badge-active' : 'badge-inactive'}">
-                                ${u.active ? 'Active' : 'Inactive'}
+                            <span class="es-badge ${fn:escapeXml(u.active ? 'badge-active' : 'badge-inactive')}">
+                                ${fn:escapeXml(u.active ? 'Active' : 'Inactive')}
                             </span>
                         </td>
                         <td>
-                            ${u.createdAt.toLocalDate()}
+                            ${fn:escapeXml(u.createdAt.toLocalDate())}
                         </td>
                         <td>
                             <!-- Activate / Deactivate -->
-                            <form action="${pageContext.request.contextPath}/admin/users/toggle/${u.userId}"
+                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/toggle/${fn:escapeXml(u.userId)}"
                                   method="post" style="display:inline;"
-                                  onsubmit="return confirmAction('${u.active ? 'Deactivate' : 'Activate'} account for ${u.username}?')">
-                                <input type="hidden" name="active" value="${!u.active}">
+                                  onsubmit="return confirmAction('Proceed with this change?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
+                                <input type="hidden" name="active" value="${fn:escapeXml(!u.active)}">
                                 <button type="submit"
-                                        class="btn ${u.active ? 'btn-warning' : 'btn-success'} btn-xs">
-                                    ${u.active ? 'Deactivate' : 'Activate'}
+                                        class="btn ${fn:escapeXml(u.active ? 'btn-warning' : 'btn-success')} btn-xs">
+                                    ${fn:escapeXml(u.active ? 'Deactivate' : 'Activate')}
                                 </button>
                             </form>
 
                             <!-- Change Role -->
                             <button type="button"
                                     class="btn btn-primary btn-xs"
-                                    onclick="openRoleModal(${u.userId}, '${u.username}', ${u.roleId})">
+                                    data-username="${fn:escapeXml(u.username)}" onclick="openRoleModal(${fn:escapeXml(u.userId)}, this.dataset.username, ${fn:escapeXml(u.roleId)})">
                                 Change Role
                             </button>
 
                             <!-- Delete (only non-self) -->
                             <c:if test="${u.userId != sessionScope.userId}">
-                                <form action="${pageContext.request.contextPath}/admin/users/delete/${u.userId}"
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/delete/${fn:escapeXml(u.userId)}"
                                       method="post" style="display:inline;"
-                                      onsubmit="return confirmDelete('account for ${u.username}')">
+                                      onsubmit="return confirmAction('Proceed with this change?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
                                     <button type="submit" class="btn btn-danger btn-xs">Delete</button>
                                 </form>
                             </c:if>
@@ -103,18 +106,19 @@
 </div>
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>
 
-<!-- â”€â”€ Change Role Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── Change Role Modal ─────────────────────────────────────────── -->
 <div class="es-modal-overlay" id="roleModal">
     <div class="es-modal">
         <h3>&#128100; Change User Role</h3>
         <p id="roleModalLabel" style="color:#718096;font-size:13px;margin-bottom:16px;"></p>
 
         <form id="roleForm" method="post">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-group">
                 <label class="required">Select New Role</label>
                 <select name="roleId" id="roleSelect" class="es-select" required>
                     <c:forEach var="r" items="${roles}">
-                        <option value="${r.role_id}">${r.role_name}</option>
+                        <option value="${fn:escapeXml(r.role_id)}">${fn:escapeXml(r.role_name)}</option>
                     </c:forEach>
                 </select>
             </div>

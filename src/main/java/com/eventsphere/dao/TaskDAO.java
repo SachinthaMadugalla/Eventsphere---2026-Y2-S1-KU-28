@@ -64,8 +64,8 @@ public class TaskDAO {
     public int addTask(Task task) {
         String sql =
             "INSERT INTO tasks (event_id, assigned_to, title, description, " +
-            "                   priority, status, start_date, due_date) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            "                   priority, status, start_date, due_date, completed_at) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 task.getEventId(),
                 task.getAssignedTo(),
@@ -74,7 +74,8 @@ public class TaskDAO {
                 task.getPriority(),
                 task.getStatus(),
                 task.getStartDate(),
-                task.getDueDate());
+                task.getDueDate(),
+                "Completed".equals(task.getStatus()) ? java.time.LocalDateTime.now() : null);
     }
 
     // ── SELECT ─────────────────────────────────────────────────
@@ -172,7 +173,7 @@ public class TaskDAO {
                 "UPDATE tasks SET status = ?, completed_at = GETDATE() WHERE task_id = ?";
             return jdbcTemplate.update(sql, status, taskId);
         } else {
-            String sql = "UPDATE tasks SET status = ? WHERE task_id = ?";
+            String sql = "UPDATE tasks SET status = ?, completed_at = NULL WHERE task_id = ?";
             return jdbcTemplate.update(sql, status, taskId);
         }
     }
