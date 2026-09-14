@@ -1,23 +1,8 @@
--- =====================================================
--- EventSphere Sample Data
--- Database: EventSphereDB
--- SE2030 Group 2026-Y2-S1-KU-28
---
--- HOW TO USE:
--- 1. Run schema.sql first in SSMS
--- 2. Then execute this file
---
--- All demo passwords = "password123"
--- BCrypt hash (strength 10):
---   $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
--- =====================================================
-
 USE EventSphereDB;
 GO
 
--- =====================================================
 -- ROLES
--- =====================================================
+
 INSERT INTO roles (role_name) VALUES
 ('Customer'),
 ('Event Manager'),
