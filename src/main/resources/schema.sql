@@ -1,24 +1,8 @@
--- =====================================================
--- EventSphere Database Schema
--- Database: EventSphereDB
--- SE2030 Group 2026-Y2-S1-KU-28
---
--- HOW TO USE:
--- 1. Open SQL Server Management Studio (SSMS)
--- 2. Connect to your SQL Server instance
--- 3. Run: CREATE DATABASE EventSphereDB;
--- 4. Select EventSphereDB in the database dropdown
--- 5. Open this file and execute it (F5)
--- 6. Then execute data.sql to load sample data
--- =====================================================
-
 USE EventSphereDB;
 GO
 
--- =====================================================
--- AUTHENTICATION & USERS
--- =====================================================
 
+-- AUTHENTICATION & USERS
 CREATE TABLE roles (
     role_id   INT IDENTITY(1,1) PRIMARY KEY,
     role_name NVARCHAR(50) NOT NULL UNIQUE
@@ -37,20 +21,16 @@ CREATE TABLE users (
     CONSTRAINT FK_users_roles FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
--- =====================================================
--- EVENT CATEGORIES
--- =====================================================
 
+-- EVENT CATEGORIES
 CREATE TABLE event_categories (
     category_id   INT IDENTITY(1,1) PRIMARY KEY,
     category_name NVARCHAR(100) NOT NULL UNIQUE,
     description   NVARCHAR(255)
 );
 
--- =====================================================
--- CUSTOMERS (Module 1)
--- =====================================================
 
+-- CUSTOMERS (Module 1)
 CREATE TABLE customers (
     customer_id   INT IDENTITY(1,1) PRIMARY KEY,
     user_id       INT NOT NULL UNIQUE,
@@ -62,10 +42,8 @@ CREATE TABLE customers (
     CONSTRAINT FK_customers_users FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- =====================================================
--- EVENTS (Module 2)
--- =====================================================
 
+-- EVENTS (Module 2)
 CREATE TABLE events (
     event_id          INT IDENTITY(1,1) PRIMARY KEY,
     event_name        NVARCHAR(200) NOT NULL,
@@ -88,10 +66,8 @@ CREATE TABLE events (
     CONSTRAINT FK_events_manager    FOREIGN KEY (manager_user_id) REFERENCES users(user_id)
 );
 
--- =====================================================
--- VENUES (Module 3)
--- =====================================================
 
+-- VENUES (Module 3)
 CREATE TABLE venues (
     venue_id     INT IDENTITY(1,1) PRIMARY KEY,
     venue_name   NVARCHAR(200) NOT NULL,
@@ -115,10 +91,8 @@ CREATE TABLE event_venues (
     CONSTRAINT FK_ev_venue FOREIGN KEY (venue_id) REFERENCES venues(venue_id)
 );
 
--- =====================================================
--- VENDORS (Module 3)
--- =====================================================
 
+-- VENDORS (Module 3)
 CREATE TABLE vendor_categories (
     vendor_cat_id   INT IDENTITY(1,1) PRIMARY KEY,
     category_name   NVARCHAR(100) NOT NULL UNIQUE
@@ -149,10 +123,8 @@ CREATE TABLE event_vendors (
     CONSTRAINT FK_evend_vendor FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id)
 );
 
--- =====================================================
--- STAFF (Module 4)
--- =====================================================
 
+-- STAFF (Module 4)
 CREATE TABLE staff (
     staff_id   INT IDENTITY(1,1) PRIMARY KEY,
     full_name  NVARCHAR(150) NOT NULL,
@@ -174,10 +146,8 @@ CREATE TABLE staff_assignments (
     CONSTRAINT FK_sa_staff FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
 );
 
--- =====================================================
--- RESOURCES (Module 4)
--- =====================================================
 
+-- RESOURCES (Module 4)
 CREATE TABLE resources (
     resource_id        INT IDENTITY(1,1) PRIMARY KEY,
     resource_name      NVARCHAR(150) NOT NULL,
@@ -202,10 +172,8 @@ CREATE TABLE resource_allocations (
     CONSTRAINT FK_ra_resource FOREIGN KEY (resource_id) REFERENCES resources(resource_id)
 );
 
--- =====================================================
--- TASKS (Module 5)
--- =====================================================
 
+-- TASKS (Module 5)
 CREATE TABLE tasks (
     task_id      INT IDENTITY(1,1) PRIMARY KEY,
     event_id     INT NOT NULL,

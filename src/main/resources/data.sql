@@ -12,9 +12,9 @@ INSERT INTO roles (role_name) VALUES
 ('Managing Director'),
 ('System Administrator');
 
--- =====================================================
+
 -- USERS  (password = "password123" for all)
--- =====================================================
+
 INSERT INTO users (username, password_hash, email, full_name, phone, role_id, is_active) VALUES
 ('admin',
  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
@@ -59,17 +59,15 @@ INSERT INTO event_categories (category_name, description) VALUES
 ('Party',           'General parties and celebrations'),
 ('Other',           'Other event types');
 
--- =====================================================
+
 -- CUSTOMERS
--- =====================================================
 INSERT INTO customers (user_id, full_name, email, phone, address) VALUES
 (8,  'Saman Kumara',     'saman@email.com',  '0751234567', '45 Lake Road, Colombo 03'),
 (9,  'Priya Wijesinghe', 'priya@email.com',  '0762345678', '12 Temple Street, Kandy'),
 (10, 'Harsha Bandara',   'harsha@email.com', '0773456789', '78 Main Street, Galle');
 
--- =====================================================
+
 -- VENUES
--- =====================================================
 INSERT INTO venues (venue_name, location, capacity, cost_per_day, description) VALUES
 ('Grand Ballroom',     'Colombo 07',    500, 150000.00, 'Luxury ballroom with stage and dance floor'),
 ('Crystal Hall',       'Colombo 03',    200,  80000.00, 'Modern event hall with AV equipment'),
@@ -77,9 +75,8 @@ INSERT INTO venues (venue_name, location, capacity, cost_per_day, description) V
 ('Conference Suite A', 'Colombo 01',    100,  35000.00, 'Business conference room with projector'),
 ('Lakeside Terrace',   'Battaramulla',  300,  90000.00, 'Scenic terrace by the lake');
 
--- =====================================================
+
 -- VENDOR CATEGORIES
--- =====================================================
 INSERT INTO vendor_categories (category_name) VALUES
 ('Catering'),
 ('Decorators'),
@@ -88,9 +85,8 @@ INSERT INTO vendor_categories (category_name) VALUES
 ('Entertainment'),
 ('Equipment Suppliers');
 
--- =====================================================
+
 -- VENDORS
--- =====================================================
 INSERT INTO vendors (vendor_name, vendor_cat_id, contact_person, phone, email, service_desc, cost) VALUES
 ('Golden Spoon Catering',   1, 'Anura Silva',      '0114567890', 'info@goldenspoon.lk',  'Full catering for up to 500 guests',         75000.00),
 ('Ceylon Decorators',       2, 'Mala Fernando',    '0115678901', 'mala@ceylondeco.lk',   'Full event decoration and floral arrangements',45000.00),
@@ -99,9 +95,8 @@ INSERT INTO vendors (vendor_name, vendor_cat_id, contact_person, phone, email, s
 ('StarStage Entertainment', 5, 'Thilini Jayamal',  '0118901234', 'info@starstage.lk',    'Live bands, DJs and entertainment performers',40000.00),
 ('EventEquip Suppliers',    6, 'Kasun Rathnayake', '0119012345', 'kasun@eventeq.lk',     'Tables, chairs, tents and general equipment',20000.00);
 
--- =====================================================
+
 -- STAFF
--- =====================================================
 INSERT INTO staff (full_name, email, phone, job_role) VALUES
 ('Chamara Wickramasinghe', 'chamara@eventsphere.com', '0720001001', 'Event Coordinator'),
 ('Sanduni Rajapaksha',     'sanduni@eventsphere.com', '0720001002', 'Setup Crew Lead'),
@@ -131,9 +126,8 @@ VALUES
 ('Podium',               'Furniture',      6,   6, 'Available', 'Speaker podiums with microphone stand'),
 ('LED Screen (120")',    'Audio/Visual',   5,   5, 'Available', 'Large LED display screens');
 
--- =====================================================
+
 -- EVENTS
--- =====================================================
 INSERT INTO events
     (event_name, category_id, customer_id, manager_user_id,
      event_date, start_time, end_time, location,
@@ -164,18 +158,16 @@ VALUES
  60, 'Workshop setup, projector required',
  'Requested', NULL);
 
--- =====================================================
+
 -- EVENT VENUES
--- =====================================================
 INSERT INTO event_venues (event_id, venue_id, assigned_date, start_time, end_time) VALUES
 (1, 1, '2026-10-15', '14:00', '23:30'),
 (2, 2, '2026-10-22', '17:00', '23:30'),
 (3, 5, '2026-11-05', '18:00', '23:00'),
 (4, 4, '2026-11-20', '07:30', '18:30');
 
--- =====================================================
+
 -- EVENT VENDORS
--- =====================================================
 INSERT INTO event_vendors (event_id, vendor_id, service_date, notes) VALUES
 (1, 1, '2026-10-15', 'Full catering for 350 guests'),
 (1, 2, '2026-10-15', 'Full venue decoration'),
@@ -184,9 +176,8 @@ INSERT INTO event_vendors (event_id, vendor_id, service_date, notes) VALUES
 (2, 1, '2026-10-22', 'Catering for 120 guests'),
 (2, 5, '2026-10-22', 'DJ and entertainment');
 
--- =====================================================
+
 -- STAFF ASSIGNMENTS
--- =====================================================
 INSERT INTO staff_assignments (event_id, staff_id, role_at_event, assigned_date) VALUES
 (1, 1, 'Lead Coordinator',  '2026-10-15'),
 (1, 2, 'Setup Lead',        '2026-10-15'),
@@ -217,10 +208,9 @@ VALUES
 (4, 5,   2, '2026-09-10', 'Projectors for conference'),
 (4, 9,   1, '2026-09-10', 'Podium for conference speakers');
 
--- =====================================================
+
 -- UPDATE available_quantity to reflect allocations above.
 -- Formula: available = total - SUM(allocated for this resource)
--- =====================================================
 UPDATE resources SET available_quantity = 500 - 350 - 120 WHERE resource_id = 1;  -- Banquet Chair  : 30
 UPDATE resources SET available_quantity =  80 -  50 -  20 WHERE resource_id = 2;  -- Round Table    : 10
 UPDATE resources SET available_quantity =  12 -   4      WHERE resource_id = 6;   -- Stage Lighting :  8
@@ -228,9 +218,8 @@ UPDATE resources SET available_quantity =  10 -   2      WHERE resource_id = 5; 
 UPDATE resources SET available_quantity =   6 -   1      WHERE resource_id = 9;   -- Podium         :  5
 -- All other resources: available_quantity already equals total_quantity (no allocations)
 
--- =====================================================
+
 -- TASKS
--- =====================================================
 INSERT INTO tasks
     (event_id, assigned_to, title, description, priority, status, start_date, due_date)
 VALUES
@@ -262,18 +251,16 @@ VALUES
     'Create and print guest list for check-in at entrance',
     'Medium', 'In Progress', '2026-10-01', '2026-10-12');
 
--- =====================================================
+
 -- BUDGETS
--- =====================================================
 INSERT INTO budgets (event_id, total_budget, estimated_cost, actual_cost, notes) VALUES
 (1, 800000.00, 720000.00, 150000.00, 'Advance payments made; final costs pending'),
 (2, 200000.00, 175000.00,      0.00, 'Budget approved'),
 (3, 350000.00, 310000.00,      0.00, 'Awaiting confirmation'),
 (4, 150000.00, 135000.00,      0.00, 'Conference budget approved');
 
--- =====================================================
+
 -- EXPENSES
--- =====================================================
 INSERT INTO expenses (event_id, category, description, amount, expense_date, recorded_by) VALUES
 (1, 'Venue',      'Venue booking deposit – Grand Ballroom', 75000.00, '2026-08-20', 7),
 (1, 'Catering',   'Catering advance payment',               50000.00, '2026-09-01', 7),
@@ -282,9 +269,8 @@ INSERT INTO expenses (event_id, category, description, amount, expense_date, rec
 -- Keep actual_cost in budgets table consistent with expenses
 UPDATE budgets SET actual_cost = 150000.00 WHERE event_id = 1;
 
--- =====================================================
+
 -- INVOICES
--- =====================================================
 INSERT INTO invoices
     (event_id, customer_id, invoice_number, total_amount,
      issued_date, due_date, status, notes)
@@ -293,11 +279,10 @@ VALUES
 (2, 2, 'INV-2026-002', 175000.00, '2026-09-01', '2026-10-15', 'Pending',         'Birthday party invoice'),
 (3, 3, 'INV-2026-003', 310000.00, '2026-09-15', '2026-11-01', 'Pending',         'Corporate dinner invoice');
 
--- =====================================================
+
 -- PAYMENTS
 -- Total paid for INV-2026-001: 150,000 + 100,000 = 250,000
 -- Invoice total: 720,000 → status = Partially Paid (correct)
--- =====================================================
 INSERT INTO payments
     (invoice_id, event_id, customer_id, amount, payment_date,
      payment_type, reference_no, notes, recorded_by)
@@ -305,9 +290,8 @@ VALUES
 (1, 1, 1, 150000.00, '2026-08-20', 'Deposit',         'PAY-001', 'Wedding advance deposit',      7),
 (1, 1, 1, 100000.00, '2026-09-15', 'Partial Payment', 'PAY-002', 'Second instalment payment',    7);
 
--- =====================================================
+
 -- COMPLAINTS
--- =====================================================
 INSERT INTO complaints
     (event_id, customer_id, subject, description, status)
 VALUES
@@ -316,9 +300,8 @@ VALUES
  'The decoration team has not confirmed the design yet. We are concerned about the timeline.',
  'Under Review');
 
--- =====================================================
+
 -- NOTIFICATIONS
--- =====================================================
 INSERT INTO notifications (user_id, title, message, is_read) VALUES
 (8, 'Booking Confirmed',
     'Your booking for Kumara Family Wedding has been confirmed.',              1),
