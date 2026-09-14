@@ -146,7 +146,7 @@ public class InvoiceDAO {
      * Returns the sum of all invoice totals (total revenue).
      */
     public BigDecimal getTotalRevenue() {
-        String sql = "SELECT ISNULL(SUM(total_amount), 0) FROM invoices WHERE status = 'Paid'";
+        String sql = "SELECT ISNULL(SUM(total_amount), 0) FROM invoices";
         BigDecimal total = jdbcTemplate.queryForObject(sql, BigDecimal.class);
         return total != null ? total : BigDecimal.ZERO;
     }
@@ -160,7 +160,7 @@ public class InvoiceDAO {
             "FROM invoices i " +
             "LEFT JOIN (SELECT invoice_id, SUM(amount) AS paid FROM payments GROUP BY invoice_id) p " +
             "       ON i.invoice_id = p.invoice_id " +
-            "WHERE i.status <> 'Paid'";
+            "";
         BigDecimal total = jdbcTemplate.queryForObject(sql, BigDecimal.class);
         return total != null ? total : BigDecimal.ZERO;
     }

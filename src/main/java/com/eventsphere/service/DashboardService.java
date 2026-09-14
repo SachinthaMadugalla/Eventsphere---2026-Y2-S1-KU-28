@@ -18,7 +18,7 @@ public class DashboardService {
     private final CustomerDAO customerDAO;
     private final StaffDAO staffDAO;
     private final InvoiceDAO invoiceDAO;
-    private final PaymentDAO paymentDAO;
+    private final ExpenseDAO expenseDAO;
     private final ComplaintDAO complaintDAO;
     private final FeedbackDAO feedbackDAO;
 
@@ -27,7 +27,7 @@ public class DashboardService {
                              CustomerDAO customerDAO,
                              StaffDAO staffDAO,
                              InvoiceDAO invoiceDAO,
-                             PaymentDAO paymentDAO,
+                             ExpenseDAO expenseDAO,
                              ComplaintDAO complaintDAO,
                              FeedbackDAO feedbackDAO) {
         this.eventDAO     = eventDAO;
@@ -35,7 +35,7 @@ public class DashboardService {
         this.customerDAO  = customerDAO;
         this.staffDAO     = staffDAO;
         this.invoiceDAO   = invoiceDAO;
-        this.paymentDAO   = paymentDAO;
+        this.expenseDAO   = expenseDAO;
         this.complaintDAO = complaintDAO;
         this.feedbackDAO  = feedbackDAO;
     }
@@ -76,7 +76,7 @@ public class DashboardService {
         // Finance
         BigDecimal revenue     = invoiceDAO.getTotalRevenue();
         BigDecimal outstanding = invoiceDAO.getTotalOutstanding();
-        BigDecimal collected   = paymentDAO.getTotalCollected();
+        BigDecimal collected   = expenseDAO.findAll().stream().map(com.eventsphere.model.Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         stats.setTotalRevenue(revenue != null ? revenue : BigDecimal.ZERO);
         stats.setPendingPayments(outstanding != null ? outstanding : BigDecimal.ZERO);

@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Submit Complaint"/>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -10,7 +11,7 @@
     <div class="page-header">
         <h2>&#9888; Submit a Complaint</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard">Dashboard</a>
             &rsaquo; Submit Complaint
         </div>
     </div>
@@ -19,7 +20,7 @@
 
     <div class="es-alert es-alert-info">
         &#8505; Your complaint will be reviewed by our Customer Relations team.
-        We aim to respond within 2â€“3 business days.
+        We aim to respond within 2–3 business days.
     </div>
 
     <div class="es-card" style="max-width:640px;">
@@ -28,18 +29,19 @@
         <%--
           customerId is resolved server-side from session.
           The form does NOT accept a customerId parameter from the browser.
-          See ReportingController.submitComplaint() â€” it reads from session.
+          See ReportingController.submitComplaint() — it reads from session.
         --%>
-        <form action="${pageContext.request.contextPath}/reporting/complaint/submit"
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/complaint/submit"
               method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
 
             <div class="es-form-group">
                 <label>Related Event <span style="color:#718096;font-weight:400;">(optional)</span></label>
                 <select name="eventId" class="es-select">
                     <option value="">-- Not related to a specific event --</option>
                     <c:forEach var="e" items="${events}">
-                        <option value="${e.eventId}">${e.eventName}
-                            (${e.eventDate})</option>
+                        <option value="${fn:escapeXml(e.eventId)}">${fn:escapeXml(e.eventName)}
+                            (${fn:escapeXml(e.eventDate)})</option>
                     </c:forEach>
                 </select>
             </div>
@@ -62,7 +64,7 @@
                 <button type="submit" class="btn btn-primary">
                     &#9888; Submit Complaint
                 </button>
-                <a href="${pageContext.request.contextPath}/customer/dashboard"
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard"
                    class="btn btn-secondary">Cancel</a>
             </div>
         </form>

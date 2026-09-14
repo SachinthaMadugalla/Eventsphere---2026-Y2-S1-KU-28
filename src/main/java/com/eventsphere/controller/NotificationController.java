@@ -44,7 +44,7 @@ public class NotificationController {
         User user = getUser(session);
         if (user == null) return "redirect:/login";
 
-        notificationService.markAsRead(notificationId);
+        notificationService.markAsRead(notificationId, user.getUserId());
         return "redirect:/notifications";
     }
 
@@ -64,7 +64,7 @@ public class NotificationController {
         User user = getUser(session);
         if (user == null) return "redirect:/login";
 
-        notificationService.deleteNotification(notificationId);
+        notificationService.deleteNotification(notificationId, user.getUserId());
         redirectAttributes.addFlashAttribute("success", "Notification dismissed.");
         return "redirect:/notifications";
     }

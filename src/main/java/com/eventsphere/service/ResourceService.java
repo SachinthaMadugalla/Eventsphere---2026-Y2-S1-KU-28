@@ -13,6 +13,7 @@ import java.util.Optional;
  * Handles resource CRUD and availability validation.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class ResourceService {
 
     private final ResourceDAO resourceDAO;
@@ -46,6 +47,7 @@ public class ResourceService {
     public String addResource(Resource resource) {
         String error = validateResource(resource);
         if (error != null) return error;
+        if (resource.getStatus() == null) resource.setStatus("Available");
         resourceDAO.addResource(resource);
         return null;
     }
@@ -65,13 +67,9 @@ public class ResourceService {
             return "Quantity must be greater than zero.";
         }
 
-        int available = resourceDAO.getAvailableQuantity(allocation.getResourceId());
-        if (allocation.getQuantity() > available) {
-            return "Insufficient stock: only " + available +
-                   " unit(s) available for this resource.";
+        if (resourceDAO.allocateResource(allocation) == 0) {
+            return "Resource is unavailable or has insufficient stock.";
         }
-
-        resourceDAO.allocateResource(allocation);
         return null;
     }
 
@@ -83,7 +81,7 @@ public class ResourceService {
     public String updateResource(Resource resource) {
         String error = validateResource(resource);
         if (error != null) return error;
-        resourceDAO.updateResource(resource);
+        if (resourceDAO.updateResource(resource) == 0) return "Total quantity cannot be less than the allocated stock, or resource was not found.";
         return null;
     }
 

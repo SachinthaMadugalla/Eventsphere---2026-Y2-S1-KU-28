@@ -47,11 +47,12 @@ public class BudgetDAO {
     public int addBudget(Budget budget) {
         String sql =
             "INSERT INTO budgets (event_id, total_budget, estimated_cost, actual_cost, notes) " +
-            "VALUES (?, ?, ?, 0, ?)";
+            "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 budget.getEventId(),
                 budget.getTotalBudget(),
                 budget.getEstimatedCost(),
+                budget.getActualCost(),
                 budget.getNotes());
     }
 

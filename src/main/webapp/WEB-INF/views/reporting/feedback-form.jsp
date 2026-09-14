@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Submit Feedback"/>
@@ -11,7 +12,7 @@
     <div class="page-header">
         <h2>&#11088; Submit Feedback</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/customer/bookings">My Bookings</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/bookings">My Bookings</a>
             &rsaquo; Submit Feedback
         </div>
     </div>
@@ -20,18 +21,19 @@
 
     <c:if test="${not empty event}">
         <div class="es-alert es-alert-info">
-            Submitting feedback for: <strong>${event.eventName}</strong>
-            &bull; Date: ${event.eventDate}
+            Submitting feedback for: <strong>${fn:escapeXml(event.eventName)}</strong>
+            &bull; Date: ${fn:escapeXml(event.eventDate)}
         </div>
     </c:if>
 
     <div class="es-card" style="max-width:600px;">
         <div class="card-header"><h3>Your Feedback</h3></div>
 
-        <form action="${pageContext.request.contextPath}/reporting/feedback/submit"
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/reporting/feedback/submit"
               method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <%-- eventId and customerId resolved server-side from session in controller --%>
-            <input type="hidden" name="eventId" value="${event.eventId}">
+            <input type="hidden" name="eventId" value="${fn:escapeXml(event.eventId)}">
 
             <!-- Star rating input -->
             <div class="es-form-group">
@@ -61,7 +63,7 @@
                         onclick="return validateRating()">
                     &#11088; Submit Feedback
                 </button>
-                <a href="${pageContext.request.contextPath}/customer/bookings"
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/bookings"
                    class="btn btn-secondary">Cancel</a>
             </div>
         </form>

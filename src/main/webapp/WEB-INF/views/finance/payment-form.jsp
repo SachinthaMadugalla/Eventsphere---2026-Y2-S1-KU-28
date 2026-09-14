@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Record Payment"/>
@@ -12,18 +13,18 @@
 
     <!-- Invoice summary -->
     <div class="es-alert es-alert-info">
-        Invoice <strong>${invoice.invoiceNumber}</strong> &bull;
+        Invoice <strong>${fn:escapeXml(invoice.invoiceNumber)}</strong> &bull;
         Total: <strong>LKR <fmt:formatNumber value="${invoice.totalAmount}" type="number" groupingUsed="true"/></strong> &bull;
         Paid: <strong>LKR <fmt:formatNumber value="${invoice.totalPaid}" type="number" groupingUsed="true"/></strong> &bull;
         Outstanding: <strong>LKR <fmt:formatNumber value="${invoice.outstanding}" type="number" groupingUsed="true"/></strong>
     </div>
 
     <div class="es-card" style="max-width:560px;">
-        <form action="${pageContext.request.contextPath}/finance/payment/record" method="post" class="es-validate">
-            <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
-            <input type="hidden" name="eventId" value="${invoice.eventId}">
-            <input type="hidden" name="customerId" value="${invoice.customerId}">
-            <input type="hidden" name="customerUserId" value="${invoice.customerId}">
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/payment/record" method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
+            <input type="hidden" name="invoiceId" value="${fn:escapeXml(invoice.invoiceId)}">
+            <input type="hidden" name="eventId" value="${fn:escapeXml(invoice.eventId)}">
+            <input type="hidden" name="customerId" value="${fn:escapeXml(invoice.customerId)}">
 
             <div class="es-form-row">
                 <div class="es-form-group">
@@ -53,7 +54,7 @@
             </div>
             <div style="display:flex;gap:12px;">
                 <button type="submit" class="btn btn-success">Record Payment</button>
-                <a href="${pageContext.request.contextPath}/finance/invoice/detail/${invoice.invoiceId}" class="btn btn-secondary">Cancel</a>
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/detail/${fn:escapeXml(invoice.invoiceId)}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

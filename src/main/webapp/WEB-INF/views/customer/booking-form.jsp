@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="New Booking"/>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -10,7 +11,7 @@
     <div class="page-header">
         <h2>&#128197; Submit Event Booking</h2>
         <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/customer/dashboard">Dashboard</a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard">Dashboard</a>
             &rsaquo; New Booking
         </div>
     </div>
@@ -22,8 +23,9 @@
             <h3>Event Details</h3>
         </div>
 
-        <form action="${pageContext.request.contextPath}/customer/booking/submit"
+        <form action="${fn:escapeXml(pageContext.request.contextPath)}/customer/booking/submit"
               method="post" class="es-validate">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
 
             <div class="es-form-group">
                 <label class="required">Event Name</label>
@@ -37,7 +39,7 @@
                     <select name="categoryId" class="es-select" required>
                         <option value="">-- Select Category --</option>
                         <c:forEach var="cat" items="${categories}">
-                            <option value="${cat.categoryId}">${cat.categoryName}</option>
+                            <option value="${fn:escapeXml(cat.categoryId)}">${fn:escapeXml(cat.categoryName)}</option>
                         </c:forEach>
                     </select>
                 </div>
@@ -82,7 +84,7 @@
                 <button type="submit" class="btn btn-accent">
                     &#128197; Submit Booking Request
                 </button>
-                <a href="${pageContext.request.contextPath}/customer/dashboard"
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard"
                    class="btn btn-secondary">Cancel</a>
             </div>
         </form>

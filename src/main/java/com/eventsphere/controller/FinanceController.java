@@ -300,6 +300,28 @@ public class FinanceController {
         return "redirect:/finance/invoice/list";
     }
 
+    @GetMapping("/invoice/edit/{invoiceId}")
+    public String invoiceEdit(@PathVariable int invoiceId, HttpSession session, Model model) {
+        User user = getUser(session);
+        if (!hasAccess(user)) return "redirect:/access-denied";
+        Optional<Invoice> invoice = financeService.getInvoiceById(invoiceId);
+        if (invoice.isEmpty()) return "redirect:/finance/invoice/list";
+        model.addAttribute("invoice", invoice.get());
+        model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
+        return "finance/invoice-edit";
+    }
+
+    @PostMapping("/invoice/edit/{invoiceId}")
+    public String updateInvoice(@PathVariable int invoiceId, @ModelAttribute Invoice invoice,
+                                HttpSession session, RedirectAttributes flash) {
+        User user = getUser(session);
+        if (!hasAccess(user)) return "redirect:/access-denied";
+        invoice.setInvoiceId(invoiceId);
+        String error = financeService.updateInvoice(invoice);
+        flash.addFlashAttribute(error == null ? "success" : "error", error == null ? "Invoice updated." : error);
+        return error == null ? "redirect:/finance/invoice/detail/" + invoiceId : "redirect:/finance/invoice/edit/" + invoiceId;
+    }
+
     @PostMapping("/invoice/delete/{invoiceId}")
     public String deleteInvoice(@PathVariable int invoiceId,
                                 HttpSession session,
@@ -346,9 +368,6 @@ public class FinanceController {
                                 @RequestParam String paymentType,
                                 @RequestParam(required = false) String referenceNo,
                                 @RequestParam(required = false) String notes,
-                                @RequestParam int customerId,
-                                @RequestParam int eventId,
-                                @RequestParam int customerUserId,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
         User user = getUser(session);
@@ -356,8 +375,6 @@ public class FinanceController {
 
         Payment payment = new Payment();
         payment.setInvoiceId(invoiceId);
-        payment.setEventId(eventId);
-        payment.setCustomerId(customerId);
         payment.setAmount(amount);
         payment.setPaymentDate(paymentDate);
         payment.setPaymentType(paymentType);
@@ -365,7 +382,7 @@ public class FinanceController {
         payment.setNotes(notes);
         payment.setRecordedBy(user.getUserId());
 
-        String error = financeService.recordPayment(payment, customerUserId);
+        String error = financeService.recordPayment(payment, 0);
         if (error != null) {
             redirectAttributes.addFlashAttribute("error", error);
             return "redirect:/finance/payment/record?invoiceId=" + invoiceId;
