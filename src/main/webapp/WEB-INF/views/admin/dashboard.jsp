@@ -10,7 +10,9 @@
 <div class="es-content">
 
     <div class="page-header">
-        <h2>&#9881; System Administrator Dashboard</h2>
+        <p class="dashboard-eyebrow">YOUR WORKSPACE AT A GLANCE</p>
+        <h2>Everything, in one place.</h2>
+        <p class="dashboard-intro">Keep your people, events and daily operations running smoothly.</p>
         <div class="breadcrumb">Home &rsaquo; Admin Dashboard</div>
     </div>
 
@@ -43,7 +45,7 @@
 
     <!-- Quick links -->
     <div class="es-card">
-        <div class="card-header"><h3>&#128295; Administration Tools</h3></div>
+        <div class="card-header"><h3>Administration tools</h3></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;">
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/admin/users" class="btn btn-primary">
                 &#128101; Manage Users
@@ -72,7 +74,7 @@
     <!-- Recent users table -->
     <div class="es-card">
         <div class="card-header">
-            <h3>&#128101; All System Users</h3>
+            <h3>System users</h3>
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/admin/users" class="btn btn-accent btn-sm">
                 Manage Users
             </a>

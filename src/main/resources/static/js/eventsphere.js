@@ -11,7 +11,8 @@
 function toggleSidebar() {
     const sidebar = document.querySelector('.es-sidebar');
     if (sidebar) {
-        sidebar.classList.toggle('open');
+        const open = sidebar.classList.toggle('open');
+        document.querySelector('.sidebar-toggle')?.setAttribute('aria-expanded', String(open));
     }
 }
 
@@ -22,8 +23,9 @@ document.addEventListener('click', function (e) {
     if (!sidebar) return;
 
     if (window.innerWidth <= 768) {
-        if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
+        if (!sidebar.contains(e.target) && !toggleBtn?.contains(e.target)) {
             sidebar.classList.remove('open');
+            toggleBtn?.setAttribute('aria-expanded', 'false');
         }
     }
 });
@@ -262,3 +264,13 @@ function toggleSection(sectionId) {
         section.style.display = section.style.display === 'none' ? 'block' : 'none';
     }
 }
+
+document.addEventListener('keydown', function (event) {
+    const sidebar = document.querySelector('.es-sidebar');
+    if (event.key === 'Escape' && sidebar?.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        const toggle = document.querySelector('.sidebar-toggle');
+        toggle?.setAttribute('aria-expanded', 'false');
+        toggle?.focus();
+    }
+});

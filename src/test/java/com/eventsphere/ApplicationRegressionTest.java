@@ -34,6 +34,7 @@ class ApplicationRegressionTest {
     @Autowired StaffService staff;
     @Autowired VendorService vendors;
     @Autowired ReportingService reporting;
+    @Autowired CustomerBookingService bookingService;
     @Autowired CustomerService customers;
     @Autowired NotificationService notifications;
 
@@ -60,6 +61,68 @@ class ApplicationRegressionTest {
         assertFalse(response.uri().getPath().contains("login"), username + " could not log in");
         assertFalse(response.body().contains("Something went wrong"), response.body());
         return client;
+    }
+
+    private Event venueBooking(java.time.LocalDate date) {
+        Event event = new Event(); event.setCustomerId(1); event.setCategoryId(1);
+        event.setEventName("Venue selection test"); event.setEventDate(date);
+        event.setStartTime(java.time.LocalTime.of(10,0)); event.setEndTime(java.time.LocalTime.of(12,0));
+        event.setGuestCount(10); event.setLocation("Untrusted custom venue");
+        return event;
+    }
+    @Test @Transactional void bookingReservesOnlyAvailableExistingVenues() {
+        var date = LocalDate.now().plusYears(4);
+        int venueId = bookingService.available(date, java.time.LocalTime.of(10,0), java.time.LocalTime.of(12,0),10).get(0).getVenueId();
+        Event first = venueBooking(date);
+        bookingService.book(first, venueId);
+        assertTrue(first.getEventId() > 0);
+        assertNotEquals("Untrusted custom venue", first.getLocation());
+        assertEquals("Requested", jdbc.queryForObject("SELECT status FROM events WHERE event_id=?",String.class,first.getEventId()));
+        assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM event_venues WHERE event_id=? AND venue_id=?",Integer.class,first.getEventId(),venueId));
+        assertTrue(bookingService.available(date, first.getStartTime(),first.getEndTime(),10).stream().noneMatch(v->v.getVenueId()==venueId));
+        assertTrue(bookingService.available(date, java.time.LocalTime.of(12,0),java.time.LocalTime.of(13,0),10).stream().anyMatch(v->v.getVenueId()==venueId));
+        int before=jdbc.queryForObject("SELECT COUNT(*) FROM events",Integer.class);
+        assertThrows(IllegalArgumentException.class,()->bookingService.book(venueBooking(date),venueId));
+        assertEquals(before,jdbc.queryForObject("SELECT COUNT(*) FROM events",Integer.class));
+        jdbc.update("UPDATE events SET status='Cancelled' WHERE event_id=?",first.getEventId());
+        assertTrue(bookingService.available(date, first.getStartTime(),first.getEndTime(),10).stream().anyMatch(v->v.getVenueId()==venueId));
+    }
+    @Test @Transactional void bookingRejectsInvalidInactiveOrUndersizedVenues() {
+        var date=LocalDate.now().plusYears(5);
+        int venueId=bookingService.available(date,java.time.LocalTime.of(10,0),java.time.LocalTime.of(12,0),10).get(0).getVenueId();
+        jdbc.update("UPDATE venues SET capacity=5 WHERE venue_id=?",venueId);
+        assertThrows(IllegalArgumentException.class,()->bookingService.book(venueBooking(date),venueId));
+        jdbc.update("UPDATE venues SET capacity=100,is_active=0 WHERE venue_id=?",venueId);
+        assertThrows(IllegalArgumentException.class,()->bookingService.book(venueBooking(date),venueId));
+        assertThrows(IllegalArgumentException.class,()->bookingService.book(venueBooking(date),999999));
+        assertThrows(IllegalArgumentException.class,()->bookingService.available(date,java.time.LocalTime.NOON,java.time.LocalTime.NOON,10));
+        assertThrows(IllegalArgumentException.class,()->bookingService.available(LocalDate.now().minusDays(1),java.time.LocalTime.of(10,0),java.time.LocalTime.NOON,10));
+    }
+    @Test void customerVenuePickerRendersAndVenueCreationIsDenied() throws Exception {
+        var c=login("customer1");
+        var form=get(c,"/customer/booking/new");
+        assertEquals(200,form.statusCode()); assertTrue(form.body().contains("id=\"venueId\""));
+        assertFalse(form.body().contains("name=\"location\""));
+        String query="/customer/booking/available-venues?date="+LocalDate.now().plusYears(4)+"&start=10:00&end=12:00&guests=10";
+        assertEquals(200,get(c,query).statusCode());
+        assertEquals(403,get(login("cro1"),query).statusCode());
+        assertEquals("/access-denied",get(c,"/venue/create").uri().getPath());
+        assertEquals("/access-denied",post(c,"/venue/create","venueName=Forbidden&location=Test&capacity=100&costPerDay=1000").uri().getPath());
+        int before=jdbc.queryForObject("SELECT COUNT(*) FROM events",Integer.class);
+        var invalid=post(c,"/customer/booking/submit","eventName=Invalid&categoryId=1&guestCount=10&eventDate="+LocalDate.now().plusYears(4)+"&startTime=10:00&endTime=12:00&venueId=999999");
+        assertTrue(invalid.body().contains("no longer available"));
+        assertEquals(before,jdbc.queryForObject("SELECT COUNT(*) FROM events",Integer.class));
+    }
+    @Test void loyaltyPagesRenderAndEnforceRoles() throws Exception {
+        HttpClient customer = login("customer1");
+        var own = customer.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/customer/loyalty")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, own.statusCode());
+        assertTrue(own.body().contains("Qualifying events"));
+        var denied = customer.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/customer/loyalty/manage")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        assertTrue(denied.body().contains("Access Denied") || denied.statusCode() == 403 || denied.statusCode() == 302);
+        var staff = login("cro1").send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:"+port+"/customer/loyalty/manage")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, staff.statusCode());
+        assertTrue(staff.body().contains("Customer loyalty overview"));
     }
 
     @Test void everyDemoAccountCanLoginAndRenderDashboard() throws Exception {

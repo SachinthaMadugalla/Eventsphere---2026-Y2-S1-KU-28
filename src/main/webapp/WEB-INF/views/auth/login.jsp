@@ -8,16 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login – EventSphere</title>
     <link rel="stylesheet" href="${fn:escapeXml(pageContext.request.contextPath)}/static/css/eventsphere.css">
+    <link rel="stylesheet" href="${fn:escapeXml(pageContext.request.contextPath)}/static/css/login.css">
 </head>
 <body>
-<div class="auth-page">
+<main class="auth-page login-page">
     <div class="auth-box">
         <div class="auth-logo">
             <h1>Event<span>Sphere</span></h1>
-            <p>Web-Based Event Planning System</p>
+            <p>Every detail. Every moment.</p>
         </div>
 
-        <h2>Sign In</h2>
+        <div class="login-heading">
+            <p class="login-eyebrow">YOUR NEXT GREAT EVENT STARTS HERE</p>
+            <h2>Welcome back.</h2>
+            <p>Log in to bring your next event to life.</p>
+        </div>
 
         <c:if test="${not empty error}">
             <div class="es-alert es-alert-error">${fn:escapeXml(error)}</div>
@@ -35,35 +40,40 @@
         <form action="${fn:escapeXml(pageContext.request.contextPath)}/login" method="post" class="es-validate">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-group">
-                <label class="required">Username</label>
-                <input type="text" name="username" class="es-input"
-                       placeholder="Enter your username" required autofocus>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="es-input" autocomplete="username"
+                       placeholder="Enter your username" required>
             </div>
             <div class="es-form-group">
-                <label class="required">Password</label>
-                <input type="password" name="password" class="es-input"
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="es-input" autocomplete="current-password"
                        placeholder="Enter your password" required>
             </div>
-            <div style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
-                    Sign In
+            <div class="login-submit">
+                <button type="submit" class="btn btn-primary">
+                    Log in <span aria-hidden="true">&rarr;</span>
                 </button>
             </div>
         </form>
 
-        <div style="text-align:center;margin-top:18px;font-size:13px;color:#718096;">
+        <div class="login-register">
             New customer?
-            <a href="${fn:escapeXml(pageContext.request.contextPath)}/register" style="color:#E8A020;font-weight:600;">
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/register">
                 Create an account
             </a>
         </div>
 
-        <div style="text-align:center;margin-top:24px;padding-top:16px;
-                    border-top:1px solid #EEF1F6;font-size:11px;color:#A0AEC0;">
-            SE2030 &bull; Group 2026-Y2-S1-KU-28
+        <div class="login-footer">
+            PLAN SIMPLY. CELEBRATE BEAUTIFULLY.
         </div>
     </div>
-</div>
+    <section class="login-story" aria-label="EventSphere event planning">
+        <p class="login-story-tag"><span aria-hidden="true"></span> MADE FOR MEMORABLE MOMENTS</p>
+        <h2>Great events.<br>Beautifully<br><em>orchestrated.</em></h2>
+        <p>From the first idea to the final applause.<br>Your events, together in one place.</p>
+        <div class="login-story-footer">EventSphere <span aria-hidden="true">/</span> Event Planning System</div>
+    </section>
+</main>
 <script src="${pageContext.request.contextPath}/static/js/eventsphere.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   Sidebar navigation — role-aware menu.
   Renders different nav links based on sessionScope.userRole.
 --%>
-<nav class="es-sidebar">
+<nav class="es-sidebar" id="main-navigation" aria-label="Main navigation">
     <!-- Brand -->
     <div class="sidebar-brand">
         <h1>EventSphere</h1>
@@ -18,6 +18,12 @@
         <div class="user-role">${fn:escapeXml(sessionScope.userRole)}</div>
     </div>
 
+    <c:if test="${sessionScope.userRole == 'Customer'}">
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty" class="nav-item"><span class="nav-icon" aria-hidden="true">&#9734;</span> My Loyalty</a>
+    </c:if>
+    <c:if test="${sessionScope.userRole == 'Customer Relations Officer' or sessionScope.userRole == 'System Administrator'}">
+        <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty/manage" class="nav-item"><span class="nav-icon" aria-hidden="true">&#9734;</span> Customer Loyalty</a>
+    </c:if>
     <!-- Navigation -->
     <div class="sidebar-nav">
 
