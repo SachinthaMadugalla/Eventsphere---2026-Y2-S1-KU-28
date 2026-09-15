@@ -50,6 +50,12 @@
         </div>
     </div>
 
+    <div class="es-card">
+        <div class="card-header"><h3>${fn:escapeXml(loyalty.status)}</h3>
+            <a class="btn btn-accent btn-sm" href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty">View loyalty details</a>
+        </div>
+        <p><strong>${fn:escapeXml(loyalty.points)} points</strong> &bull; Earn 100 points per completed, fully paid event. Loyal membership starts at 300 points.</p>
+    </div>
     <!-- Recent bookings -->
     <div class="es-card">
         <div class="card-header">

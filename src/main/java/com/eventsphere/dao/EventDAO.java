@@ -87,19 +87,18 @@ public class EventDAO {
             " event_date, start_time, end_time, location, guest_count, " +
             " requirements, status, notes) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql,
-                event.getEventName(),
-                event.getCategoryId(),
-                event.getCustomerId(),
-                event.getManagerUserId(),
-                event.getEventDate(),
-                event.getStartTime(),
-                event.getEndTime(),
-                event.getLocation(),
-                event.getGuestCount(),
-                event.getRequirements(),
-                event.getStatus(),
-                event.getNotes());
+        var keys = new org.springframework.jdbc.support.GeneratedKeyHolder();
+        int changed = jdbcTemplate.update(connection -> {
+            var statement = connection.prepareStatement(sql, new String[]{"event_id"});
+            Object[] values = {event.getEventName(), event.getCategoryId(), event.getCustomerId(),
+                event.getManagerUserId(), event.getEventDate(), event.getStartTime(), event.getEndTime(),
+                event.getLocation(), event.getGuestCount(), event.getRequirements(), event.getStatus(), event.getNotes()};
+            for (int i = 0; i < values.length; i++) statement.setObject(i + 1, values[i]);
+            return statement;
+        }, keys);
+        if (keys.getKey() == null) throw new IllegalStateException("Event ID was not returned by the database.");
+        event.setEventId(keys.getKey().intValue());
+        return changed;
     }
 
     /**

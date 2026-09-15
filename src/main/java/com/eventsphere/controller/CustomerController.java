@@ -22,13 +22,17 @@ import java.util.Optional;
 @RequestMapping("/customer")
 public class CustomerController {
 
+    private final com.eventsphere.service.LoyaltyService loyaltyService;
+    private final com.eventsphere.service.CustomerBookingService bookingService;
     private final CustomerService customerService;
     private final EventService eventService;
     private final NotificationService notificationService;
 
-    public CustomerController(CustomerService customerService,
+    public CustomerController(com.eventsphere.service.CustomerBookingService bookingService, com.eventsphere.service.LoyaltyService loyaltyService, CustomerService customerService,
                                EventService eventService,
                                NotificationService notificationService) {
+        this.bookingService = bookingService;
+        this.loyaltyService = loyaltyService;
         this.customerService     = customerService;
         this.eventService        = eventService;
         this.notificationService = notificationService;
@@ -55,6 +59,9 @@ public class CustomerController {
         if (optCustomer.isEmpty()) return "redirect:/login";
 
         Customer customer = optCustomer.get();
+        model.addAttribute("loyalty", new com.eventsphere.service.LoyaltyService.Summary(
+            customer.getCustomerId(), customer.getFullName(),
+            loyaltyService.history(customer.getCustomerId()).size() * com.eventsphere.service.LoyaltyService.POINTS_PER_EVENT));
         model.addAttribute("customer",      customer);
         model.addAttribute("events",        eventService.getEventsByCustomerId(customer.getCustomerId()));
         model.addAttribute("notifications", notificationService.getUnreadForUser(user.getUserId()));
@@ -104,14 +111,28 @@ public class CustomerController {
         User user = getLoggedInUser(session);
         if (!isCustomer(user)) return "redirect:/login";
 
-        model.addAttribute("event",      new Event());
+        if (!model.containsAttribute("event")) model.addAttribute("event", new Event());
         model.addAttribute("categories", eventService.getAllCategories());
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "customer/booking-form";
     }
 
+    @GetMapping("/booking/available-venues")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> availableVenues(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.TIME) java.time.LocalTime start,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.TIME) java.time.LocalTime end,
+            @RequestParam int guests, HttpSession session) {
+        if (!isCustomer(getLoggedInUser(session))) return org.springframework.http.ResponseEntity.status(403).build();
+        try {
+            var choices = bookingService.available(date, start, end, guests).stream()
+                .map(v -> java.util.Map.of("id", v.getVenueId(), "name", v.getVenueName(), "location", v.getLocation(), "capacity", v.getCapacity())).toList();
+            return org.springframework.http.ResponseEntity.ok(choices);
+        } catch (IllegalArgumentException ex) { return org.springframework.http.ResponseEntity.badRequest().body(java.util.Map.of("error", ex.getMessage())); }
+    }
     @PostMapping("/booking/submit")
-    public String submitBooking(@ModelAttribute Event event,
+    public String submitBooking(@ModelAttribute Event event, @RequestParam(defaultValue = "0") int venueId,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
         User user = getLoggedInUser(session);
@@ -123,9 +144,13 @@ public class CustomerController {
         event.setManagerUserId(null);
         event.setNotes(null);
         event.setCustomerId(optCustomer.get().getCustomerId());
-        String error = eventService.createEvent(event);
+        String error = null;
+        try { bookingService.book(event, venueId); }
+        catch (IllegalArgumentException ex) { error = ex.getMessage(); }
+        catch (org.springframework.dao.ConcurrencyFailureException ex) { error = "Availability changed while submitting. Please check venues and try again."; }
         if (error != null) {
             redirectAttributes.addFlashAttribute("error", error);
+            redirectAttributes.addFlashAttribute("event", event);
             return "redirect:/customer/booking/new";
         }
         redirectAttributes.addFlashAttribute("success",

@@ -131,3 +131,19 @@ String sql =
 ```
 
 ---
+
+### Customer loyalty
+
+Customers start with 0 points (Regular Customer). Each completed event earns 100 points when every invoice for that event is fully paid; 300 points qualifies as Loyal Customer. Events without invoices, zero-value invoices, cancelled events and partially paid events do not qualify. Multiple invoices or payments never multiply the points for a single event. Archived completed events remain eligible.
+
+Points are calculated from current event and payment records rather than stored as an independent balance. Existing qualifying events count automatically. Payment corrections, deleted payments and status changes recalculate eligibility, including downgrading status when the total drops below 300. The qualifying-events page is a current eligibility breakdown, not an immutable points transaction ledger. No database migration or manual points adjustment is introduced.
+
+Customers can use My Loyalty (`/customer/loyalty`) and see their balance on the dashboard. Customer Relations Officers and System Administrators can view all customer statuses at `/customer/loyalty/manage`. These routes enforce access on the server. Feedback continues to belong to Reporting & Feedback Management.
+
+### Customer venue selection
+
+Customer bookings require an existing active venue, a date, start/end times and a guest count. Availability excludes overlapping non-cancelled venue assignments and venues below the requested capacity. The customer cannot enter a custom location: the server derives it from the selected venue record. Availability is rechecked in the same serializable transaction that creates the booking and venue assignment, and the generated event key links the correct reservation. Requested bookings hold the slot until cancellation; cancellation makes the slot available again. Boundary-adjacent reservations do not overlap. If availability changes, the form preserves the event details and asks the customer to reselect.
+
+The picker clears stale selections when scheduling inputs change, handles loading/error/empty results, and enables submission only after selecting a venue. Existing venue management endpoints continue to deny Customer access.
+
+Responsive checks cover Login, Register, customer dashboard, booking, loyalty, profile and booking-list pages at widths 320, 390, 768, 1024 and 1440 in the in-app browser. Mobile navigation is hidden from keyboard navigation while closed, supports Escape to close, and has an expanded-state announcement. Mobile controls use readable 16px text and 44px minimum heights. These checks do not constitute testing every physical device or browser.
