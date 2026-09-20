@@ -5,7 +5,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/** Refuse to serve the application without a working, initialized SQL Server database. */
+
 @Component
 @Profile("!test")
 public class SqlServerConnectionCheck implements InitializingBean {

@@ -333,3 +333,14 @@ PRINT '  customer1 / password123  -> Customer (Saman Kumara)';
 PRINT '  customer2 / password123  -> Customer (Priya Wijesinghe)';
 PRINT '  customer3 / password123  -> Customer (Harsha Bandara)';
 PRINT '==============================================';
+
+SELECT * FROM users;
+GO
+
+SELECT * FROM events;
+GO
+
+
+DELETE FROM events
+WHERE event_id=6;
+

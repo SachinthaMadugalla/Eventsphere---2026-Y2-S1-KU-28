@@ -334,3 +334,27 @@ CREATE INDEX IX_feedback_event      ON feedback(event_id);
 CREATE INDEX IX_complaints_customer ON complaints(customer_id);
 
 GO
+
+SELECT * FROM feedback;
+GO
+
+DELETE FROM events
+WHERE event_id=4;
+
+INSERT INTO feedback(event_name,category_id,start_time,end_time,guest_count)
+VALUES ('dj night','10','2026-09-28','18:00:00','22:00:00',78);
+
+SELECT * FROM invoices;
+GO
+
+SELECT * FROM venues;
+GO
+
+INSERT INTO venues(venue_name,location,capacity,cost_per_day,description)
+VALUES('Swiss dail','kandy',1500,230000.00,'near to lake round');
+
+SELECT * FROM staff;
+GO
+
+SELECT * FROM events;
+GO
