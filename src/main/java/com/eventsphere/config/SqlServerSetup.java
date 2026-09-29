@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.util.*;
 import java.util.regex.Pattern;
 
-/** Launcher entry point: create only a missing database/schema, never reset existing data. */
+
 public final class SqlServerSetup {
     private SqlServerSetup() {}
 

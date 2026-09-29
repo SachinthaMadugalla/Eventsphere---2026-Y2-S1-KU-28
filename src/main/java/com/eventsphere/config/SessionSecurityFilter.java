@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** Keeps session permissions current and protects form submissions from cross-site requests. */
+
 @Component
 public class SessionSecurityFilter extends OncePerRequestFilter {
     private final UserDAO users;
