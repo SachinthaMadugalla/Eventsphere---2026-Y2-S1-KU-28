@@ -341,6 +341,78 @@ SELECT * FROM events;
 GO
 
 
-DELETE FROM events
-WHERE event_id=6;
+-- =====================================================
+-- LOYALTY POINTS SAMPLE DATA
+-- Adding completed and fully paid events so customers
+-- can see their loyalty points
+-- =====================================================
 
+-- Fix Event 1: Mark as Completed and add final payment
+UPDATE events SET status = 'Completed' WHERE event_id = 1;
+
+-- Add final payment to fully pay Event 1 invoice (INV-2026-001)
+-- Invoice total: 720,000 LKR, Already paid: 250,000 LKR, Remaining: 470,000 LKR
+INSERT INTO payments
+    (invoice_id, event_id, customer_id, amount, payment_date,
+     payment_type, reference_no, notes, recorded_by)
+VALUES
+(1, 1, 1, 470000.00, '2026-10-14', 'Final Payment', 'PAY-003', 
+ 'Final payment before event - balance cleared', 7);
+
+-- Update invoice status to Paid
+UPDATE invoices SET status = 'Paid' WHERE invoice_id = 1;
+
+-- Add additional completed historical event for customer 1 (Saman Kumara)
+-- This gives customer 1 a second completed event (Event 1 + Event 6 = 200 points)
+INSERT INTO events
+    (event_name, category_id, customer_id, manager_user_id,
+     event_date, start_time, end_time, location,
+     guest_count, requirements, status, notes)
+VALUES
+('Saman 25th Anniversary Celebration', 6, 1, 3,
+ '2025-08-20', '18:00', '22:00', 'Garden Pavilion, Nugegoda',
+ 80, 'Anniversary party with catering and decoration',
+ 'Completed', 'Past event - successfully completed');
+
+-- Add completed events for customer 2 (Priya Wijesinghe) 
+-- This gives customer 2: 100 points = Regular Customer
+INSERT INTO events
+    (event_name, category_id, customer_id, manager_user_id,
+     event_date, start_time, end_time, location,
+     guest_count, requirements, status, notes)
+VALUES
+('Company Launch Event', 3, 2, 4,
+ '2025-09-15', '17:00', '21:00', 'Crystal Hall, Colombo 03',
+ 100, 'Product launch with cocktail reception',
+ 'Completed', 'Successful corporate event');
+
+-- Get the event IDs for the new events (they'll be 6 and 7)
+-- Create invoices for these completed events
+INSERT INTO invoices
+    (event_id, customer_id, invoice_number, total_amount,
+     issued_date, due_date, status, notes)
+VALUES
+-- Customer 1 event (ID 6) - Anniversary
+(6, 1, 'INV-2025-020', 125000.00, '2025-07-15', '2025-08-15', 'Paid', 'Anniversary party - paid in full'),
+
+-- Customer 2 event (ID 7) - Product launch
+(7, 2, 'INV-2025-030', 180000.00, '2025-08-20', '2025-09-10', 'Paid', 'Product launch - paid in full');
+
+-- Add full payments for these invoices
+INSERT INTO payments
+    (invoice_id, event_id, customer_id, amount, payment_date,
+     payment_type, reference_no, notes, recorded_by)
+VALUES
+-- Invoice 4 (event 6) - Customer 1 anniversary
+(4, 6, 1, 125000.00, '2025-08-10', 'Full Payment', 'PAY-2025-020', 'Full payment for anniversary party', 7),
+
+-- Invoice 5 (event 7) - Customer 2 product launch
+(5, 7, 2, 180000.00, '2025-09-08', 'Full Payment', 'PAY-2025-030', 'Full payment for product launch event', 7);
+
+-- =====================================================
+-- LOYALTY POINTS SUMMARY
+-- After this data is loaded:
+-- Customer 1 (Saman Kumara):    2 completed events (Event 1 + Event 6) = 200 points → Regular Customer
+-- Customer 2 (Priya Wijesinghe): 1 completed event (Event 7) = 100 points → Regular Customer  
+-- Customer 3 (Harsha Bandara):   0 completed events = 0 points → Regular Customer
+-- =====================================================
