@@ -8,22 +8,26 @@
 <nav class="es-sidebar" id="main-navigation" aria-label="Main navigation">
     <!-- Brand -->
     <div class="sidebar-brand">
-        <h1>EventSphere</h1>
-        <p>Event Planning System</p>
+        <h1>Event<span>Sphere</span></h1>
+        <p>Every detail. <em>Every moment.</em></p>
     </div>
 
     <!-- User info -->
     <div class="sidebar-user">
-        <div class="user-name">${fn:escapeXml(sessionScope.userFullName)}</div>
-        <div class="user-role">${fn:escapeXml(sessionScope.userRole)}</div>
+        <c:choose>
+            <c:when test="${not empty sessionScope.loggedInUser.profilePicture}">
+                <img src="${fn:escapeXml(pageContext.request.contextPath)}${fn:escapeXml(sessionScope.loggedInUser.profilePicture)}" alt="Avatar" class="user-avatar" style="object-fit: cover;" aria-hidden="true">
+            </c:when>
+            <c:otherwise>
+                <span class="user-avatar" aria-hidden="true">${fn:escapeXml(fn:toUpperCase(fn:substring(sessionScope.userFullName, 0, 1)))}</span>
+            </c:otherwise>
+        </c:choose>
+        <div class="user-meta">
+            <div class="user-name">${fn:escapeXml(sessionScope.userFullName)}</div>
+            <div class="user-role">${fn:escapeXml(sessionScope.userRole)}</div>
+        </div>
     </div>
 
-    <c:if test="${sessionScope.userRole == 'Customer'}">
-        <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty" class="nav-item"><span class="nav-icon" aria-hidden="true">&#9734;</span> My Loyalty</a>
-    </c:if>
-    <c:if test="${sessionScope.userRole == 'Customer Relations Officer' or sessionScope.userRole == 'System Administrator'}">
-        <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty/manage" class="nav-item"><span class="nav-icon" aria-hidden="true">&#9734;</span> Customer Loyalty</a>
-    </c:if>
     <!-- Navigation -->
     <div class="sidebar-nav">
 
@@ -42,11 +46,13 @@
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/profile" class="nav-item">
                 <span class="nav-icon">&#128100;</span> My Profile
             </a>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty" class="nav-item">
+                <span class="nav-icon" aria-hidden="true">&#9734;</span> My Loyalty
+            </a>
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/notifications" class="nav-item">
                 <span class="nav-icon">&#128276;</span> Notifications
                 <c:if test="${unreadCount > 0}">
-                    <span style="margin-left:auto;background:#E53E3E;color:#fff;
-                          border-radius:10px;padding:1px 7px;font-size:10px;">${fn:escapeXml(unreadCount)}</span>
+                    <span class="nav-count">${fn:escapeXml(unreadCount)}</span>
                 </c:if>
             </a>
             <span class="nav-section-title">Feedback</span>
@@ -209,11 +215,15 @@
         <!-- ── SHARED: NOTIFICATIONS ──────────── -->
         <c:if test="${sessionScope.userRole != 'Customer'}">
             <span class="nav-section-title">Account</span>
+            <c:if test="${sessionScope.userRole == 'Customer Relations Officer' or sessionScope.userRole == 'System Administrator'}">
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/loyalty/manage" class="nav-item">
+                    <span class="nav-icon" aria-hidden="true">&#9734;</span> Customer Loyalty
+                </a>
+            </c:if>
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/notifications" class="nav-item">
                 <span class="nav-icon">&#128276;</span> Notifications
                 <c:if test="${unreadCount > 0}">
-                    <span style="margin-left:auto;background:#E53E3E;color:#fff;
-                          border-radius:10px;padding:1px 7px;font-size:10px;">${fn:escapeXml(unreadCount)}</span>
+                    <span class="nav-count">${fn:escapeXml(unreadCount)}</span>
                 </c:if>
             </a>
         </c:if>
@@ -222,8 +232,8 @@
 
     <div class="sidebar-footer">
         <form action="${fn:escapeXml(pageContext.request.contextPath)}/logout" method="post">
-<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}"><button type="submit" class="btn btn-secondary">
-            <span style="margin-right:8px;">&#8594;</span> Sign Out
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}"><button type="submit" class="btn sidebar-signout">
+            Sign out <span aria-hidden="true">&rarr;</span>
         </button></form>
     </div>
 </nav>

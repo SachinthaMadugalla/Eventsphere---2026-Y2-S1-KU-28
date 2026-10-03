@@ -64,67 +64,124 @@ function confirmAction(message) {
 // ── FORM VALIDATION ────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Highlight required fields that are empty on submit
+    // Phone inputs: keep digits only and never more than 10 of them
+    document.querySelectorAll('input[data-rule="phone"]').forEach(function (field) {
+        field.addEventListener('input', function () {
+            const digits = field.value.replace(/\D/g, '').slice(0, 10);
+            if (digits !== field.value) field.value = digits;
+        });
+    });
+
     const forms = document.querySelectorAll('form.es-validate');
     forms.forEach(function (form) {
         form.addEventListener('submit', function (e) {
             let valid = true;
-            const required = form.querySelectorAll('[required]');
 
-            required.forEach(function (field) {
+            // Clear previous errors on every field in the form
+            form.querySelectorAll('.field-error').forEach(function (msg) { msg.remove(); });
+            form.querySelectorAll('input, select, textarea').forEach(function (field) {
                 field.style.borderColor = '';
-                const msg = field.parentElement.querySelector('.field-error');
-                if (msg) msg.remove();
-
-                if (!field.value || field.value.trim() === '') {
-                    valid = false;
-                    field.style.borderColor = '#E53E3E';
-                    const err = document.createElement('span');
-                    err.className = 'field-error';
-                    err.style.cssText = 'color:#E53E3E;font-size:11px;display:block;margin-top:3px;';
-                    err.textContent = 'This field is required.';
-                    field.parentElement.appendChild(err);
-                }
+                field.removeAttribute('aria-invalid');
             });
 
-            // Email format check
-            const emailFields = form.querySelectorAll('input[type="email"]');
-            emailFields.forEach(function (field) {
-                if (field.value && !isValidEmail(field.value)) {
+            form.querySelectorAll('input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])').forEach(function (field) {
+                const error = getFieldError(field, form);
+                if (error) {
                     valid = false;
-                    field.style.borderColor = '#E53E3E';
-                    const err = document.createElement('span');
-                    err.className = 'field-error';
-                    err.style.cssText = 'color:#E53E3E;font-size:11px;display:block;margin-top:3px;';
-                    err.textContent = 'Please enter a valid email address.';
-                    field.parentElement.appendChild(err);
-                }
-            });
-
-            // Number min check
-            const numberFields = form.querySelectorAll('input[type="number"][min]');
-            numberFields.forEach(function (field) {
-                const min = parseFloat(field.getAttribute('min'));
-                if (field.value !== '' && parseFloat(field.value) < min) {
-                    valid = false;
-                    field.style.borderColor = '#E53E3E';
+                    showFieldError(field, error);
                 }
             });
 
             if (!valid) {
                 e.preventDefault();
-                // Scroll to first error
-                const firstError = form.querySelector('[style*="E53E3E"]');
+                const firstError = form.querySelector('[aria-invalid="true"]');
                 if (firstError) {
                     firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus({ preventScroll: true });
                 }
             }
         });
     });
 });
 
+/**
+ * Returns an error message for the field, or null when it is valid.
+ * Rules come from standard attributes (required, minlength, maxlength, min, max, type=email)
+ * and from data-rule="phone|name|username" and data-match="<id of field to match>".
+ */
+function getFieldError(field, form) {
+    const value = (field.value || '').trim();
+
+    if (field.hasAttribute('required') && value === '') {
+        return 'This field is required.';
+    }
+    if (value === '') return null; // optional field left empty
+
+    const rule = field.getAttribute('data-rule');
+    if (rule === 'phone' && !isValidPhone(value)) {
+        return 'Phone number must be exactly 10 digits and start with 0 (e.g. 0771234567).';
+    }
+    if (rule === 'name' && !isValidPersonName(value)) {
+        return 'Use 2-100 letters. Spaces, dots, apostrophes and hyphens are allowed.';
+    }
+    if (rule === 'username' && !isValidUsername(value)) {
+        return 'Use 3-50 letters, numbers, dots, underscores or hyphens.';
+    }
+    if (field.type === 'email' && !isValidEmail(value)) {
+        return 'Please enter a valid email address (e.g. name@example.com).';
+    }
+
+    const minLength = parseInt(field.getAttribute('minlength'), 10);
+    if (!isNaN(minLength) && field.value.length < minLength) {
+        return 'Must be at least ' + minLength + ' characters.';
+    }
+    const maxLength = parseInt(field.getAttribute('maxlength'), 10);
+    if (!isNaN(maxLength) && field.value.length > maxLength) {
+        return 'Must not exceed ' + maxLength + ' characters.';
+    }
+
+    if (field.type === 'number') {
+        const num = parseFloat(value);
+        if (isNaN(num)) return 'Please enter a valid number.';
+        const min = parseFloat(field.getAttribute('min'));
+        const max = parseFloat(field.getAttribute('max'));
+        if (!isNaN(min) && num < min) return 'Value must be at least ' + min + '.';
+        if (!isNaN(max) && num > max) return 'Value must not exceed ' + max + '.';
+    }
+
+    const matchId = field.getAttribute('data-match');
+    if (matchId) {
+        const other = form.querySelector('#' + matchId);
+        if (other && other.value !== field.value) return 'Passwords do not match.';
+    }
+    return null;
+}
+
+function showFieldError(field, message) {
+    field.style.borderColor = '#E53E3E';
+    field.setAttribute('aria-invalid', 'true');
+    const err = document.createElement('span');
+    err.className = 'field-error';
+    err.setAttribute('role', 'alert');
+    err.style.cssText = 'color:#E53E3E;font-size:11px;display:block;margin-top:3px;';
+    err.textContent = message;
+    field.parentElement.appendChild(err);
+}
+
 function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) && email.indexOf('..') === -1 && email.length <= 150;
+}
+
+function isValidPhone(phone) {
+    return /^0\d{9}$/.test(phone);
+}
+
+function isValidPersonName(name) {
+    return name.length >= 2 && name.length <= 100 && /^\p{L}[\p{L} .'-]*$/u.test(name);
+}
+
+function isValidUsername(username) {
+    return /^[A-Za-z0-9._-]{3,50}$/.test(username);
 }
 
 // ── STAR RATING DISPLAY ────────────────────────────────────────────────────
@@ -232,6 +289,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// ── TOPBAR DATE CHIP ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    const chip = document.getElementById('topbar-date');
+    if (chip) {
+        chip.textContent = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+});
+
 // ── TABLE SEARCH FILTER (client-side) ─────────────────────────────────────
 /**
  * Live filter a table using a text input.
@@ -272,5 +337,55 @@ document.addEventListener('keydown', function (event) {
         const toggle = document.querySelector('.sidebar-toggle');
         toggle?.setAttribute('aria-expanded', 'false');
         toggle?.focus();
+    }
+});
+
+// ── SEARCHABLE SELECT (Tom Select) ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    // Apply searchable select to large lists (Customers, Venues, Vendors, Events, etc.)
+    const searchableNames = ['customerId', 'venueId', 'vendorId', 'eventId', 'managerUserId', 'categoryId', 'resourceId', 'staffId', 'roleId'];
+    
+    document.querySelectorAll('select.es-select').forEach(function (selectEl) {
+        if (selectEl.classList.contains('tomselected')) return;
+        
+        if (searchableNames.includes(selectEl.name) || selectEl.classList.contains('search-select')) {
+            new TomSelect(selectEl, {
+                create: false,
+                placeholder: selectEl.options[0]?.text || "Select an option"
+            });
+        }
+    });
+});
+
+// ── DARK MODE TOGGLE ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('darkModeToggle');
+    const icon = toggleBtn ? toggleBtn.querySelector('i') : null;
+    
+    // Check saved preference
+    const isDark = localStorage.getItem('es-theme') === 'dark';
+    if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (icon) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+    }
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('es-theme', 'light');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('es-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        });
     }
 });
