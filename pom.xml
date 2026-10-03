@@ -92,6 +92,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Stripe Checkout for online card payments -->
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>33.4.2</version>
+        </dependency>
+
         <!-- Spring Boot DevTools (optional, for hot reload) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
