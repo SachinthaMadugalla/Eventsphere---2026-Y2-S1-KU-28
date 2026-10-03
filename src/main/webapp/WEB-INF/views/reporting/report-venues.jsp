@@ -15,7 +15,84 @@
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Venue Usage
         </div>
+ <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<c:set var="pageTitle" value="Venue Usage Report"/>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
+<%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
+<div class="es-main">
+<%@ include file="/WEB-INF/views/common/topbar.jsp" %>
+<div class="es-content">
+
+    <div class="page-header">
+        <h2>&#127968; Venue Usage Report</h2>
+        <div class="breadcrumb">
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
+            &rsaquo; Venue Usage
+        </div>
     </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="btn btn-secondary btn-sm" onclick="printPage()">&#128424; Print</button>
+    </div>
+
+    <div class="es-alert es-alert-info">
+        Shows all venue-to-event assignments. Use this to identify the most frequently booked venues.
+    </div>
+
+    <div class="es-card">
+        <div class="card-header">
+            <h3>Venue Assignments</h3>
+            <span style="font-size:12px;color:#718096;">${fn:escapeXml(assignments.size())} assignment(s)</span>
+        </div>
+        <c:choose>
+            <c:when test="${empty assignments}">
+                <div class="es-empty">
+                    <span class="es-empty-icon">&#127968;</span>
+                    <p>No venue assignments on record.</p>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="es-table-wrap">
+                    <table class="es-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Venue</th>
+                                <th>Event</th>
+                                <th>Assigned Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach var="a" items="${assignments}" varStatus="st">
+                            <tr>
+                                <td>${fn:escapeXml(st.count)}</td>
+                                <td><strong>${fn:escapeXml(a.venueName)}</strong></td>
+                                <td>${fn:escapeXml(a.eventName)}</td>
+                                <td>
+                                    ${fn:escapeXml(a.assignedDate)}
+                                </td>
+                                <td>${fn:escapeXml(empty a.startTime ? '—' : a.startTime)}</td>
+                                <td>${fn:escapeXml(empty a.endTime   ? '—' : a.endTime)}</td>
+                                <td>${fn:escapeXml(empty a.notes     ? '—' : a.notes)}</td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+
+</div>
+<%@ include file="/WEB-INF/views/common/footer.jsp" %>
+
+   </div>
 
     <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
         <button class="btn btn-secondary btn-sm" onclick="printPage()">&#128424; Print</button>
