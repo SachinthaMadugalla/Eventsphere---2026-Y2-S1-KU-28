@@ -7,8 +7,16 @@
     const fields = ['eventDate', 'startTime', 'endTime', 'guestCount'].map(n => form.elements[n]);
     let revision = 0, pending;
     const reset = message => {
-        venue.replaceChildren(new Option(message, ''));
-        venue.disabled = true; submit.disabled = true;
+        if (venue.tomselect) {
+            venue.tomselect.clearOptions();
+            venue.tomselect.addOption({value: '', text: message});
+            venue.tomselect.setValue('');
+            venue.tomselect.disable();
+        } else {
+            venue.replaceChildren(new Option(message, ''));
+            venue.disabled = true;
+        }
+        submit.disabled = true;
     };
     async function refresh() {
         const current = ++revision;
@@ -28,9 +36,21 @@
             const venues = await response.json();
             if (current !== revision) return;
             if (!Array.isArray(venues)) throw new Error('Please log in again to check availability.');
-            reset(venues.length ? 'Select an available venue' : 'No available venues');
-            venues.forEach(v => venue.add(new Option(`${v.name} — ${v.location} (up to ${v.capacity} guests)`, v.id)));
-            venue.disabled = !venues.length;
+
+            const defaultMsg = venues.length ? 'Select an available venue' : 'No available venues';
+            if (venue.tomselect) {
+                venue.tomselect.clearOptions();
+                venue.tomselect.addOption({value: '', text: defaultMsg});
+                venues.forEach(v => venue.tomselect.addOption({value: v.id, text: `${v.name} — ${v.location} (up to ${v.capacity} guests)`}));
+                venue.tomselect.setValue('');
+                if (venues.length) venue.tomselect.enable();
+                else venue.tomselect.disable();
+            } else {
+                reset(defaultMsg);
+                venues.forEach(v => venue.add(new Option(`${v.name} — ${v.location} (up to ${v.capacity} guests)`, v.id)));
+                venue.disabled = !venues.length;
+            }
+
             status.textContent = venues.length ? `${venues.length} available venue(s). Availability is checked again when you submit.` : 'No venues match this date, time and guest count. Try another date or time.';
         } catch (error) {
             if (current !== revision || error.name === 'AbortError') return;
