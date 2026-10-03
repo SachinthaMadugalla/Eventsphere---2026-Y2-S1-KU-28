@@ -28,4 +28,30 @@ public class ValidationUtil {
         if (username == null || username.isEmpty()) return false;
         return USERNAME_PATTERN.matcher(username).matches();
     }
+
+    public static boolean isBlank(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    public static String trimToNull(String str) {
+        if (str == null) return null;
+        String trimmed = str.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    public static String checkOptionalPhone(String phone) {
+        if (isBlank(phone)) return null;
+        if (!isValidPhone(phone.trim())) {
+            return "Phone number must be exactly 10 digits and start with 0.";
+        }
+        return null;
+    }
+
+    public static String checkOptionalEmail(String email) {
+        if (isBlank(email)) return null;
+        if (!isValidEmail(email.trim())) {
+            return "Please enter a valid email address.";
+        }
+        return null;
+    }
 }
