@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** Keeps session permissions current and protects form submissions from cross-site requests. */
+
 @Component
 public class SessionSecurityFilter extends OncePerRequestFilter {
     private final UserDAO users;
@@ -19,7 +19,10 @@ public class SessionSecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/static/");
+        // The Stripe webhook is called server-to-server (no session/CSRF token); it is
+        // authenticated by verifying the Stripe-Signature header instead.
+        return request.getServletPath().startsWith("/static/")
+            || request.getServletPath().equals("/stripe/webhook");
     }
 
     @Override

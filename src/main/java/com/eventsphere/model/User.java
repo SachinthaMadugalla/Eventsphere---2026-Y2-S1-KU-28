@@ -18,6 +18,7 @@ public class User {
     private String roleName;   // populated by JOIN in DAO
     private boolean active;
     private LocalDateTime createdAt;
+    private String profilePicture; // optional URL or path to avatar
 
     public User() {}
 
@@ -52,6 +53,9 @@ public class User {
 
     public LocalDateTime getCreatedAt()                   { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt)     { this.createdAt = createdAt; }
+
+    public String getProfilePicture()                     { return profilePicture; }
+    public void setProfilePicture(String profilePicture)  { this.profilePicture = profilePicture; }
 
     @Override
     public String toString() {

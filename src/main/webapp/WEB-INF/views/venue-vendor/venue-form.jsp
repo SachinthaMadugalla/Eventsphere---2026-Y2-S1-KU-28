@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/common/topbar.jsp" %>
 <div class="es-content">
     <div class="page-header">
-        <h2>${fn:escapeXml(isEdit ? '&#9998; Edit Venue' : '&#43; Add Venue')}</h2>
+        <h2>${isEdit ? '&#9998;' : '&#43;'} ${fn:escapeXml(isEdit ? 'Edit Venue' : 'Add Venue')}</h2>
         <div class="breadcrumb"><a href="${fn:escapeXml(pageContext.request.contextPath)}/venue/list">Venues</a> &rsaquo; ${fn:escapeXml(isEdit ? venue.venueName : 'New')}</div>
     </div>
     <%@ include file="/WEB-INF/views/common/alerts.jsp" %>

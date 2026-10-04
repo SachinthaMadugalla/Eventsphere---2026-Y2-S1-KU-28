@@ -67,34 +67,38 @@
                             ${fn:escapeXml(u.createdAt.toLocalDate())}
                         </td>
                         <td>
-                            <!-- Activate / Deactivate -->
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/toggle/${fn:escapeXml(u.userId)}"
-                                  method="post" style="display:inline;"
-                                  onsubmit="return confirmAction('Proceed with this change?')">
-<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <input type="hidden" name="active" value="${fn:escapeXml(!u.active)}">
-                                <button type="submit"
-                                        class="btn ${fn:escapeXml(u.active ? 'btn-warning' : 'btn-success')} btn-xs">
-                                    ${fn:escapeXml(u.active ? 'Deactivate' : 'Activate')}
-                                </button>
-                            </form>
-
-                            <!-- Change Role -->
-                            <button type="button"
-                                    class="btn btn-primary btn-xs"
-                                    data-username="${fn:escapeXml(u.username)}" onclick="openRoleModal(${fn:escapeXml(u.userId)}, this.dataset.username, ${fn:escapeXml(u.roleId)})">
-                                Change Role
-                            </button>
-
-                            <!-- Delete (only non-self) -->
-                            <c:if test="${u.userId != sessionScope.userId}">
-                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/delete/${fn:escapeXml(u.userId)}"
-                                      method="post" style="display:inline;"
+                            <div class="tbl-actions">
+                                <!-- Activate / Deactivate -->
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/toggle/${fn:escapeXml(u.userId)}"
+                                      method="post" style="display:contents;"
                                       onsubmit="return confirmAction('Proceed with this change?')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                    <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                                    <input type="hidden" name="active" value="${fn:escapeXml(!u.active)}">
+                                    <button type="submit"
+                                            class="btn-icon ${u.active ? 'btn-icon-warning' : 'btn-icon-success'}"
+                                            title="${u.active ? 'Deactivate' : 'Activate'}">
+                                        <i class="fa-solid ${u.active ? 'fa-ban' : 'fa-check'}"></i>
+                                    </button>
                                 </form>
-                            </c:if>
+
+                                <!-- Change Role -->
+                                <button type="button"
+                                        class="btn-sm-icon btn-primary"
+                                        data-username="${fn:escapeXml(u.username)}" onclick="openRoleModal(${fn:escapeXml(u.userId)}, this.dataset.username, ${fn:escapeXml(u.roleId)})"
+                                        title="Change Role">
+                                    <i class="fa-solid fa-user-shield"></i> Role
+                                </button>
+
+                                <!-- Delete (only non-self) -->
+                                <c:if test="${u.userId != sessionScope.userId}">
+                                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/admin/users/delete/${fn:escapeXml(u.userId)}"
+                                          method="post" style="display:contents;"
+                                          onsubmit="return confirmAction('Proceed with this change?')">
+<input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
+                                        <button type="submit" class="btn-icon btn-icon-danger" title="Delete User"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                </c:if>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>

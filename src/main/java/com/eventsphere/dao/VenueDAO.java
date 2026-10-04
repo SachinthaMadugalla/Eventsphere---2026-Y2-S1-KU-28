@@ -63,8 +63,8 @@ public class VenueDAO {
      */
     public int addVenue(Venue venue) {
         String sql =
-            "INSERT INTO venues (venue_name, location, capacity, cost_per_day, description) " +
-            "VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO venues (venue_name, location, capacity, cost_per_day, description) " +
+                        "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 venue.getVenueName(),
                 venue.getLocation(),
@@ -78,8 +78,8 @@ public class VenueDAO {
      */
     public int assignVenueToEvent(EventVenue ev) {
         String sql =
-            "INSERT INTO event_venues (event_id, venue_id, assigned_date, start_time, end_time, notes) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+                "INSERT INTO event_venues (event_id, venue_id, assigned_date, start_time, end_time, notes) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 ev.getEventId(),
                 ev.getVenueId(),
@@ -96,9 +96,9 @@ public class VenueDAO {
      */
     public List<Venue> findAll() {
         String sql =
-            "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
-            "       description, is_active, created_at " +
-            "FROM venues ORDER BY venue_name";
+                "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
+                        "       description, is_active, created_at " +
+                        "FROM venues ORDER BY venue_name";
         return jdbcTemplate.query(sql, venueRowMapper);
     }
 
@@ -107,9 +107,9 @@ public class VenueDAO {
      */
     public List<Venue> findAllActive() {
         String sql =
-            "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
-            "       description, is_active, created_at " +
-            "FROM venues WHERE is_active = 1 ORDER BY venue_name";
+                "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
+                        "       description, is_active, created_at " +
+                        "FROM venues WHERE is_active = 1 ORDER BY venue_name";
         return jdbcTemplate.query(sql, venueRowMapper);
     }
 
@@ -118,9 +118,9 @@ public class VenueDAO {
      */
     public Optional<Venue> findById(int venueId) {
         String sql =
-            "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
-            "       description, is_active, created_at " +
-            "FROM venues WHERE venue_id = ?";
+                "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
+                        "       description, is_active, created_at " +
+                        "FROM venues WHERE venue_id = ?";
         List<Venue> result = jdbcTemplate.query(sql, venueRowMapper, venueId);
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
@@ -130,13 +130,13 @@ public class VenueDAO {
      */
     public List<EventVenue> findAssignmentsByEventId(int eventId) {
         String sql =
-            "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
-            "       ev.venue_id, v.venue_name, " +
-            "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
-            "FROM event_venues ev " +
-            "JOIN events e  ON ev.event_id  = e.event_id " +
-            "JOIN venues v  ON ev.venue_id   = v.venue_id " +
-            "WHERE ev.event_id = ?";
+                "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
+                        "       ev.venue_id, v.venue_name, " +
+                        "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
+                        "FROM event_venues ev " +
+                        "JOIN events e  ON ev.event_id  = e.event_id " +
+                        "JOIN venues v  ON ev.venue_id   = v.venue_id " +
+                        "WHERE ev.event_id = ?";
         return jdbcTemplate.query(sql, eventVenueRowMapper, eventId);
     }
 
@@ -145,13 +145,13 @@ public class VenueDAO {
      */
     public List<EventVenue> findAssignmentsByVenueId(int venueId) {
         String sql =
-            "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
-            "       ev.venue_id, v.venue_name, " +
-            "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
-            "FROM event_venues ev " +
-            "JOIN events e  ON ev.event_id = e.event_id " +
-            "JOIN venues v  ON ev.venue_id  = v.venue_id " +
-            "WHERE ev.venue_id = ? ORDER BY ev.assigned_date DESC";
+                "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
+                        "       ev.venue_id, v.venue_name, " +
+                        "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
+                        "FROM event_venues ev " +
+                        "JOIN events e  ON ev.event_id = e.event_id " +
+                        "JOIN venues v  ON ev.venue_id  = v.venue_id " +
+                        "WHERE ev.venue_id = ? ORDER BY ev.assigned_date DESC";
         return jdbcTemplate.query(sql, eventVenueRowMapper, venueId);
     }
 
@@ -160,13 +160,13 @@ public class VenueDAO {
      */
     public List<EventVenue> findAllAssignments() {
         String sql =
-            "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
-            "       ev.venue_id, v.venue_name, " +
-            "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
-            "FROM event_venues ev " +
-            "JOIN events e  ON ev.event_id = e.event_id " +
-            "JOIN venues v  ON ev.venue_id  = v.venue_id " +
-            "ORDER BY ev.assigned_date DESC";
+                "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
+                        "       ev.venue_id, v.venue_name, " +
+                        "       ev.assigned_date, ev.start_time, ev.end_time, ev.notes " +
+                        "FROM event_venues ev " +
+                        "JOIN events e  ON ev.event_id = e.event_id " +
+                        "JOIN venues v  ON ev.venue_id  = v.venue_id " +
+                        "ORDER BY ev.assigned_date DESC";
         return jdbcTemplate.query(sql, eventVenueRowMapper);
     }
 
@@ -188,15 +188,15 @@ public class VenueDAO {
                                    String startTime, String endTime,
                                    int excludeEventVenueId) {
         String sql =
-            "SELECT COUNT(*) " +
-            "FROM event_venues ev " +
-            "JOIN events e ON ev.event_id = e.event_id " +
-            "WHERE ev.venue_id = ? " +
-            "  AND ev.assigned_date = ? " +
-            "  AND ev.event_venue_id <> ? " +
-            "  AND e.status NOT IN ('Cancelled') " +
-            "  AND (ev.start_time IS NULL OR ev.start_time < ?) " +
-            "  AND (ev.end_time IS NULL OR ev.end_time > ?)";
+                "SELECT COUNT(*) " +
+                        "FROM event_venues ev " +
+                        "JOIN events e ON ev.event_id = e.event_id " +
+                        "WHERE ev.venue_id = ? " +
+                        "  AND ev.assigned_date = ? " +
+                        "  AND ev.event_venue_id <> ? " +
+                        "  AND e.status NOT IN ('Cancelled') " +
+                        "  AND (ev.start_time IS NULL OR ev.start_time < ?) " +
+                        "  AND (ev.end_time IS NULL OR ev.end_time > ?)";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
                 venueId, date, excludeEventVenueId, endTime, startTime);
         return count != null ? count : 0;
@@ -209,9 +209,9 @@ public class VenueDAO {
      */
     public int updateVenue(Venue venue) {
         String sql =
-            "UPDATE venues SET venue_name = ?, location = ?, capacity = ?, " +
-            "                  cost_per_day = ?, description = ? " +
-            "WHERE venue_id = ?";
+                "UPDATE venues SET venue_name = ?, location = ?, capacity = ?, " +
+                        "                  cost_per_day = ?, description = ? " +
+                        "WHERE venue_id = ?";
         return jdbcTemplate.update(sql,
                 venue.getVenueName(),
                 venue.getLocation(),
