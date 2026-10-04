@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 /**
  * Represents a staff member at EventSphere.
- * Maps to the 'staff' table in EventSphereDB.
+
  */
 public class Staff {
 

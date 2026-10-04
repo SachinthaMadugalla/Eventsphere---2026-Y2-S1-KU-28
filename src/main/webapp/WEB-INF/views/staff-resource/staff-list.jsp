@@ -27,17 +27,19 @@
                         <td>${fn:escapeXml(empty s.email ? '—' : s.email)}</td>
                         <td><span class="es-badge ${fn:escapeXml(s.active ? 'badge-active' : 'badge-inactive')}">${fn:escapeXml(s.active ? 'Active' : 'Inactive')}</span></td>
                         <td>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/staff/detail/${fn:escapeXml(s.staffId)}" class="btn btn-secondary btn-xs">View</a>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/staff/edit/${fn:escapeXml(s.staffId)}" class="btn btn-primary btn-xs">Edit</a>
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/staff/toggle/${fn:escapeXml(s.staffId)}" method="post" style="display:inline;">
+                            <div class="tbl-actions">
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/staff/detail/${fn:escapeXml(s.staffId)}" class="btn-icon btn-icon-view" title="View Staff"><i class="fa-solid fa-eye"></i></a>
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/staff/edit/${fn:escapeXml(s.staffId)}" class="btn-icon btn-icon-edit" title="Edit Staff"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/staff/toggle/${fn:escapeXml(s.staffId)}" method="post" style="display:contents;">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <input type="hidden" name="active" value="${fn:escapeXml(!s.active)}">
-                                <button type="submit" class="btn btn-warning btn-xs">${fn:escapeXml(s.active ? 'Deactivate' : 'Activate')}</button>
-                            </form>
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/staff/delete/${fn:escapeXml(s.staffId)}" method="post" style="display:inline;" onsubmit="return confirmAction('Proceed with this change?')">
+                                    <input type="hidden" name="active" value="${fn:escapeXml(!s.active)}">
+                                    <button type="submit" class="btn-icon ${s.active ? 'btn-icon-warning' : 'btn-icon-success'}" title="${s.active ? 'Deactivate' : 'Activate'}"><i class="fa-solid ${s.active ? 'fa-ban' : 'fa-check'}"></i></button>
+                                </form>
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/staff/delete/${fn:escapeXml(s.staffId)}" method="post" style="display:contents;" onsubmit="return confirmAction('Proceed with this change?')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                            </form>
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete Staff"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>

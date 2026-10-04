@@ -88,7 +88,7 @@ public class StaffService {
 
         if (conflicts > 0) {
             return "Scheduling conflict: this staff member is already assigned to another event on " +
-                   sa.getAssignedDate() + ".";
+                    sa.getAssignedDate() + ".";
         }
 
         staffDAO.assignStaffToEvent(sa);
@@ -98,7 +98,7 @@ public class StaffService {
     // ── UPDATE ─────────────────────────────────────────────────
 
     /**
-     * Updates a staff member's details.
+     * Updates  THE staff member's details.
      */
     public String updateStaff(Staff staff) {
         String error = validateStaff(staff);
@@ -127,9 +127,23 @@ public class StaffService {
         if (staff.getFullName() == null || staff.getFullName().trim().isEmpty()) {
             return "Staff full name is required.";
         }
+        if (!com.eventsphere.util.ValidationUtil.isValidPersonName(staff.getFullName())) {
+            return "Staff name must be 2-100 characters and contain only letters, spaces, dots, apostrophes or hyphens.";
+        }
         if (staff.getJobRole() == null || staff.getJobRole().trim().isEmpty()) {
             return "Job role is required.";
         }
+        if (staff.getJobRole().trim().length() > 100) {
+            return "Job role must not exceed 100 characters.";
+        }
+        String phoneError = com.eventsphere.util.ValidationUtil.checkOptionalPhone(staff.getPhone());
+        if (phoneError != null) return phoneError;
+        String emailError = com.eventsphere.util.ValidationUtil.checkOptionalEmail(staff.getEmail());
+        if (emailError != null) return emailError;
+        staff.setFullName(staff.getFullName().trim());
+        staff.setJobRole(staff.getJobRole().trim());
+        staff.setPhone(com.eventsphere.util.ValidationUtil.trimToNull(staff.getPhone()));
+        staff.setEmail(com.eventsphere.util.ValidationUtil.trimToNull(staff.getEmail()));
         return null;
     }
 }

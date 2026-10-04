@@ -6,37 +6,37 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 <%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
 <div class="es-main">
-<%@ include file="/WEB-INF/views/common/topbar.jsp" %>
-<div class="es-content">
+    <%@ include file="/WEB-INF/views/common/topbar.jsp" %>
+    <div class="es-content">
 
-    <div class="page-header">
-        <h2>&#128100; Staff Allocation Report</h2>
-        <div class="breadcrumb">
-            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
-            &rsaquo; Staff Allocation
+        <div class="page-header">
+            <h2>&#128100; Staff Allocation Report</h2>
+            <div class="breadcrumb">
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
+                &rsaquo; Staff Allocation
+            </div>
         </div>
-    </div>
 
-    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-        <button class="btn btn-secondary btn-sm" onclick="printPage()">&#128424; Print</button>
-    </div>
-
-    <div class="es-card">
-        <div class="card-header">
-            <h3>Staff Assignments</h3>
-            <span style="font-size:12px;color:#718096;">${fn:escapeXml(assignments.size())} assignment(s)</span>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+            <button class="btn btn-secondary btn-sm" onclick="printPage()">&#128424; Print</button>
         </div>
-        <c:choose>
-            <c:when test="${empty assignments}">
-                <div class="es-empty">
-                    <span class="es-empty-icon">&#128100;</span>
-                    <p>No staff assignments on record.</p>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div class="es-table-wrap">
-                    <table class="es-table">
-                        <thead>
+
+        <div class="es-card">
+            <div class="card-header">
+                <h3>Staff Assignments</h3>
+                <span style="font-size:12px;color:#718096;">${fn:escapeXml(assignments.size())} assignment(s)</span>
+            </div>
+            <c:choose>
+                <c:when test="${empty assignments}">
+                    <div class="es-empty">
+                        <span class="es-empty-icon">&#128100;</span>
+                        <p>No staff assignments on record.</p>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="es-table-wrap">
+                        <table class="es-table">
+                            <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Staff Member</th>
@@ -46,30 +46,30 @@
                                 <th>Assigned Date</th>
                                 <th>Notes</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach var="a" items="${assignments}" varStatus="st">
-                            <tr>
-                                <td>${fn:escapeXml(st.count)}</td>
-                                <td><strong>${fn:escapeXml(a.staffName)}</strong></td>
-                                <td>${fn:escapeXml(a.eventName)}</td>
-                                <td>
-                                    ${fn:escapeXml(a.eventDate)}
-                                </td>
-                                <td>${fn:escapeXml(empty a.roleAtEvent ? '—' : a.roleAtEvent)}</td>
-                                <td>
-                                    ${fn:escapeXml(a.assignedDate)}
-                                </td>
-                                <td>${fn:escapeXml(empty a.notes ? '—' : a.notes)}</td>
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-            </c:otherwise>
-        </c:choose>
-    </div>
+                            </thead>
+                            <tbody>
+                            <c:forEach var="a" items="${assignments}" varStatus="st">
+                                <tr>
+                                    <td>${fn:escapeXml(st.count)}</td>
+                                    <td><strong>${fn:escapeXml(a.staffName)}</strong></td>
+                                    <td>${fn:escapeXml(a.eventName)}</td>
+                                    <td>
+                                            ${fn:escapeXml(a.eventDate)}
+                                    </td>
+                                    <td>${fn:escapeXml(empty a.roleAtEvent ? '—' : a.roleAtEvent)}</td>
+                                    <td>
+                                            ${fn:escapeXml(a.assignedDate)}
+                                    </td>
+                                    <td>${fn:escapeXml(empty a.notes ? '—' : a.notes)}</td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </div>
 
-</div>
-<%@ include file="/WEB-INF/views/common/footer.jsp" %>
+    </div>
+    <%@ include file="/WEB-INF/views/common/footer.jsp" %>
 

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 /**
  * Represents the allocation of a resource to an event.
- * Maps to the 'resource_allocations' table in EventSphereDB.
+
  */
 public class ResourceAllocation {
 
