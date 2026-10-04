@@ -61,8 +61,8 @@ public class StaffDAO {
      */
     public int addStaff(Staff staff) {
         String sql =
-            "INSERT INTO staff (full_name, email, phone, job_role) " +
-            "VALUES (?, ?, ?, ?)";
+                "INSERT INTO staff (full_name, email, phone, job_role) " +
+                        "VALUES (?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 staff.getFullName(),
                 staff.getEmail(),
@@ -75,8 +75,8 @@ public class StaffDAO {
      */
     public int assignStaffToEvent(StaffAssignment sa) {
         String sql =
-            "INSERT INTO staff_assignments (event_id, staff_id, role_at_event, assigned_date, notes) " +
-            "VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO staff_assignments (event_id, staff_id, role_at_event, assigned_date, notes) " +
+                        "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 sa.getEventId(),
                 sa.getStaffId(),
@@ -92,8 +92,8 @@ public class StaffDAO {
      */
     public List<Staff> findAll() {
         String sql =
-            "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
-            "FROM staff ORDER BY full_name";
+                "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
+                        "FROM staff ORDER BY full_name";
         return jdbcTemplate.query(sql, staffRowMapper);
     }
 
@@ -102,8 +102,8 @@ public class StaffDAO {
      */
     public List<Staff> findAllActive() {
         String sql =
-            "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
-            "FROM staff WHERE is_active = 1 ORDER BY full_name";
+                "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
+                        "FROM staff WHERE is_active = 1 ORDER BY full_name";
         return jdbcTemplate.query(sql, staffRowMapper);
     }
 
@@ -112,8 +112,8 @@ public class StaffDAO {
      */
     public Optional<Staff> findById(int staffId) {
         String sql =
-            "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
-            "FROM staff WHERE staff_id = ?";
+                "SELECT staff_id, full_name, email, phone, job_role, is_active, created_at " +
+                        "FROM staff WHERE staff_id = ?";
         List<Staff> result = jdbcTemplate.query(sql, staffRowMapper, staffId);
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
@@ -123,13 +123,13 @@ public class StaffDAO {
      */
     public List<StaffAssignment> findAssignmentsByEventId(int eventId) {
         String sql =
-            "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
-            "       sa.staff_id, s.full_name AS staff_name, " +
-            "       sa.role_at_event, sa.assigned_date, sa.notes " +
-            "FROM staff_assignments sa " +
-            "JOIN events e ON sa.event_id = e.event_id " +
-            "JOIN staff  s ON sa.staff_id  = s.staff_id " +
-            "WHERE sa.event_id = ?";
+                "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
+                        "       sa.staff_id, s.full_name AS staff_name, " +
+                        "       sa.role_at_event, sa.assigned_date, sa.notes " +
+                        "FROM staff_assignments sa " +
+                        "JOIN events e ON sa.event_id = e.event_id " +
+                        "JOIN staff  s ON sa.staff_id  = s.staff_id " +
+                        "WHERE sa.event_id = ?";
         return jdbcTemplate.query(sql, assignmentRowMapper, eventId);
     }
 
@@ -138,13 +138,13 @@ public class StaffDAO {
      */
     public List<StaffAssignment> findAssignmentsByStaffId(int staffId) {
         String sql =
-            "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
-            "       sa.staff_id, s.full_name AS staff_name, " +
-            "       sa.role_at_event, sa.assigned_date, sa.notes " +
-            "FROM staff_assignments sa " +
-            "JOIN events e ON sa.event_id = e.event_id " +
-            "JOIN staff  s ON sa.staff_id  = s.staff_id " +
-            "WHERE sa.staff_id = ? ORDER BY e.event_date DESC";
+                "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
+                        "       sa.staff_id, s.full_name AS staff_name, " +
+                        "       sa.role_at_event, sa.assigned_date, sa.notes " +
+                        "FROM staff_assignments sa " +
+                        "JOIN events e ON sa.event_id = e.event_id " +
+                        "JOIN staff  s ON sa.staff_id  = s.staff_id " +
+                        "WHERE sa.staff_id = ? ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, assignmentRowMapper, staffId);
     }
 
@@ -153,13 +153,13 @@ public class StaffDAO {
      */
     public List<StaffAssignment> findAllAssignments() {
         String sql =
-            "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
-            "       sa.staff_id, s.full_name AS staff_name, " +
-            "       sa.role_at_event, sa.assigned_date, sa.notes " +
-            "FROM staff_assignments sa " +
-            "JOIN events e ON sa.event_id = e.event_id " +
-            "JOIN staff  s ON sa.staff_id  = s.staff_id " +
-            "ORDER BY e.event_date DESC";
+                "SELECT sa.assignment_id, sa.event_id, e.event_name, e.event_date, " +
+                        "       sa.staff_id, s.full_name AS staff_name, " +
+                        "       sa.role_at_event, sa.assigned_date, sa.notes " +
+                        "FROM staff_assignments sa " +
+                        "JOIN events e ON sa.event_id = e.event_id " +
+                        "JOIN staff  s ON sa.staff_id  = s.staff_id " +
+                        "ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, assignmentRowMapper);
     }
 
@@ -176,13 +176,13 @@ public class StaffDAO {
      */
     public int countStaffConflicts(int staffId, LocalDate eventDate, int excludeEventId) {
         String sql =
-            "SELECT COUNT(*) " +
-            "FROM staff_assignments sa " +
-            "JOIN events e ON sa.event_id = e.event_id " +
-            "WHERE sa.staff_id  = ? " +
-            "  AND e.event_date  = ? " +
-            "  AND sa.event_id  <> ? " +
-            "  AND e.status NOT IN ('Cancelled')";
+                "SELECT COUNT(*) " +
+                        "FROM staff_assignments sa " +
+                        "JOIN events e ON sa.event_id = e.event_id " +
+                        "WHERE sa.staff_id  = ? " +
+                        "  AND e.event_date  = ? " +
+                        "  AND sa.event_id  <> ? " +
+                        "  AND e.status NOT IN ('Cancelled')";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
                 staffId, eventDate, excludeEventId);
         return count != null ? count : 0;
@@ -195,8 +195,8 @@ public class StaffDAO {
      */
     public int updateStaff(Staff staff) {
         String sql =
-            "UPDATE staff SET full_name = ?, email = ?, phone = ?, job_role = ? " +
-            "WHERE staff_id = ?";
+                "UPDATE staff SET full_name = ?, email = ?, phone = ?, job_role = ? " +
+                        "WHERE staff_id = ?";
         return jdbcTemplate.update(sql,
                 staff.getFullName(),
                 staff.getEmail(),
