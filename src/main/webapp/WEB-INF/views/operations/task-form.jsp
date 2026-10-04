@@ -8,7 +8,7 @@
 <div class="es-main">
 <%@ include file="/WEB-INF/views/common/topbar.jsp" %>
 <div class="es-content">
-    <div class="page-header"><h2>${fn:escapeXml(isEdit ? '&#9998; Edit Task' : '&#43; Create Task')}</h2></div>
+    <div class="page-header"><h2>${isEdit ? '&#9998;' : '&#43;'} ${fn:escapeXml(isEdit ? 'Edit Task' : 'Create Task')}</h2></div>
     <%@ include file="/WEB-INF/views/common/alerts.jsp" %>
     <div class="es-card" style="max-width:640px;">
         <c:set var="action" value="${isEdit ? '/task/edit/'.concat(task.taskId) : '/task/create'}"/>

@@ -54,12 +54,14 @@
                                 <td><span class="es-badge badge-${fn:escapeXml(t.priority.toLowerCase())}">${fn:escapeXml(t.priority)}</span></td>
                                 <td><c:set var="s" value="${t.status.toLowerCase().replace(' ','')}"/><span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(t.status)}</span></td>
                                 <td>
-                                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/task/detail/${fn:escapeXml(t.taskId)}" class="btn btn-secondary btn-xs">View</a>
-                                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/task/edit/${fn:escapeXml(t.taskId)}" class="btn btn-primary btn-xs">Edit</a>
-                                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/task/delete/${fn:escapeXml(t.taskId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this task')">
+                                    <div class="tbl-actions">
+                                        <a href="${fn:escapeXml(pageContext.request.contextPath)}/task/detail/${fn:escapeXml(t.taskId)}" class="btn-icon btn-icon-view" title="View Task"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="${fn:escapeXml(pageContext.request.contextPath)}/task/edit/${fn:escapeXml(t.taskId)}" class="btn-icon btn-icon-edit" title="Edit Task"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <form action="${fn:escapeXml(pageContext.request.contextPath)}/task/delete/${fn:escapeXml(t.taskId)}" method="post" style="display:contents;" onsubmit="return confirmDelete('this task')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                        <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                                    </form>
+                                            <button type="submit" class="btn-icon btn-icon-danger" title="Delete Task"><i class="fa-solid fa-trash-can"></i></button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
