@@ -984,6 +984,17 @@ PRINT '  28 Payments across Deposit/Partial/Full/Cheque/Cash/Bank Transfer';
 PRINT '  Loyalty: 400/300/200/200/100/100/100/100 pts across 8 customers';
 PRINT '============================================================';
 
+USE EventSphereDB;
+GO
+
+IF COL_LENGTH('dbo.events', 'is_archived') IS NULL
+BEGIN
+    ALTER TABLE dbo.events
+    ADD is_archived BIT NOT NULL
+        CONSTRAINT DF_events_is_archived DEFAULT 0;
+END;
+GO
+
 SELECT * FROM users;
 GO
 SELECT * FROM events;
