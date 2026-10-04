@@ -4,6 +4,7 @@ import com.eventsphere.dao.VendorDAO;
 import com.eventsphere.model.EventVendor;
 import com.eventsphere.model.Vendor;
 import com.eventsphere.model.VendorCategory;
+import com.eventsphere.util.ValidationUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -89,7 +90,7 @@ public class VendorService {
 
         if (conflicts > 0) {
             return "Scheduling conflict: this vendor is already booked on " +
-                   ev.getServiceDate() + " for another event.";
+                    ev.getServiceDate() + " for another event.";
         }
 
         vendorDAO.assignVendorToEvent(ev);
@@ -128,12 +129,26 @@ public class VendorService {
         if (vendor.getVendorName() == null || vendor.getVendorName().trim().isEmpty()) {
             return "Vendor name is required.";
         }
+        if (vendor.getVendorName().trim().length() > 200) {
+            return "Vendor name must not exceed 200 characters.";
+        }
         if (vendor.getVendorCatId() <= 0) {
             return "Please select a vendor category.";
         }
         if (vendor.getCost() == null || vendor.getCost().compareTo(BigDecimal.ZERO) < 0) {
             return "Cost cannot be negative.";
         }
+        if (!ValidationUtil.isBlank(vendor.getContactPerson()) && !ValidationUtil.isValidPersonName(vendor.getContactPerson())) {
+            return "Contact person name must be 2-100 characters and contain only letters, spaces, dots, apostrophes or hyphens.";
+        }
+        String phoneError = ValidationUtil.checkOptionalPhone(vendor.getPhone());
+        if (phoneError != null) return phoneError;
+        String emailError = ValidationUtil.checkOptionalEmail(vendor.getEmail());
+        if (emailError != null) return emailError;
+        vendor.setVendorName(vendor.getVendorName().trim());
+        vendor.setContactPerson(ValidationUtil.trimToNull(vendor.getContactPerson()));
+        vendor.setPhone(ValidationUtil.trimToNull(vendor.getPhone()));
+        vendor.setEmail(ValidationUtil.trimToNull(vendor.getEmail()));
         return null;
     }
 }

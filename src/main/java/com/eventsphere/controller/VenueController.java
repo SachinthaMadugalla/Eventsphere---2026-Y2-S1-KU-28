@@ -18,9 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 
-/**
- * Module 3 – Venue Management.
- */
 @Controller
 @RequestMapping("/venue")
 public class VenueController {
@@ -43,7 +40,7 @@ public class VenueController {
         if (user == null) return false;
         String r = user.getRoleName();
         return "Event Manager".equals(r) || "Managing Director".equals(r)
-            || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
+                || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
     }
 
     // ── LIST ───────────────────────────────────────────────────

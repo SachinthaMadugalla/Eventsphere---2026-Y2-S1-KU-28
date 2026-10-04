@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * DAO for Vendor Management (Module 3).
+ DAO for Vendor Management (Module 3).
  * All SQL queries are explicitly written here.
  */
 @Repository
@@ -71,9 +71,9 @@ public class VendorDAO {
      */
     public int addVendor(Vendor vendor) {
         String sql =
-            "INSERT INTO vendors (vendor_name, vendor_cat_id, contact_person, phone, " +
-            "                     email, service_desc, cost) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO vendors (vendor_name, vendor_cat_id, contact_person, phone, " +
+                        "                     email, service_desc, cost) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 vendor.getVendorName(),
                 vendor.getVendorCatId(),
@@ -89,8 +89,8 @@ public class VendorDAO {
      */
     public int assignVendorToEvent(EventVendor ev) {
         String sql =
-            "INSERT INTO event_vendors (event_id, vendor_id, service_date, notes) " +
-            "VALUES (?, ?, ?, ?)";
+                "INSERT INTO event_vendors (event_id, vendor_id, service_date, notes) " +
+                        "VALUES (?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 ev.getEventId(),
                 ev.getVendorId(),
@@ -105,12 +105,12 @@ public class VendorDAO {
      */
     public List<Vendor> findAll() {
         String sql =
-            "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
-            "       v.contact_person, v.phone, v.email, v.service_desc, " +
-            "       v.cost, v.is_active, v.created_at " +
-            "FROM vendors v " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "ORDER BY v.vendor_name";
+                "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
+                        "       v.contact_person, v.phone, v.email, v.service_desc, " +
+                        "       v.cost, v.is_active, v.created_at " +
+                        "FROM vendors v " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "ORDER BY v.vendor_name";
         return jdbcTemplate.query(sql, vendorRowMapper);
     }
 
@@ -119,12 +119,12 @@ public class VendorDAO {
      */
     public List<Vendor> findAllActive() {
         String sql =
-            "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
-            "       v.contact_person, v.phone, v.email, v.service_desc, " +
-            "       v.cost, v.is_active, v.created_at " +
-            "FROM vendors v " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "WHERE v.is_active = 1 ORDER BY v.vendor_name";
+                "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
+                        "       v.contact_person, v.phone, v.email, v.service_desc, " +
+                        "       v.cost, v.is_active, v.created_at " +
+                        "FROM vendors v " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "WHERE v.is_active = 1 ORDER BY v.vendor_name";
         return jdbcTemplate.query(sql, vendorRowMapper);
     }
 
@@ -133,12 +133,12 @@ public class VendorDAO {
      */
     public Optional<Vendor> findById(int vendorId) {
         String sql =
-            "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
-            "       v.contact_person, v.phone, v.email, v.service_desc, " +
-            "       v.cost, v.is_active, v.created_at " +
-            "FROM vendors v " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "WHERE v.vendor_id = ?";
+                "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
+                        "       v.contact_person, v.phone, v.email, v.service_desc, " +
+                        "       v.cost, v.is_active, v.created_at " +
+                        "FROM vendors v " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "WHERE v.vendor_id = ?";
         List<Vendor> result = jdbcTemplate.query(sql, vendorRowMapper, vendorId);
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
@@ -148,7 +148,7 @@ public class VendorDAO {
      */
     public List<VendorCategory> findAllCategories() {
         String sql =
-            "SELECT vendor_cat_id, category_name FROM vendor_categories ORDER BY category_name";
+                "SELECT vendor_cat_id, category_name FROM vendor_categories ORDER BY category_name";
         return jdbcTemplate.query(sql, catRowMapper);
     }
 
@@ -157,14 +157,14 @@ public class VendorDAO {
      */
     public List<EventVendor> findAssignmentsByEventId(int eventId) {
         String sql =
-            "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
-            "       ev.vendor_id, v.vendor_name, vc.category_name, " +
-            "       ev.service_date, ev.notes " +
-            "FROM event_vendors ev " +
-            "JOIN events e           ON ev.event_id  = e.event_id " +
-            "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "WHERE ev.event_id = ?";
+                "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
+                        "       ev.vendor_id, v.vendor_name, vc.category_name, " +
+                        "       ev.service_date, ev.notes " +
+                        "FROM event_vendors ev " +
+                        "JOIN events e           ON ev.event_id  = e.event_id " +
+                        "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "WHERE ev.event_id = ?";
         return jdbcTemplate.query(sql, eventVendorRowMapper, eventId);
     }
 
@@ -173,14 +173,14 @@ public class VendorDAO {
      */
     public List<EventVendor> findAssignmentsByVendorId(int vendorId) {
         String sql =
-            "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
-            "       ev.vendor_id, v.vendor_name, vc.category_name, " +
-            "       ev.service_date, ev.notes " +
-            "FROM event_vendors ev " +
-            "JOIN events e           ON ev.event_id  = e.event_id " +
-            "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "WHERE ev.vendor_id = ? ORDER BY ev.service_date DESC";
+                "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
+                        "       ev.vendor_id, v.vendor_name, vc.category_name, " +
+                        "       ev.service_date, ev.notes " +
+                        "FROM event_vendors ev " +
+                        "JOIN events e           ON ev.event_id  = e.event_id " +
+                        "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "WHERE ev.vendor_id = ? ORDER BY ev.service_date DESC";
         return jdbcTemplate.query(sql, eventVendorRowMapper, vendorId);
     }
 
@@ -189,14 +189,14 @@ public class VendorDAO {
      */
     public List<EventVendor> findAllAssignments() {
         String sql =
-            "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
-            "       ev.vendor_id, v.vendor_name, vc.category_name, " +
-            "       ev.service_date, ev.notes " +
-            "FROM event_vendors ev " +
-            "JOIN events e           ON ev.event_id  = e.event_id " +
-            "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
-            "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
-            "ORDER BY ev.service_date DESC";
+                "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
+                        "       ev.vendor_id, v.vendor_name, vc.category_name, " +
+                        "       ev.service_date, ev.notes " +
+                        "FROM event_vendors ev " +
+                        "JOIN events e           ON ev.event_id  = e.event_id " +
+                        "JOIN vendors v          ON ev.vendor_id  = v.vendor_id " +
+                        "JOIN vendor_categories vc ON v.vendor_cat_id = vc.vendor_cat_id " +
+                        "ORDER BY ev.service_date DESC";
         return jdbcTemplate.query(sql, eventVendorRowMapper);
     }
 
@@ -213,13 +213,13 @@ public class VendorDAO {
      */
     public int countVendorConflicts(int vendorId, LocalDate serviceDate, int excludeEventId) {
         String sql =
-            "SELECT COUNT(*) " +
-            "FROM event_vendors ev " +
-            "JOIN events e ON ev.event_id = e.event_id " +
-            "WHERE ev.vendor_id  = ? " +
-            "  AND ev.service_date = ? " +
-            "  AND ev.event_id    <> ? " +
-            "  AND e.status NOT IN ('Cancelled')";
+                "SELECT COUNT(*) " +
+                        "FROM event_vendors ev " +
+                        "JOIN events e ON ev.event_id = e.event_id " +
+                        "WHERE ev.vendor_id  = ? " +
+                        "  AND ev.service_date = ? " +
+                        "  AND ev.event_id    <> ? " +
+                        "  AND e.status NOT IN ('Cancelled')";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
                 vendorId, serviceDate, excludeEventId);
         return count != null ? count : 0;
@@ -232,9 +232,9 @@ public class VendorDAO {
      */
     public int updateVendor(Vendor vendor) {
         String sql =
-            "UPDATE vendors SET vendor_name = ?, vendor_cat_id = ?, contact_person = ?, " +
-            "                   phone = ?, email = ?, service_desc = ?, cost = ? " +
-            "WHERE vendor_id = ?";
+                "UPDATE vendors SET vendor_name = ?, vendor_cat_id = ?, contact_person = ?, " +
+                        "                   phone = ?, email = ?, service_desc = ?, cost = ? " +
+                        "WHERE vendor_id = ?";
         return jdbcTemplate.update(sql,
                 vendor.getVendorName(),
                 vendor.getVendorCatId(),

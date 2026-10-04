@@ -36,6 +36,7 @@ public class UserDAO {
         u.setRoleId(rs.getInt("role_id"));
         u.setRoleName(rs.getString("role_name"));
         u.setActive(rs.getBoolean("is_active"));
+        u.setProfilePicture(rs.getString("profile_picture"));
         u.setCreatedAt(rs.getTimestamp("created_at") != null
                 ? rs.getTimestamp("created_at").toLocalDateTime() : null);
         return u;
@@ -48,15 +49,16 @@ public class UserDAO {
      */
     public int addUser(User user) {
         String sql =
-            "INSERT INTO users (username, password_hash, email, full_name, phone, role_id, is_active) " +
-            "VALUES (?, ?, ?, ?, ?, ?, 1)";
+            "INSERT INTO users (username, password_hash, email, full_name, phone, role_id, profile_picture, is_active) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
         return jdbcTemplate.update(sql,
                 user.getUsername(),
                 user.getPasswordHash(),
                 user.getEmail(),
                 user.getFullName(),
-                user.getPhone(),
-                user.getRoleId());
+                user.getPhone() != null ? user.getPhone() : new org.springframework.jdbc.core.SqlParameterValue(java.sql.Types.VARCHAR, null),
+                user.getRoleId(),
+                user.getProfilePicture() != null ? user.getProfilePicture() : new org.springframework.jdbc.core.SqlParameterValue(java.sql.Types.VARCHAR, null));
     }
 
     /**
@@ -76,7 +78,7 @@ public class UserDAO {
     public Optional<User> findByUsername(String username) {
         String sql =
             "SELECT u.user_id, u.username, u.password_hash, u.email, u.full_name, " +
-            "       u.phone, u.role_id, r.role_name, u.is_active, u.created_at " +
+            "       u.phone, u.role_id, r.role_name, u.is_active, u.profile_picture, u.created_at " +
             "FROM users u " +
             "JOIN roles r ON u.role_id = r.role_id " +
             "WHERE u.username = ?";
@@ -90,7 +92,7 @@ public class UserDAO {
     public Optional<User> findById(int userId) {
         String sql =
             "SELECT u.user_id, u.username, u.password_hash, u.email, u.full_name, " +
-            "       u.phone, u.role_id, r.role_name, u.is_active, u.created_at " +
+            "       u.phone, u.role_id, r.role_name, u.is_active, u.profile_picture, u.created_at " +
             "FROM users u " +
             "JOIN roles r ON u.role_id = r.role_id " +
             "WHERE u.user_id = ?";
@@ -104,7 +106,7 @@ public class UserDAO {
     public List<User> findAll() {
         String sql =
             "SELECT u.user_id, u.username, u.password_hash, u.email, u.full_name, " +
-            "       u.phone, u.role_id, r.role_name, u.is_active, u.created_at " +
+            "       u.phone, u.role_id, r.role_name, u.is_active, u.profile_picture, u.created_at " +
             "FROM users u " +
             "JOIN roles r ON u.role_id = r.role_id " +
             "ORDER BY u.created_at DESC";
@@ -117,7 +119,7 @@ public class UserDAO {
     public List<User> findAllManagers() {
         String sql =
             "SELECT u.user_id, u.username, u.password_hash, u.email, u.full_name, " +
-            "       u.phone, u.role_id, r.role_name, u.is_active, u.created_at " +
+            "       u.phone, u.role_id, r.role_name, u.is_active, u.profile_picture, u.created_at " +
             "FROM users u " +
             "JOIN roles r ON u.role_id = r.role_id " +
             "WHERE r.role_name = 'Event Manager' AND u.is_active = 1 " +
@@ -143,6 +145,15 @@ public class UserDAO {
         return count != null && count > 0;
     }
 
+    /**
+     * Checks whether an email address is used by any user other than the given one (for profile updates).
+     */
+    public boolean existsByEmailExcludingUser(String email, int userId) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND user_id <> ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email, userId);
+        return count != null && count > 0;
+    }
+
     // ── UPDATE ─────────────────────────────────────────────────
 
     /**
@@ -150,12 +161,13 @@ public class UserDAO {
      */
     public int updateUser(User user) {
         String sql =
-            "UPDATE users SET email = ?, full_name = ?, phone = ? " +
+            "UPDATE users SET email = ?, full_name = ?, phone = ?, profile_picture = COALESCE(?, profile_picture) " +
             "WHERE user_id = ?";
         return jdbcTemplate.update(sql,
                 user.getEmail(),
                 user.getFullName(),
-                user.getPhone(),
+                user.getPhone() != null ? user.getPhone() : new org.springframework.jdbc.core.SqlParameterValue(java.sql.Types.VARCHAR, null),
+                user.getProfilePicture() != null ? user.getProfilePicture() : new org.springframework.jdbc.core.SqlParameterValue(java.sql.Types.VARCHAR, null),
                 user.getUserId());
     }
 

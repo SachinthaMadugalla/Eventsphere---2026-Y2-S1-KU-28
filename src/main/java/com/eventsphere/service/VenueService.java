@@ -82,7 +82,7 @@ public class VenueService {
             Venue venue = optVenue.get();
             if (venue.getCapacity() < eventGuestCount) {
                 return "Venue capacity (" + venue.getCapacity() +
-                       ") is less than the event guest count (" + eventGuestCount + ").";
+                        ") is less than the event guest count (" + eventGuestCount + ").";
             }
         }
 
@@ -100,7 +100,7 @@ public class VenueService {
 
         if (conflicts > 0) {
             return "Scheduling conflict: this venue is already booked on " +
-                   ev.getAssignedDate() + " during the requested time.";
+                    ev.getAssignedDate() + " during the requested time.";
         }
 
         venueDAO.assignVenueToEvent(ev);

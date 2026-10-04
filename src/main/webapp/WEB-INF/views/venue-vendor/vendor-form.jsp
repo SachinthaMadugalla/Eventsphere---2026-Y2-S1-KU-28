@@ -9,7 +9,7 @@
 <%@ include file="/WEB-INF/views/common/topbar.jsp" %>
 <div class="es-content">
     <div class="page-header">
-        <h2>${fn:escapeXml(isEdit ? '&#9998; Edit Vendor' : '&#43; Add Vendor')}</h2>
+        <h2>${isEdit ? '&#9998;' : '&#43;'} ${fn:escapeXml(isEdit ? 'Edit Vendor' : 'Add Vendor')}</h2>
         <div class="breadcrumb"><a href="${fn:escapeXml(pageContext.request.contextPath)}/vendor/list">Vendors</a> &rsaquo; ${fn:escapeXml(isEdit ? vendor.vendorName : 'New')}</div>
     </div>
     <%@ include file="/WEB-INF/views/common/alerts.jsp" %>
@@ -19,7 +19,7 @@
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <div class="es-form-group">
                 <label class="required">Vendor Name</label>
-                <input type="text" name="vendorName" class="es-input" value="${fn:escapeXml(vendor.vendorName)}" required>
+                <input type="text" name="vendorName" class="es-input" value="${fn:escapeXml(vendor.vendorName)}" required maxlength="200">
             </div>
             <div class="es-form-row">
                 <div class="es-form-group">
@@ -39,16 +39,19 @@
             <div class="es-form-row">
                 <div class="es-form-group">
                     <label>Contact Person</label>
-                    <input type="text" name="contactPerson" class="es-input" value="${fn:escapeXml(vendor.contactPerson)}">
+                    <input type="text" name="contactPerson" class="es-input" value="${fn:escapeXml(vendor.contactPerson)}"
+                           minlength="2" maxlength="100" data-rule="name">
                 </div>
                 <div class="es-form-group">
                     <label>Phone</label>
-                    <input type="text" name="phone" class="es-input" value="${fn:escapeXml(vendor.phone)}">
+                    <input type="tel" name="phone" class="es-input" value="${fn:escapeXml(vendor.phone)}" placeholder="0XXXXXXXXX"
+                           inputmode="numeric" maxlength="10" pattern="0[0-9]{9}"
+                           title="Exactly 10 digits starting with 0 (e.g. 0112345678)" data-rule="phone">
                 </div>
             </div>
             <div class="es-form-group">
                 <label>Email</label>
-                <input type="email" name="email" class="es-input" value="${fn:escapeXml(vendor.email)}">
+                <input type="email" name="email" class="es-input" value="${fn:escapeXml(vendor.email)}" maxlength="150">
             </div>
             <div class="es-form-group">
                 <label>Service Description</label>

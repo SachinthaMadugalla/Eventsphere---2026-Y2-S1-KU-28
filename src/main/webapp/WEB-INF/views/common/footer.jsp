@@ -9,7 +9,7 @@
         </div>
     </div><!-- /.es-main -->
 </div><!-- /.es-wrapper -->
-<script src="${pageContext.request.contextPath}/static/js/eventsphere.js"></script>
+<script src="${pageContext.request.contextPath}/static/js/eventsphere.js?v=4"></script>
 <script src="${pageContext.request.contextPath}/static/js/charts.js"></script>
 </body>
 </html>

@@ -19,7 +19,10 @@ public class SessionSecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/static/");
+        // The Stripe webhook is called server-to-server (no session/CSRF token); it is
+        // authenticated by verifying the Stripe-Signature header instead.
+        return request.getServletPath().startsWith("/static/")
+            || request.getServletPath().equals("/stripe/webhook");
     }
 
     @Override
