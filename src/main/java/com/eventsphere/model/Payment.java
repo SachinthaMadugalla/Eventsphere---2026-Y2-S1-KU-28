@@ -21,6 +21,8 @@ public class Payment {
     private LocalDate paymentDate;
     private String paymentType;     // Deposit, Partial Payment, Full Payment
     private String referenceNo;
+    private String paymentMethod = "Cash"; // Cash, Bank Transfer, Cheque, Card (Stripe)
+    private String stripeSessionId;        // set only for Stripe Checkout payments
     private String notes;
     private Integer recordedBy;
     private String recordedByName;  // populated by JOIN
@@ -62,6 +64,12 @@ public class Payment {
 
     public String getReferenceNo()                      { return referenceNo; }
     public void setReferenceNo(String referenceNo)      { this.referenceNo = referenceNo; }
+
+    public String getPaymentMethod()                        { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod)      { this.paymentMethod = paymentMethod; }
+
+    public String getStripeSessionId()                      { return stripeSessionId; }
+    public void setStripeSessionId(String stripeSessionId)  { this.stripeSessionId = stripeSessionId; }
 
     public String getNotes()                            { return notes; }
     public void setNotes(String notes)                  { this.notes = notes; }

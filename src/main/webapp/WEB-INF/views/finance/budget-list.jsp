@@ -26,11 +26,13 @@
                             LKR <fmt:formatNumber value="${b.variance}" type="number" groupingUsed="true"/>
                         </td>
                         <td>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/budget/edit/${fn:escapeXml(b.budgetId)}" class="btn btn-primary btn-xs">Edit</a>
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/budget/delete/${fn:escapeXml(b.budgetId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this budget')">
+                            <div class="tbl-actions">
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/budget/edit/${fn:escapeXml(b.budgetId)}" class="btn-icon btn-icon-edit" title="Edit Budget"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/budget/delete/${fn:escapeXml(b.budgetId)}" method="post" style="display:contents;" onsubmit="return confirmDelete('this budget')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                            </form>
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete Budget"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>

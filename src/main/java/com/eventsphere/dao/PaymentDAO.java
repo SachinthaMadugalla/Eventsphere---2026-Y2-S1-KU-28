@@ -38,6 +38,8 @@ public class PaymentDAO {
                 ? rs.getDate("payment_date").toLocalDate() : null);
         p.setPaymentType(rs.getString("payment_type"));
         p.setReferenceNo(rs.getString("reference_no"));
+        p.setPaymentMethod(rs.getString("payment_method"));
+        p.setStripeSessionId(rs.getString("stripe_session_id"));
         p.setNotes(rs.getString("notes"));
         int recBy = rs.getInt("recorded_by");
         p.setRecordedBy(rs.wasNull() ? null : recBy);
@@ -56,8 +58,8 @@ public class PaymentDAO {
         String sql =
             "INSERT INTO payments " +
             "(invoice_id, event_id, customer_id, amount, payment_date, " +
-            " payment_type, reference_no, notes, recorded_by) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " payment_type, reference_no, payment_method, stripe_session_id, notes, recorded_by) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 payment.getInvoiceId(),
                 payment.getEventId(),
@@ -66,6 +68,8 @@ public class PaymentDAO {
                 payment.getPaymentDate(),
                 payment.getPaymentType(),
                 payment.getReferenceNo(),
+                payment.getPaymentMethod() == null ? "Cash" : payment.getPaymentMethod(),
+                payment.getStripeSessionId(),
                 payment.getNotes(),
                 payment.getRecordedBy());
     }
@@ -81,7 +85,7 @@ public class PaymentDAO {
             "       p.event_id, e.event_name, " +
             "       p.customer_id, c.full_name AS customer_name, " +
             "       p.amount, p.payment_date, p.payment_type, " +
-            "       p.reference_no, p.notes, p.recorded_by, " +
+            "       p.reference_no, p.payment_method, p.stripe_session_id, p.notes, p.recorded_by, " +
             "       u.full_name AS recorded_by_name, p.created_at " +
             "FROM payments p " +
             "JOIN invoices  i ON p.invoice_id  = i.invoice_id " +
@@ -101,7 +105,7 @@ public class PaymentDAO {
             "       p.event_id, e.event_name, " +
             "       p.customer_id, c.full_name AS customer_name, " +
             "       p.amount, p.payment_date, p.payment_type, " +
-            "       p.reference_no, p.notes, p.recorded_by, " +
+            "       p.reference_no, p.payment_method, p.stripe_session_id, p.notes, p.recorded_by, " +
             "       u.full_name AS recorded_by_name, p.created_at " +
             "FROM payments p " +
             "JOIN invoices  i ON p.invoice_id  = i.invoice_id " +
@@ -122,7 +126,7 @@ public class PaymentDAO {
             "       p.event_id, e.event_name, " +
             "       p.customer_id, c.full_name AS customer_name, " +
             "       p.amount, p.payment_date, p.payment_type, " +
-            "       p.reference_no, p.notes, p.recorded_by, " +
+            "       p.reference_no, p.payment_method, p.stripe_session_id, p.notes, p.recorded_by, " +
             "       u.full_name AS recorded_by_name, p.created_at " +
             "FROM payments p " +
             "JOIN invoices  i ON p.invoice_id  = i.invoice_id " +
@@ -131,6 +135,15 @@ public class PaymentDAO {
             "LEFT JOIN users u ON p.recorded_by = u.user_id " +
             "WHERE p.invoice_id = ? ORDER BY p.payment_date DESC";
         return jdbcTemplate.query(sql, paymentRowMapper, invoiceId);
+    }
+
+    /**
+     * Returns true when a payment has already been recorded for this Stripe Checkout session.
+     */
+    public boolean existsByStripeSessionId(String sessionId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM payments WHERE stripe_session_id = ?", Integer.class, sessionId);
+        return count != null && count > 0;
     }
 
     /**

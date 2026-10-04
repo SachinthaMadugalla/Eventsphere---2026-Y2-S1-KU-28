@@ -31,7 +31,7 @@
             <div class="es-form-row">
                 <div class="es-form-group">
                     <label class="required">Total Amount (LKR)</label>
-                    <input type="number" name="totalAmount" class="es-input" required min="1" step="0.01" placeholder="0.00">
+                    <input type="number" name="totalAmount" class="es-input" required min="0.01" step="0.01" placeholder="0.00">
                 </div>
                 <div class="es-form-group">
                     <label>Invoice Number</label>

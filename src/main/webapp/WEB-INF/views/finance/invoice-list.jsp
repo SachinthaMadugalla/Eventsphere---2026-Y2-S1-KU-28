@@ -26,13 +26,17 @@
                         <td>${fn:escapeXml(inv.dueDate)}</td>
                         <td><c:set var="s" value="${inv.status.toLowerCase().replace(' ','')}"/><span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(inv.status)}</span></td>
                         <td>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/detail/${fn:escapeXml(inv.invoiceId)}" class="btn btn-secondary btn-xs">View</a>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/edit/${fn:escapeXml(inv.invoiceId)}" class="btn btn-primary btn-xs">Edit</a>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/payment/record?invoiceId=${fn:escapeXml(inv.invoiceId)}" class="btn btn-success btn-xs">+ Payment</a>
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/delete/${fn:escapeXml(inv.invoiceId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this invoice')">
+                            <div class="tbl-actions">
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/detail/${fn:escapeXml(inv.invoiceId)}" class="btn-icon btn-icon-view" title="View Invoice"><i class="fa-solid fa-eye"></i></a>
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/edit/${fn:escapeXml(inv.invoiceId)}" class="btn-icon btn-icon-edit" title="Edit Invoice"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <c:if test="${inv.status != 'Paid'}">
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/payment/record?invoiceId=${fn:escapeXml(inv.invoiceId)}" class="btn btn-success btn-xs" title="Record Payment" style="height:30px;display:inline-flex;align-items:center;gap:4px;"><i class="fa-solid fa-credit-card"></i> Pay</a>
+                                </c:if>
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/delete/${fn:escapeXml(inv.invoiceId)}" method="post" style="display:contents;" onsubmit="return confirmDelete('this invoice')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                            </form>
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete Invoice"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>

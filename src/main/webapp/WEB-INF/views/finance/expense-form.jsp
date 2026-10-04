@@ -10,7 +10,7 @@
 <div class="es-content">
 
     <div class="page-header">
-        <h2>${fn:escapeXml(isEdit ? '&#9998; Edit Expense' : '&#43; Record Expense')}</h2>
+        <h2>${isEdit ? '&#9998;' : '&#43;'} ${fn:escapeXml(isEdit ? 'Edit Expense' : 'Record Expense')}</h2>
         <div class="breadcrumb">
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/expense/list">Expenses</a>
             &rsaquo; ${fn:escapeXml(isEdit ? 'Edit' : 'New Expense')}

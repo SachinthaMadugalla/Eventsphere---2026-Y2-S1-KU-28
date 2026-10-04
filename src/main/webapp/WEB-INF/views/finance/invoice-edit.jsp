@@ -12,7 +12,7 @@
             <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
             <p><strong>${fn:escapeXml(invoice.invoiceNumber)}</strong> · ${fn:escapeXml(invoice.status)}</p>
             <label class="required">Total Amount (LKR)</label>
-            <input type="number" name="totalAmount" class="es-input" required min="1" step="0.01" value="${fn:escapeXml(invoice.totalAmount)}">
+            <input type="number" name="totalAmount" class="es-input" required min="0.01" step="0.01" value="${fn:escapeXml(invoice.totalAmount)}">
             <label>Due Date</label>
             <input type="date" name="dueDate" class="es-input" value="${fn:escapeXml(invoice.dueDate)}">
             <label>Notes</label>

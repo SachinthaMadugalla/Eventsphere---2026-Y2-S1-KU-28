@@ -367,6 +367,7 @@ public class FinanceController {
                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate paymentDate,
                                 @RequestParam String paymentType,
                                 @RequestParam(required = false) String referenceNo,
+                                @RequestParam(defaultValue = "Cash") String paymentMethod,
                                 @RequestParam(required = false) String notes,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
@@ -379,6 +380,8 @@ public class FinanceController {
         payment.setPaymentDate(paymentDate);
         payment.setPaymentType(paymentType);
         payment.setReferenceNo(referenceNo);
+        // Staff can record offline methods only; card payments come from Stripe.
+        payment.setPaymentMethod(java.util.Set.of("Cash", "Bank Transfer", "Cheque").contains(paymentMethod) ? paymentMethod : "Cash");
         payment.setNotes(notes);
         payment.setRecordedBy(user.getUserId());
 

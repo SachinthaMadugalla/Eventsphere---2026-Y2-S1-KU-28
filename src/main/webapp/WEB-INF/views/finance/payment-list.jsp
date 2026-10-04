@@ -14,7 +14,7 @@
         <div class="card-header"><h3>All Payments</h3></div>
         <div class="es-table-wrap">
             <table class="es-table">
-                <thead><tr><th>Invoice #</th><th>Event</th><th>Customer</th><th>Amount (LKR)</th><th>Date</th><th>Type</th><th>Reference</th><th>Recorded By</th></tr></thead>
+                <thead><tr><th>Invoice #</th><th>Event</th><th>Customer</th><th>Amount (LKR)</th><th>Date</th><th>Type</th><th>Method</th><th>Reference</th><th>Recorded By</th></tr></thead>
                 <tbody>
                 <c:forEach var="p" items="${payments}">
                     <tr>
@@ -24,6 +24,7 @@
                         <td><strong><fmt:formatNumber value="${p.amount}" type="number" groupingUsed="true"/></strong></td>
                         <td>${fn:escapeXml(p.paymentDate)}</td>
                         <td>${fn:escapeXml(p.paymentType)}</td>
+                        <td>${fn:escapeXml(empty p.paymentMethod ? '—' : p.paymentMethod)}</td>
                         <td>${fn:escapeXml(empty p.referenceNo ? '—' : p.referenceNo)}</td>
                         <td>${fn:escapeXml(empty p.recordedByName ? '—' : p.recordedByName)}</td>
                     </tr>

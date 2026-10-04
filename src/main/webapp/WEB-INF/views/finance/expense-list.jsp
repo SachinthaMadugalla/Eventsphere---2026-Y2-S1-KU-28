@@ -25,12 +25,14 @@
                         <td>${fn:escapeXml(ex.expenseDate)}</td>
                         <td>${fn:escapeXml(empty ex.recordedByName ? '—' : ex.recordedByName)}</td>
                         <td>
-                            <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/expense/edit/${fn:escapeXml(ex.expenseId)}" class="btn btn-primary btn-xs">Edit</a>
-                            <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/expense/delete/${fn:escapeXml(ex.expenseId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this expense')">
+                            <div class="tbl-actions">
+                                <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/expense/edit/${fn:escapeXml(ex.expenseId)}" class="btn-icon btn-icon-edit" title="Edit Expense"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <form action="${fn:escapeXml(pageContext.request.contextPath)}/finance/expense/delete/${fn:escapeXml(ex.expenseId)}" method="post" style="display:contents;" onsubmit="return confirmDelete('this expense')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                <input type="hidden" name="eventId" value="${fn:escapeXml(ex.eventId)}">
-                                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                            </form>
+                                    <input type="hidden" name="eventId" value="${fn:escapeXml(ex.eventId)}">
+                                    <button type="submit" class="btn-icon btn-icon-danger" title="Delete Expense"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>
