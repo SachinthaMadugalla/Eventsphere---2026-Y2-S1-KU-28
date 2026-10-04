@@ -41,7 +41,7 @@ public class StaffController {
         if (user == null) return false;
         String r = user.getRoleName();
         return "Event Manager".equals(r) || "Managing Director".equals(r)
-            || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
+                || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
     }
 
     // ── LIST ───────────────────────────────────────────────────
