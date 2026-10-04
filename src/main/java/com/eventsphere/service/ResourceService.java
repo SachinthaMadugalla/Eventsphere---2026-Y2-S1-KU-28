@@ -74,7 +74,7 @@ public class ResourceService {
     }
 
     // ── UPDATE ─────────────────────────────────────────────────
-
+  /**UPDATE **/
 
     public String updateResource(Resource resource) {
         String error = validateResource(resource);
