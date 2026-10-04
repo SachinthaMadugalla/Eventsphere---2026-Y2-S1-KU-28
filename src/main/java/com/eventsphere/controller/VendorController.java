@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Module 3 – Vendor Management.
+ */
 @Controller
 @RequestMapping("/vendor")
 public class VendorController {
@@ -39,7 +42,7 @@ public class VendorController {
         if (user == null) return false;
         String r = user.getRoleName();
         return "Event Manager".equals(r) || "Managing Director".equals(r)
-                || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
+            || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
     }
 
     // ── LIST ───────────────────────────────────────────────────
