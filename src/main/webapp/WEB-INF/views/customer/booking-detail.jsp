@@ -119,7 +119,8 @@
     <div class="es-card" style="margin-top:24px;">
         <div class="card-header">
             <h3>&#128179; Payment & Invoice</h3>
-            <span class="es-badge badge-${fn:escapeXml(invoice.status.toLowerCase())}">${fn:escapeXml(invoice.status)}</span>
+            <c:set var="invStatus" value="${invoice.status.toLowerCase().replace(' ','')}"/>
+            <span class="es-badge badge-${fn:escapeXml(invStatus)}">${fn:escapeXml(invoice.status)}</span>
         </div>
         <div class="detail-grid">
             <div class="detail-item">
@@ -131,7 +132,7 @@
             <div class="detail-item">
                 <div class="detail-label">Amount Paid</div>
                 <div class="detail-value" style="color: #38a169; font-weight: bold;">
-                    LKR <fmt:formatNumber value="${invoice.paidAmount}" pattern="#,##0.00"/>
+                    LKR <fmt:formatNumber value="${invoice.totalPaid}" pattern="#,##0.00"/>
                 </div>
             </div>
             <div class="detail-item">
@@ -153,7 +154,14 @@
                 <i class="fa-solid fa-credit-card"></i> Pay LKR <fmt:formatNumber value="${invoice.outstanding}" pattern="#,##0.00"/> Securely
             </a>
             <div style="font-size: 11px; color: #a0aec0; margin-top: 8px;">
-                <i class="fa-solid fa-lock"></i> Payments are securely processed by Stripe. Your card details are never stored on our servers.
+                <c:choose>
+                    <c:when test="${stripeEnabled}">
+                        <i class="fa-solid fa-lock"></i> Payments are securely processed by Stripe. Your card details are never stored on our servers.
+                    </c:when>
+                    <c:otherwise>
+                        <i class="fa-solid fa-circle-check" style="color:#38a169;"></i> Instant Demo Payment: Click above to simulate card payment and mark this invoice as Paid.
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
         </c:if>

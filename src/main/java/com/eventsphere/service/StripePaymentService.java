@@ -59,10 +59,21 @@ public class StripePaymentService {
     public String createCheckout(Invoice invoice, String customerEmail, String baseUrl) throws StripeException {
         if (!isEnabled()) throw new IllegalStateException("Online card payments are not configured.");
         BigDecimal outstanding = invoice.getOutstanding();
+        if (outstanding == null && invoice.getTotalAmount() != null) {
+            BigDecimal paid = invoice.getTotalPaid() != null ? invoice.getTotalPaid() : BigDecimal.ZERO;
+            outstanding = invoice.getTotalAmount().subtract(paid);
+        }
         if (outstanding == null || outstanding.signum() <= 0) {
             throw new IllegalArgumentException("This invoice is already fully paid.");
         }
         long amountMinor = outstanding.setScale(2, RoundingMode.HALF_UP).movePointRight(2).longValueExact();
+
+        SessionCreateParams.LineItem.PriceData.ProductData.Builder prodData =
+                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                        .setName(invoice.getInvoiceNumber() != null ? "Invoice " + invoice.getInvoiceNumber() : "EventSphere Invoice");
+        if (invoice.getEventName() != null && !invoice.getEventName().isBlank()) {
+            prodData.setDescription(invoice.getEventName());
+        }
 
         SessionCreateParams.Builder params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -77,10 +88,7 @@ public class StripePaymentService {
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                                 .setCurrency(currency)
                                 .setUnitAmount(amountMinor)
-                                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                        .setName("Invoice " + invoice.getInvoiceNumber())
-                                        .setDescription(invoice.getEventName())
-                                        .build())
+                                .setProductData(prodData.build())
                                 .build())
                         .build());
         if (customerEmail != null && !customerEmail.isBlank()) params.setCustomerEmail(customerEmail);

@@ -14,7 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.eventsphere.service.FinanceService;
 import com.eventsphere.service.StripePaymentService;
 import com.eventsphere.model.Invoice;
-
+import com.eventsphere.model.Payment;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -205,6 +207,7 @@ public class CustomerController {
                 .ifPresent(invoice -> model.addAttribute("invoice", invoice));
         }
         
+        model.addAttribute("stripeEnabled", stripePaymentService.isEnabled());
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "customer/booking-detail";
     }
@@ -247,11 +250,40 @@ public class CustomerController {
         User user = getLoggedInUser(session);
         if (!isCustomer(user)) return "redirect:/login";
 
-        Optional<Invoice> opt = financeService.getInvoiceById(invoiceId);
+        Optional<Invoice> opt = financeService.getInvoiceWithPayments(invoiceId);
         if (opt.isEmpty()) return "redirect:/customer/bookings";
         Invoice invoice = opt.get();
         if (invoice.getCustomerId() != customerService.getCustomerByUserId(user.getUserId()).orElseThrow().getCustomerId()) {
             return "redirect:/access-denied";
+        }
+
+        // When Stripe API keys are not configured, allow smooth payment via Demo Simulator
+        if (!stripePaymentService.isEnabled()) {
+            Optional<Invoice> invWithPayments = financeService.getInvoiceWithPayments(invoiceId);
+            BigDecimal outstanding = invWithPayments.map(Invoice::getOutstanding).orElse(invoice.getTotalAmount());
+            if (outstanding == null || outstanding.signum() <= 0) {
+                flash.addFlashAttribute("error", "This invoice is already fully paid.");
+                return "redirect:/customer/booking/" + invoice.getEventId();
+            }
+
+            Payment payment = new Payment();
+            payment.setInvoiceId(invoiceId);
+            payment.setAmount(outstanding);
+            payment.setPaymentDate(LocalDate.now());
+            payment.setPaymentType("Full Payment");
+            payment.setPaymentMethod("Card (Demo Simulation)");
+            payment.setReferenceNo("DEMO-PAY-" + System.currentTimeMillis());
+            payment.setNotes("Online card payment processed in demo mode.");
+
+            String error = financeService.recordPayment(payment, user.getUserId());
+            if (error != null) {
+                flash.addFlashAttribute("error", error);
+            } else {
+                flash.addFlashAttribute("success",
+                        "Payment of LKR " + String.format("%,.2f", outstanding) +
+                        " processed successfully! Your invoice is now marked as Paid.");
+            }
+            return "redirect:/customer/booking/" + invoice.getEventId();
         }
 
         try {
@@ -259,10 +291,12 @@ public class CustomerController {
                     request.getServerPort(), request.getContextPath());
             String url = stripePaymentService.createCheckout(invoice, user.getEmail(), baseUrl);
             return "redirect:" + url;
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             flash.addFlashAttribute("error", ex.getMessage());
         } catch (com.stripe.exception.StripeException ex) {
-            flash.addFlashAttribute("error", "Could not connect to payment gateway. Please try again later.");
+            flash.addFlashAttribute("error", "Stripe payment error: " + ex.getMessage());
+        } catch (Exception ex) {
+            flash.addFlashAttribute("error", "Checkout error: " + ex.getMessage());
         }
         return "redirect:/customer/booking/" + invoice.getEventId();
     }

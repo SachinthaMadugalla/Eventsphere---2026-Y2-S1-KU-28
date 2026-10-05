@@ -70,6 +70,19 @@ public class Invoice {
     public BigDecimal getTotalPaid()                    { return totalPaid; }
     public void setTotalPaid(BigDecimal totalPaid)      { this.totalPaid = totalPaid; }
 
-    public BigDecimal getOutstanding()                  { return outstanding; }
+    // Alias for totalPaid for template compatibility
+    public BigDecimal getPaidAmount()                   { return totalPaid; }
+    public void setPaidAmount(BigDecimal paidAmount)    { this.totalPaid = paidAmount; }
+
+    public BigDecimal getOutstanding() {
+        if (outstanding != null) {
+            return outstanding;
+        }
+        if (totalAmount != null) {
+            BigDecimal paid = totalPaid != null ? totalPaid : BigDecimal.ZERO;
+            return totalAmount.subtract(paid);
+        }
+        return BigDecimal.ZERO;
+    }
     public void setOutstanding(BigDecimal outstanding)  { this.outstanding = outstanding; }
 }

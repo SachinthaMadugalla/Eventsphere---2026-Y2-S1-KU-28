@@ -151,7 +151,7 @@ public class FinanceService {
     public List<Invoice> getAllInvoices()                    { return invoiceDAO.findAll(); }
     public List<Invoice> getInvoicesByCustomer(int cid)     { return invoiceDAO.findByCustomerId(cid); }
     public List<Invoice> getInvoicesByEvent(int eid)        { return invoiceDAO.findByEventId(eid); }
-    public Optional<Invoice> getInvoiceById(int id)         { return invoiceDAO.findById(id); }
+    public Optional<Invoice> getInvoiceById(int id)         { return getInvoiceWithPayments(id); }
 
     /**
      * Creates a new invoice. Generates invoice number automatically.
