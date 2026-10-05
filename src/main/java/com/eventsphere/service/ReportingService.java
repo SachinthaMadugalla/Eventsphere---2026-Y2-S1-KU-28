@@ -9,12 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for Reporting & Feedback Management (Module 7).
- * Handles feedback and complaints. Reporting data is gathered
- * from other services (EventService, FinanceService, etc.)
- * and assembled in the controller.
- */
+// Service for Reporting & Feedback Management .Handles feedback and complaints. Reporting data is gathered
+
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class ReportingService {
@@ -35,10 +31,8 @@ public class ReportingService {
     public List<Feedback> getFeedbackByEvent(int eid)        { return feedbackDAO.findByEventId(eid); }
     public double getAverageRating()                         { return feedbackDAO.getAverageRating(); }
 
-    /**
-     * Submits new feedback for a completed event.
-     * Validates rating range and prevents duplicate submissions.
-     */
+    // Submits new feedback for a completed event. Validates rating range and prevents duplicate submissions.
+   
     public String submitFeedback(Feedback feedback) {
         if (feedback.getRating() < 1 || feedback.getRating() > 5) {
             return "Rating must be between 1 and 5.";
@@ -50,9 +44,8 @@ public class ReportingService {
         return null;
     }
 
-    /**
-     * Moderates inappropriate feedback.
-     */
+    // Moderates inappropriate feedback.
+     
     public String moderateFeedback(int feedbackId, String reason) {
         if (reason == null || reason.trim().isEmpty()) {
             return "Moderation reason is required.";
@@ -65,7 +58,7 @@ public class ReportingService {
         feedbackDAO.deleteFeedback(feedbackId);
     }
 
-    // ── COMPLAINTS ─────────────────────────────────────────────
+    // COMPLAINTS 
 
     public List<Complaint> getAllComplaints()               { return complaintDAO.findAll(); }
     public Optional<Complaint> getComplaintById(int id)    { return complaintDAO.findById(id); }
@@ -73,9 +66,8 @@ public class ReportingService {
     public List<Complaint> getEscalatedComplaints()        { return complaintDAO.findEscalated(); }
     public int countOpenComplaints()                       { return complaintDAO.countOpen(); }
 
-    /**
-     * Submits a new complaint.
-     */
+    // Submits a new complaint.
+   
     public String submitComplaint(Complaint complaint) {
         if (complaint.getSubject() == null || complaint.getSubject().trim().isEmpty()) {
             return "Complaint subject is required.";
@@ -87,9 +79,8 @@ public class ReportingService {
         return null;
     }
 
-    /**
-     * Updates complaint status and response, with optional escalation.
-     */
+    //Updates complaint status and response, with optional escalation.
+    
     public String updateComplaint(Complaint complaint) {
         if (complaint.getStatus() == null || complaint.getStatus().trim().isEmpty()) {
             return "Status is required.";
@@ -99,9 +90,8 @@ public class ReportingService {
         return null;
     }
 
-    /**
-     * Escalates a complaint to the Managing Director.
-     */
+    //Escalates a complaint to the Managing Director.
+    
     public void escalateComplaint(int complaintId) {
         complaintDAO.escalateComplaint(complaintId);
     }
