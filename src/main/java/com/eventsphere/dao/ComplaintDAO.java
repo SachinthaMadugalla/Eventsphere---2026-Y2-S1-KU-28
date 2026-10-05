@@ -8,10 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for Complaint Management (Module 7 – Reporting & Feedback).
- * All SQL queries are explicitly written here.
- */
 @Repository
 public class ComplaintDAO {
 
@@ -21,7 +17,7 @@ public class ComplaintDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ── RowMapper ──────────────────────────────────────────────
+    // RowMapper 
 
     private final RowMapper<Complaint> complaintRowMapper = (rs, rowNum) -> {
         Complaint c = new Complaint();
@@ -43,11 +39,10 @@ public class ComplaintDAO {
         return c;
     };
 
-    // ── INSERT ─────────────────────────────────────────────────
+    // INSERT 
 
-    /**
-     * Submits a new complaint.
-     */
+    // Submits a new complaint.
+    
     public int addComplaint(Complaint complaint) {
         String sql =
             "INSERT INTO complaints (event_id, customer_id, subject, description, status) " +
@@ -59,11 +54,10 @@ public class ComplaintDAO {
                 complaint.getDescription());
     }
 
-    // ── SELECT ─────────────────────────────────────────────────
+    // SELECT 
 
-    /**
-     * Returns all complaints.
-     */
+    // Returns all complaints.
+  
     public List<Complaint> findAll() {
         String sql =
             "SELECT co.complaint_id, co.event_id, e.event_name, " +
@@ -77,9 +71,8 @@ public class ComplaintDAO {
         return jdbcTemplate.query(sql, complaintRowMapper);
     }
 
-    /**
-     * Finds a complaint by its primary key.
-     */
+    //Finds a complaint by its primary key.
+
     public Optional<Complaint> findById(int complaintId) {
         String sql =
             "SELECT co.complaint_id, co.event_id, e.event_name, " +
@@ -94,9 +87,8 @@ public class ComplaintDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
-    /**
-     * Returns complaints for a specific customer.
-     */
+    // Returns complaints for a specific customer.
+  
     public List<Complaint> findByCustomerId(int customerId) {
         String sql =
             "SELECT co.complaint_id, co.event_id, e.event_name, " +
@@ -110,9 +102,8 @@ public class ComplaintDAO {
         return jdbcTemplate.query(sql, complaintRowMapper, customerId);
     }
 
-    /**
-     * Returns only escalated complaints (for Managing Director).
-     */
+    // Returns only escalated complaints (for Managing Director)
+    
     public List<Complaint> findEscalated() {
         String sql =
             "SELECT co.complaint_id, co.event_id, e.event_name, " +
@@ -126,20 +117,17 @@ public class ComplaintDAO {
         return jdbcTemplate.query(sql, complaintRowMapper);
     }
 
-    /**
-     * Returns count of open complaints (Submitted or Under Review).
-     */
+    //Returns count of open complaints (Submitted or Under Review)
+    
     public int countOpen() {
         String sql =
             "SELECT COUNT(*) FROM complaints WHERE status IN ('Submitted','Under Review')";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
-
-    /**
-     * Updates complaint status and response.
-     */
+    // UPDATE
+    // Updates complaint status and response
+    
     public int updateComplaint(Complaint complaint) {
         String sql =
             "UPDATE complaints SET status = ?, response = ?, is_escalated = ?, " +
@@ -152,9 +140,7 @@ public class ComplaintDAO {
                 complaint.getComplaintId());
     }
 
-    /**
-     * Escalates a complaint to the Managing Director.
-     */
+    // Escalates a complaint to the Managing Director
     public int escalateComplaint(int complaintId) {
         String sql =
             "UPDATE complaints SET is_escalated = 1, updated_date = GETDATE() " +
@@ -162,11 +148,10 @@ public class ComplaintDAO {
         return jdbcTemplate.update(sql, complaintId);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    // DELETE
 
-    /**
-     * Deletes a complaint by ID.
-     */
+    // Deletes a complaint by ID.
+
     public int deleteComplaint(int complaintId) {
         String sql = "DELETE FROM complaints WHERE complaint_id = ?";
         return jdbcTemplate.update(sql, complaintId);
