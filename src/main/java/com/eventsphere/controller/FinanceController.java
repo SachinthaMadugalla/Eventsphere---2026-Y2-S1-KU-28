@@ -280,6 +280,13 @@ public class FinanceController {
         model.addAttribute("invoice",    new Invoice());
         model.addAttribute("events",     eventService.getAllEvents());
         model.addAttribute("customers",  customerService.getAllCustomers());
+        
+        java.util.Map<Integer, BigDecimal> budgetMap = new java.util.HashMap<>();
+        for (com.eventsphere.model.Budget b : financeService.getAllBudgets()) {
+            budgetMap.put(b.getEventId(), b.getTotalBudget());
+        }
+        model.addAttribute("budgetMap",  budgetMap);
+        
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "finance/invoice-form";
     }
@@ -367,6 +374,7 @@ public class FinanceController {
                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate paymentDate,
                                 @RequestParam String paymentType,
                                 @RequestParam(required = false) String referenceNo,
+                                @RequestParam(defaultValue = "Cash") String paymentMethod,
                                 @RequestParam(required = false) String notes,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
@@ -379,6 +387,8 @@ public class FinanceController {
         payment.setPaymentDate(paymentDate);
         payment.setPaymentType(paymentType);
         payment.setReferenceNo(referenceNo);
+        // Staff can record offline methods only; card payments come from Stripe.
+        payment.setPaymentMethod(java.util.Set.of("Cash", "Bank Transfer", "Cheque").contains(paymentMethod) ? paymentMethod : "Cash");
         payment.setNotes(notes);
         payment.setRecordedBy(user.getUserId());
 

@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for Vendor Management (Module 3).
- * Contains vendor business logic and scheduling conflict detection.
- */
+
+//Service for Vendor Management (Module 3).
+//Contains vendor business logic and scheduling conflict detection.
+
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class VendorService {
@@ -25,7 +25,7 @@ public class VendorService {
         this.vendorDAO = vendorDAO;
     }
 
-    // ── READ ───────────────────────────────────────────────────
+    //READ
 
     public List<Vendor> getAllVendors()        { return vendorDAO.findAll(); }
     public List<Vendor> getActiveVendors()    { return vendorDAO.findAllActive(); }
@@ -50,11 +50,9 @@ public class VendorService {
         return vendorDAO.findAllAssignments();
     }
 
-    // ── CREATE ─────────────────────────────────────────────────
+    //CREATE
 
-    /**
-     * Adds a new vendor. Returns null on success, error message on failure.
-     */
+    //Adds a new vendor. Returns null on success, error message on failure.
     public String addVendor(Vendor vendor) {
         String error = validateVendor(vendor);
         if (error != null) return error;
@@ -62,16 +60,14 @@ public class VendorService {
         return null;
     }
 
-    // ── ASSIGN ─────────────────────────────────────────────────
+    //ASSIGN
 
-    /**
-     * Assigns a vendor to an event with schedule conflict checking.
-     *
-     * Conflict rule: same vendor already booked on the same service date
-     * for a different non-cancelled event.
-     *
-     * @return null on success, error message if conflict
-     */
+    //Assigns a vendor to an event with schedule conflict checking.
+    //Conflict rule: same vendor already booked on the same service date
+    //for a different non cancelled event
+
+    //@return null on success, error message if conflict
+
     @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignVendorToEvent(EventVendor ev) {
         if (vendorDAO.findById(ev.getVendorId()).filter(v -> v.isActive()).isEmpty()) return "Selected entry is unavailable.";
@@ -97,11 +93,8 @@ public class VendorService {
         return null;
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
-
-    /**
-     * Updates an existing vendor.
-     */
+    //UPDATE
+    //Updates an existing vendor
     public String updateVendor(Vendor vendor) {
         String error = validateVendor(vendor);
         if (error != null) return error;
@@ -113,8 +106,7 @@ public class VendorService {
         vendorDAO.setActiveStatus(vendorId, active);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
-
+    //DELETE
     public void deleteVendor(int vendorId) {
         vendorDAO.deleteVendor(vendorId);
     }
@@ -123,8 +115,7 @@ public class VendorService {
         vendorDAO.removeAssignment(eventVendorId);
     }
 
-    // ── VALIDATION ─────────────────────────────────────────────
-
+    //VALIDATION
     private String validateVendor(Vendor vendor) {
         if (vendor.getVendorName() == null || vendor.getVendorName().trim().isEmpty()) {
             return "Vendor name is required.";

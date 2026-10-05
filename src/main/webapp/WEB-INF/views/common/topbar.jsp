@@ -28,14 +28,7 @@
         </a>
         <!-- User info -->
         <span class="topbar-user">
-            <c:choose>
-                <c:when test="${not empty sessionScope.loggedInUser.profilePicture}">
-                    <img src="${fn:escapeXml(pageContext.request.contextPath)}${fn:escapeXml(sessionScope.loggedInUser.profilePicture)}" alt="Avatar" class="topbar-avatar" style="object-fit: cover;" aria-hidden="true">
-                </c:when>
-                <c:otherwise>
-                    <span class="topbar-avatar" aria-hidden="true">${fn:escapeXml(fn:toUpperCase(fn:substring(sessionScope.userFullName, 0, 1)))}</span>
-                </c:otherwise>
-            </c:choose>
+            <span class="topbar-avatar" aria-hidden="true">${fn:escapeXml(fn:toUpperCase(fn:substring(sessionScope.userFullName, 0, 1)))}</span>
             <span class="topbar-user-text">
                 <span class="topbar-user-name">${fn:escapeXml(sessionScope.userFullName)}</span>
                 <span class="topbar-user-role">${fn:escapeXml(sessionScope.userRole)}</span>

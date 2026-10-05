@@ -25,7 +25,7 @@
                         <td>${fn:escapeXml(inv.issuedDate)}</td>
                         <td>${fn:escapeXml(inv.dueDate)}</td>
                         <td><c:set var="s" value="${inv.status.toLowerCase().replace(' ','')}"/><span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(inv.status)}</span></td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/detail/${fn:escapeXml(inv.invoiceId)}" class="btn btn-secondary btn-xs">View</a>
                             <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/invoice/edit/${fn:escapeXml(inv.invoiceId)}" class="btn btn-primary btn-xs">Edit</a>
                             <a href="${fn:escapeXml(pageContext.request.contextPath)}/finance/payment/record?invoiceId=${fn:escapeXml(inv.invoiceId)}" class="btn btn-success btn-xs">+ Payment</a>

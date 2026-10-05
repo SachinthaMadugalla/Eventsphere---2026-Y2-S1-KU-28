@@ -983,8 +983,3 @@ PRINT '  26 Invoices (13 Paid, 3 Partially Paid, 5 Pending, 2 Partially Paid/Can
 PRINT '  28 Payments across Deposit/Partial/Full/Cheque/Cash/Bank Transfer';
 PRINT '  Loyalty: 400/300/200/200/100/100/100/100 pts across 8 customers';
 PRINT '============================================================';
-
-SELECT * FROM users;
-GO
-SELECT * FROM events;
-GO

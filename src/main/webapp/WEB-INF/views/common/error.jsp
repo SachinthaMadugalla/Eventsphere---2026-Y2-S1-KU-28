@@ -22,9 +22,17 @@
         <p style="color:#718096;margin-bottom:24px;">
             Please go back and try again. If the problem persists, contact your system administrator.
         </p>
-        <a href="${fn:escapeXml(pageContext.request.contextPath)}/dashboard" class="btn btn-primary">
-            &#8592; Back to Dashboard
-        </a>
+        <c:choose>
+            <c:when test="${empty sessionScope.user}">
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/" class="btn btn-primary">&#8592; Home</a>
+            </c:when>
+            <c:when test="${sessionScope.user.role == 'Customer'}">
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/dashboard" class="btn btn-primary">&#8592; Back to Dashboard</a>
+            </c:when>
+            <c:otherwise>
+                <a href="${fn:escapeXml(pageContext.request.contextPath)}/dashboard" class="btn btn-primary">&#8592; Back to Dashboard</a>
+            </c:otherwise>
+        </c:choose>
         &nbsp;
         <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
     </div>

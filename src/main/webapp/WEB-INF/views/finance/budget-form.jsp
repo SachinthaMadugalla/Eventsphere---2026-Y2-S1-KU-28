@@ -8,7 +8,14 @@
 <div class="es-main">
 <%@ include file="/WEB-INF/views/common/topbar.jsp" %>
 <div class="es-content">
-    <div class="page-header"><h2>${fn:escapeXml(isEdit ? '&#9998; Edit Budget' : '&#43; Create Budget')}</h2></div>
+    <div class="page-header">
+        <h2>
+            <c:choose>
+                <c:when test="${isEdit}"><i class="fa-solid fa-pen-to-square"></i> Edit Budget</c:when>
+                <c:otherwise><i class="fa-solid fa-plus"></i> Create Budget</c:otherwise>
+            </c:choose>
+        </h2>
+    </div>
     <%@ include file="/WEB-INF/views/common/alerts.jsp" %>
     <div class="es-card" style="max-width:560px;">
         <c:set var="action" value="${isEdit ? '/finance/budget/edit/'.concat(budget.budgetId) : '/finance/budget/create'}"/>

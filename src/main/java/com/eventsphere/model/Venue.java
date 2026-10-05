@@ -3,10 +3,10 @@ package com.eventsphere.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Represents a venue available for events.
- * Maps to the 'venues' table in EventSphereDB.
- */
+
+ //Represents a venue available for events.
+ //Maps to the 'venues' table in EventSphereDB.
+
 public class Venue {
 
     private int venueId;
@@ -20,7 +20,7 @@ public class Venue {
 
     public Venue() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    //Getters & Setters
 
     public int getVenueId()                         { return venueId; }
     public void setVenueId(int venueId)             { this.venueId = venueId; }

@@ -30,10 +30,12 @@ public class DashboardStatsDTO {
     // Feedback & complaints
     private int openComplaints;
     private int totalFeedback;
+    private double averageRating;
 
     // User/customer stats
     private int totalCustomers;
     private int totalStaff;
+    private int totalGuests;
 
     public DashboardStatsDTO() {}
 
@@ -89,4 +91,10 @@ public class DashboardStatsDTO {
 
     public int getTotalStaff()                          { return totalStaff; }
     public void setTotalStaff(int totalStaff)           { this.totalStaff = totalStaff; }
+
+    public double getAverageRating()                  { return averageRating; }
+    public void setAverageRating(double averageRating) { this.averageRating = averageRating; }
+
+    public int getTotalGuests()                       { return totalGuests; }
+    public void setTotalGuests(int totalGuests)       { this.totalGuests = totalGuests; }
 }

@@ -22,6 +22,7 @@ $toolsDir = Join-Path $projectRoot '.tools'
 $processFile = Join-Path $localDir 'server.json'
 $launchLock = $null
 $serverProcess = $null
+$stripeProcess = $null
 
 function Test-Ready([string]$Url) {
     try {
@@ -128,17 +129,88 @@ try {
     Get-Content -LiteralPath (Join-Path $localDir 'database-setup.log') | Where-Object { $_ -match '^(Initialized SQL Server|SQL Server verified)' }
     if ($SetupOnly) { Write-Host 'SQL Server setup complete. Run Start-EventSphere.cmd.'; exit 0 }
 
-    $war = Join-Path $projectRoot 'target\EventSphere-1.0.0.war'
-    $serverProcess = Start-Process -FilePath $javaExe -ArgumentList @("`"-Djava.library.path=$nativeDir`"", '-jar', "`"$war`"", '--spring.profiles.active=sqlserver', "--server.port=$Port") -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $localDir 'server.log') -RedirectStandardError (Join-Path $localDir 'server-error.log')
-    @{ pid = $serverProcess.Id; started = $serverProcess.StartTime.ToUniversalTime().Ticks.ToString(); url = $url; databaseProvider = 'SqlServer' } | ConvertTo-Json | Set-Content -LiteralPath $processFile -Encoding UTF8
+    # ── Stripe Configuration (.local/stripe.json) ──────────────
+    $stripeConfigFile = Join-Path $localDir 'stripe.json'
+    $savedStripeConfig = if (Test-Path -LiteralPath $stripeConfigFile) {
+        try { Get-Content -LiteralPath $stripeConfigFile -Raw | ConvertFrom-Json } catch { $null }
+    } else { $null }
+
+    $stripeApiKey = $env:STRIPE_SECRET_KEY
+    if (!$stripeApiKey -and $savedStripeConfig -and $savedStripeConfig.secretKey) {
+        $stripeApiKey = $savedStripeConfig.secretKey
+    }
+    $stripeWebhookSecret = $env:STRIPE_WEBHOOK_SECRET
+    if (!$stripeWebhookSecret -and $savedStripeConfig -and $savedStripeConfig.webhookSecret) {
+        $stripeWebhookSecret = $savedStripeConfig.webhookSecret
+    }
+
+    if (!$BuildOnly -and !$SetupOnly) {
+        try {
+            if ($stripeApiKey) {
+                $masked = if ($stripeApiKey.Length -gt 14) { $stripeApiKey.Substring(0, 12) + "..." + $stripeApiKey.Substring($stripeApiKey.Length - 4) } else { $stripeApiKey }
+                Write-Host "Current Stripe Key: $masked" -ForegroundColor Cyan
+                $inputKey = Read-Host "paste stripe api keys here (Press Enter to keep current) : "
+            } else {
+                $inputKey = Read-Host "paste stripe api keys here : "
+            }
+            if ($inputKey -and $inputKey.Trim()) {
+                $stripeApiKey = $inputKey.Trim()
+                $inputWh = Read-Host "paste stripe webhook signing secret here (optional, Press Enter to skip)"
+                if ($inputWh -and $inputWh.Trim()) {
+                    $stripeWebhookSecret = $inputWh.Trim()
+                }
+                @{
+                    secretKey = $stripeApiKey
+                    webhookSecret = if ($stripeWebhookSecret) { $stripeWebhookSecret } else { "" }
+                    currency = "lkr"
+                } | ConvertTo-Json | Set-Content -LiteralPath $stripeConfigFile -Encoding UTF8
+                Write-Host "Stripe credentials saved to .local/stripe.json" -ForegroundColor Green
+            }
+        } catch { }
+    }
+
+    $serverArgs = @("`"-Djava.library.path=$nativeDir`"", '-jar', "`"$war`"", '--spring.profiles.active=sqlserver', "--server.port=$Port")
+    if ($stripeApiKey) {
+        $serverArgs += "--stripe.secret-key=$stripeApiKey"
+    }
+    if ($stripeWebhookSecret) {
+        $serverArgs += "--stripe.webhook-secret=$stripeWebhookSecret"
+    }
+    $serverProcess = Start-Process -FilePath $javaExe -ArgumentList $serverArgs -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $localDir 'server.log') -RedirectStandardError (Join-Path $localDir 'server-error.log')
+
+    # Resolve Stripe CLI and configure listener if API key is provided
+    $stripeExe = Get-Command stripe.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+    if (!$stripeExe) {
+        $wingetStripe = Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Packages\Stripe.StripeCli_Microsoft.Winget.Source_8wekyb3d8bbwe\stripe.exe'
+        if (Test-Path -LiteralPath $wingetStripe) { $stripeExe = $wingetStripe }
+    }
+
+    if ($stripeExe -and $stripeApiKey) {
+        $stripeLog = Join-Path $localDir 'stripe-listener.log'
+        $stripeErrLog = Join-Path $localDir 'stripe-error.log'
+        $stripeArgs = @('listen', '--all-snapshot', '--forward-to', "localhost:$Port/stripe/webhook", '--api-key', $stripeApiKey)
+        $stripeProcess = Start-Process -FilePath $stripeExe -ArgumentList $stripeArgs -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stripeLog -RedirectStandardError $stripeErrLog
+    }
+
+    @{
+        pid = $serverProcess.Id
+        started = $serverProcess.StartTime.ToUniversalTime().Ticks.ToString()
+        url = $url
+        databaseProvider = 'SqlServer'
+        stripePid = if ($stripeProcess) { $stripeProcess.Id } else { $null }
+    } | ConvertTo-Json | Set-Content -LiteralPath $processFile -Encoding UTF8
+
     Write-Host 'Waiting for the database and web server...'
-    $deadline = (Get-Date).AddSeconds(90)
+    $deadline = (Get-Date).AddSeconds(180)
     do {
         $serverProcess.Refresh()
         if ($serverProcess.HasExited) { throw 'EventSphere exited during startup. See .local/server.log and .local/server-error.log.' }
         if (Test-Ready $url) {
             Write-Host "EventSphere is ready at $url"
             Write-Host 'Demo login: admin / password123. Use Stop-EventSphere.cmd to stop the server.'
+            if ($stripeProcess -and !$stripeProcess.HasExited) {
+                Write-Host "Stripe webhook forwarder is active in the background for http://localhost:$Port/stripe/webhook"
+            }
             if (!$NoBrowser) { Start-Process $url }
             exit 0
         }
@@ -146,6 +218,7 @@ try {
     } while ((Get-Date) -lt $deadline)
     throw 'Startup timed out. See .local/server.log and .local/server-error.log.'
 } catch {
+    if ($stripeProcess -and !$stripeProcess.HasExited) { $stripeProcess.Kill(); $stripeProcess.WaitForExit() }
     if ($serverProcess -and !$serverProcess.HasExited) { $serverProcess.Kill(); $serverProcess.WaitForExit() }
     Write-Host ("ERROR: " + $_.Exception.Message) -ForegroundColor Red
     $_ | Out-String | Set-Content -LiteralPath (Join-Path $toolsDir 'launcher-error.log')

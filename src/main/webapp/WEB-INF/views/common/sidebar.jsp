@@ -14,14 +14,7 @@
 
     <!-- User info -->
     <div class="sidebar-user">
-        <c:choose>
-            <c:when test="${not empty sessionScope.loggedInUser.profilePicture}">
-                <img src="${fn:escapeXml(pageContext.request.contextPath)}${fn:escapeXml(sessionScope.loggedInUser.profilePicture)}" alt="Avatar" class="user-avatar" style="object-fit: cover;" aria-hidden="true">
-            </c:when>
-            <c:otherwise>
-                <span class="user-avatar" aria-hidden="true">${fn:escapeXml(fn:toUpperCase(fn:substring(sessionScope.userFullName, 0, 1)))}</span>
-            </c:otherwise>
-        </c:choose>
+        <span class="user-avatar" aria-hidden="true">${fn:escapeXml(fn:toUpperCase(fn:substring(sessionScope.userFullName, 0, 1)))}</span>
         <div class="user-meta">
             <div class="user-name">${fn:escapeXml(sessionScope.userFullName)}</div>
             <div class="user-role">${fn:escapeXml(sessionScope.userRole)}</div>

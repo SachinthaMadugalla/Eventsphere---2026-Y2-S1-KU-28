@@ -17,9 +17,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * Module 3 – Vendor Management.
- */
+//Module 3 – Vendor Management.
+
 @Controller
 @RequestMapping("/vendor")
 public class VendorController {
@@ -45,7 +44,7 @@ public class VendorController {
             || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
     }
 
-    // ── LIST ───────────────────────────────────────────────────
+    //LIST
 
     @GetMapping("/list")
     public String listVendors(HttpSession session, Model model) {
@@ -58,7 +57,7 @@ public class VendorController {
         return "venue-vendor/vendor-list";
     }
 
-    // ── DETAIL ─────────────────────────────────────────────────
+    //DETAIL
 
     @GetMapping("/detail/{vendorId}")
     public String vendorDetail(@PathVariable int vendorId,
@@ -75,7 +74,7 @@ public class VendorController {
         return "venue-vendor/vendor-detail";
     }
 
-    // ── CREATE ─────────────────────────────────────────────────
+    //CREATE
 
     @GetMapping("/create")
     public String createForm(HttpSession session, Model model) {
@@ -119,7 +118,7 @@ public class VendorController {
         return "redirect:/vendor/list";
     }
 
-    // ── EDIT ───────────────────────────────────────────────────
+    //EDIT
 
     @GetMapping("/edit/{vendorId}")
     public String editForm(@PathVariable int vendorId,
@@ -169,7 +168,7 @@ public class VendorController {
         return "redirect:/vendor/list";
     }
 
-    // ── TOGGLE ACTIVE ─────────────────────────────────────────
+    //TOGGLE ACTIVE
 
     @PostMapping("/toggle/{vendorId}")
     public String toggleActive(@PathVariable int vendorId,
@@ -185,7 +184,7 @@ public class VendorController {
         return "redirect:/vendor/list";
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    //DELETE
 
     @PostMapping("/delete/{vendorId}")
     public String deleteVendor(@PathVariable int vendorId,
@@ -199,7 +198,7 @@ public class VendorController {
         return "redirect:/vendor/list";
     }
 
-    // ── ASSIGN TO EVENT ───────────────────────────────────────
+    //ASSIGN TO EVENT
 
     @GetMapping("/assign")
     public String assignForm(@RequestParam int eventId,

@@ -11,7 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.eventsphere.service.FinanceService;
+import com.eventsphere.service.StripePaymentService;
+import com.eventsphere.model.Invoice;
+import com.eventsphere.model.Payment;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -27,15 +32,21 @@ public class CustomerController {
     private final CustomerService customerService;
     private final EventService eventService;
     private final NotificationService notificationService;
+    private final FinanceService financeService;
+    private final StripePaymentService stripePaymentService;
 
     public CustomerController(com.eventsphere.service.CustomerBookingService bookingService, com.eventsphere.service.LoyaltyService loyaltyService, CustomerService customerService,
                                EventService eventService,
-                               NotificationService notificationService) {
+                               NotificationService notificationService,
+                               FinanceService financeService,
+                               StripePaymentService stripePaymentService) {
         this.bookingService = bookingService;
         this.loyaltyService = loyaltyService;
         this.customerService     = customerService;
         this.eventService        = eventService;
         this.notificationService = notificationService;
+        this.financeService = financeService;
+        this.stripePaymentService = stripePaymentService;
     }
 
     // ── SECURITY HELPER ───────────────────────────────────────
@@ -189,6 +200,14 @@ public class CustomerController {
 
         if (!ownsEvent(user, opt.get())) return "redirect:/access-denied";
         model.addAttribute("event",      opt.get());
+        
+        java.util.List<Invoice> invoices = financeService.getInvoicesByEvent(eventId);
+        if (!invoices.isEmpty()) {
+            financeService.getInvoiceWithPayments(invoices.get(0).getInvoiceId())
+                .ifPresent(invoice -> model.addAttribute("invoice", invoice));
+        }
+        
+        model.addAttribute("stripeEnabled", stripePaymentService.isEnabled());
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "customer/booking-detail";
     }
@@ -220,6 +239,89 @@ public class CustomerController {
     private boolean ownsEvent(User user, Event event) {
         return customerService.getCustomerByUserId(user.getUserId())
                 .map(c -> c.getCustomerId() == event.getCustomerId()).orElse(false);
+    }
+
+    // ── STRIPE PAYMENTS ────────────────────────────────────────
+
+    @GetMapping("/payment/checkout")
+    public String checkout(@RequestParam int invoiceId,
+                           jakarta.servlet.http.HttpServletRequest request,
+                           HttpSession session, RedirectAttributes flash) {
+        User user = getLoggedInUser(session);
+        if (!isCustomer(user)) return "redirect:/login";
+
+        Optional<Invoice> opt = financeService.getInvoiceWithPayments(invoiceId);
+        if (opt.isEmpty()) return "redirect:/customer/bookings";
+        Invoice invoice = opt.get();
+        if (invoice.getCustomerId() != customerService.getCustomerByUserId(user.getUserId()).orElseThrow().getCustomerId()) {
+            return "redirect:/access-denied";
+        }
+
+        // When Stripe API keys are not configured, allow smooth payment via Demo Simulator
+        if (!stripePaymentService.isEnabled()) {
+            Optional<Invoice> invWithPayments = financeService.getInvoiceWithPayments(invoiceId);
+            BigDecimal outstanding = invWithPayments.map(Invoice::getOutstanding).orElse(invoice.getTotalAmount());
+            if (outstanding == null || outstanding.signum() <= 0) {
+                flash.addFlashAttribute("error", "This invoice is already fully paid.");
+                return "redirect:/customer/booking/" + invoice.getEventId();
+            }
+
+            Payment payment = new Payment();
+            payment.setInvoiceId(invoiceId);
+            payment.setAmount(outstanding);
+            payment.setPaymentDate(LocalDate.now());
+            payment.setPaymentType("Full Payment");
+            payment.setPaymentMethod("Card (Demo Simulation)");
+            payment.setReferenceNo("DEMO-PAY-" + System.currentTimeMillis());
+            payment.setNotes("Online card payment processed in demo mode.");
+
+            String error = financeService.recordPayment(payment, user.getUserId());
+            if (error != null) {
+                flash.addFlashAttribute("error", error);
+            } else {
+                flash.addFlashAttribute("success",
+                        "Payment of LKR " + String.format("%,.2f", outstanding) +
+                        " processed successfully! Your invoice is now marked as Paid.");
+            }
+            return "redirect:/customer/booking/" + invoice.getEventId();
+        }
+
+        try {
+            String baseUrl = String.format("%s://%s:%d%s", request.getScheme(), request.getServerName(),
+                    request.getServerPort(), request.getContextPath());
+            String url = stripePaymentService.createCheckout(invoice, user.getEmail(), baseUrl);
+            return "redirect:" + url;
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("error", ex.getMessage());
+        } catch (com.stripe.exception.StripeException ex) {
+            flash.addFlashAttribute("error", "Stripe payment error: " + ex.getMessage());
+        } catch (Exception ex) {
+            flash.addFlashAttribute("error", "Checkout error: " + ex.getMessage());
+        }
+        return "redirect:/customer/booking/" + invoice.getEventId();
+    }
+
+    @GetMapping("/payment/success")
+    public String paymentSuccess(@RequestParam(name = "session_id", required = false) String sessionId,
+                                 HttpSession session, RedirectAttributes flash) {
+        User user = getLoggedInUser(session);
+        if (!isCustomer(user)) return "redirect:/login";
+        if (sessionId == null) return "redirect:/customer/bookings";
+
+        try {
+            com.stripe.model.checkout.Session stripeSession = stripePaymentService.retrieveSession(sessionId);
+            String error = stripePaymentService.recordIfPaid(stripeSession);
+            if (error != null) {
+                flash.addFlashAttribute("error", error);
+            } else {
+                flash.addFlashAttribute("success", "Payment successful! Your invoice has been updated and a receipt has been emailed to you.");
+            }
+            String eventId = stripeSession.getMetadata() != null ? stripeSession.getMetadata().get("eventId") : null;
+            return eventId != null ? "redirect:/customer/booking/" + eventId : "redirect:/customer/bookings";
+        } catch (com.stripe.exception.StripeException ex) {
+            flash.addFlashAttribute("error", "Error verifying payment status. If your card was charged, it will be automatically recorded shortly.");
+            return "redirect:/customer/bookings";
+        }
     }
 
     // ── NOTIFICATIONS ─────────────────────────────────────────

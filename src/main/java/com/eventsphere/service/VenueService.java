@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for Venue Management (Module 3).
- * Contains venue business logic and conflict detection.
- */
+
+//Service for Venue Management (Module 3).
+//Contains venue business logic and conflict detection.
+
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class VenueService {
@@ -23,7 +23,7 @@ public class VenueService {
         this.venueDAO = venueDAO;
     }
 
-    // ── READ ───────────────────────────────────────────────────
+    //READ
 
     public List<Venue> getAllVenues()        { return venueDAO.findAll(); }
     public List<Venue> getActiveVenues()    { return venueDAO.findAllActive(); }
@@ -44,11 +44,9 @@ public class VenueService {
         return venueDAO.findAllAssignments();
     }
 
-    // ── CREATE ─────────────────────────────────────────────────
+    //CREATE
 
-    /**
-     * Adds a new venue. Returns null on success, error message on failure.
-     */
+    //Adds a new venue. Returns null on success, error message on failure.
     public String addVenue(Venue venue) {
         String error = validateVenue(venue);
         if (error != null) return error;
@@ -56,18 +54,14 @@ public class VenueService {
         return null;
     }
 
-    // ── ASSIGN ─────────────────────────────────────────────────
+    //ASSIGN
 
-    /**
-     * Assigns a venue to an event with conflict checking.
-     *
-     * Conflict rule: same venue, same date, overlapping time ranges.
-     * Time overlap: startA < endB AND startB < endA
-     *
-     * Also checks that venue capacity >= event guest count.
-     *
-     * @return null on success, error message if conflict or invalid
-     */
+    // Assigns a venue to an event with conflict checking.
+    //Conflict rule: same venue, same date, overlapping time ranges.
+    //Time overlap: startA < endB AND startB < endA
+    //Also checks that venue capacity >= event guest count.
+    //@return null on success, error message if conflict or invalid
+
     @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignVenueToEvent(EventVenue ev, int eventGuestCount) {
         if (ev.getAssignedDate() == null) return "Assignment date is required.";
@@ -75,7 +69,7 @@ public class VenueService {
         if (ev.getEndTime() == null) ev.setEndTime(java.time.LocalTime.of(23, 59, 59));
         if (!ev.getEndTime().isAfter(ev.getStartTime())) return "End time must be after start time.";
 
-        // Capacity check
+        //Capacity check
         Optional<Venue> optVenue = venueDAO.findById(ev.getVenueId());
         if (optVenue.isEmpty() || !optVenue.get().isActive()) return "Venue is unavailable.";
         if (optVenue.isPresent()) {
@@ -86,7 +80,7 @@ public class VenueService {
             }
         }
 
-        // Conflict check
+        //Conflict check
         String startStr = ev.getStartTime() != null ? ev.getStartTime().toString() : "00:00";
         String endStr   = ev.getEndTime()   != null ? ev.getEndTime().toString()   : "23:59";
 
@@ -95,7 +89,8 @@ public class VenueService {
                 ev.getAssignedDate(),
                 startStr,
                 endStr,
-                0  // 0 = new assignment, no exclusion needed
+                0
+                //0 = new assignment, no exclusion needed
         );
 
         if (conflicts > 0) {
@@ -107,11 +102,9 @@ public class VenueService {
         return null;
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
+    //UPDATE
 
-    /**
-     * Updates an existing venue.
-     */
+    //Updates an existing venue.
     public String updateVenue(Venue venue) {
         String error = validateVenue(venue);
         if (error != null) return error;
@@ -123,7 +116,7 @@ public class VenueService {
         venueDAO.setActiveStatus(venueId, active);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    //DELETE
 
     public void deleteVenue(int venueId) {
         venueDAO.deleteVenue(venueId);
@@ -133,7 +126,7 @@ public class VenueService {
         venueDAO.removeAssignment(eventVenueId);
     }
 
-    // ── VALIDATION ─────────────────────────────────────────────
+    //VALIDATION
 
     private String validateVenue(Venue venue) {
         if (venue.getVenueName() == null || venue.getVenueName().trim().isEmpty()) {

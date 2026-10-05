@@ -16,7 +16,6 @@ CREATE TABLE users (
     full_name     NVARCHAR(150) NOT NULL,
     phone         NVARCHAR(20),
     role_id       INT NOT NULL,
-    profile_picture NVARCHAR(255),
     is_active     BIT NOT NULL DEFAULT 1,
     created_at    DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_users_roles FOREIGN KEY (role_id) REFERENCES roles(role_id)
@@ -33,14 +32,14 @@ CREATE TABLE event_categories (
 
 -- CUSTOMERS (Module 1)
 CREATE TABLE customers (
-    customer_id    INT IDENTITY(1,1) PRIMARY KEY,
-    user_id        INT NOT NULL UNIQUE,
-    full_name      NVARCHAR(150) NOT NULL,
-    email          NVARCHAR(150) NOT NULL,
-    phone          NVARCHAR(20),
-    address        NVARCHAR(255),
+    customer_id   INT IDENTITY(1,1) PRIMARY KEY,
+    user_id       INT NOT NULL UNIQUE,
+    full_name     NVARCHAR(150) NOT NULL,
+    email         NVARCHAR(150) NOT NULL,
+    phone         NVARCHAR(20),
+    address       NVARCHAR(255),
     loyalty_points INT NOT NULL DEFAULT 0,
-    registered_at  DATETIME2 NOT NULL DEFAULT GETDATE(),
+    registered_at DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_customers_users FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -251,8 +250,7 @@ CREATE TABLE payments (
     -- Deposit, Partial Payment, Full Payment
     reference_no   NVARCHAR(100),
     payment_method NVARCHAR(30) NOT NULL DEFAULT 'Cash',
-    -- Cash, Bank Transfer, Cheque, Card (Stripe)
-    stripe_session_id NVARCHAR(255),   -- Stripe Checkout session; set only for online payments
+    stripe_session_id NVARCHAR(255) NULL,
     notes          NVARCHAR(255),
     recorded_by    INT,   -- user_id
     created_at     DATETIME2 NOT NULL DEFAULT GETDATE(),
