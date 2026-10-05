@@ -114,6 +114,52 @@
         </div>
     </div>
 
+    <!-- INVOICE SECTION -->
+    <c:if test="${not empty invoice}">
+    <div class="es-card" style="margin-top:24px;">
+        <div class="card-header">
+            <h3>&#128179; Payment & Invoice</h3>
+            <span class="es-badge badge-${fn:escapeXml(invoice.status.toLowerCase())}">${fn:escapeXml(invoice.status)}</span>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Invoice Total</div>
+                <div class="detail-value" style="color: #2b6cb0; font-size: 16px; font-weight: bold;">
+                    LKR <fmt:formatNumber value="${invoice.totalAmount}" pattern="#,##0.00"/>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Amount Paid</div>
+                <div class="detail-value" style="color: #38a169; font-weight: bold;">
+                    LKR <fmt:formatNumber value="${invoice.paidAmount}" pattern="#,##0.00"/>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Outstanding Balance</div>
+                <div class="detail-value" style="color: #e53e3e; font-weight: bold;">
+                    LKR <fmt:formatNumber value="${invoice.outstanding}" pattern="#,##0.00"/>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Due Date</div>
+                <div class="detail-value">${fn:escapeXml(invoice.dueDate)}</div>
+            </div>
+        </div>
+        
+        <c:if test="${invoice.outstanding > 0}">
+        <div style="margin-top:20px; padding-top:16px; border-top: 1px solid #EEF1F6;">
+            <p style="font-size: 13px; color: #718096; margin-bottom: 12px;">You have an outstanding balance. You can pay securely online using your credit or debit card.</p>
+            <a href="${fn:escapeXml(pageContext.request.contextPath)}/customer/payment/checkout?invoiceId=${fn:escapeXml(invoice.invoiceId)}" class="btn btn-primary" style="font-size: 15px; padding: 10px 20px;">
+                <i class="fa-solid fa-credit-card"></i> Pay LKR <fmt:formatNumber value="${invoice.outstanding}" pattern="#,##0.00"/> Securely
+            </a>
+            <div style="font-size: 11px; color: #a0aec0; margin-top: 8px;">
+                <i class="fa-solid fa-lock"></i> Payments are securely processed by Stripe. Your card details are never stored on our servers.
+            </div>
+        </div>
+        </c:if>
+    </div>
+    </c:if>
+
 </div>
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>
 

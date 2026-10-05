@@ -3,6 +3,7 @@ package com.eventsphere.controller;
 import com.eventsphere.dto.RegistrationDTO;
 import com.eventsphere.model.User;
 import com.eventsphere.service.AuthService;
+import com.eventsphere.service.DashboardService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +21,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final AuthService authService;
+    private final DashboardService dashboardService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, DashboardService dashboardService) {
         this.authService = authService;
+        this.dashboardService = dashboardService;
     }
 
     // ── HOME → login redirect ──────────────────────────────────
@@ -46,6 +49,8 @@ public class AuthController {
         }
         if (error != null)  model.addAttribute("error",   "Invalid username or password.");
         if (logout != null) model.addAttribute("message", "You have been logged out.");
+        
+        model.addAttribute("stats", dashboardService.getStats());
         return "auth/login";
     }
 
@@ -87,17 +92,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public String processRegister(@ModelAttribute RegistrationDTO dto,
-                                  Model model) {
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
         String error = authService.registerCustomer(dto);
         if (error != null) {
             model.addAttribute("error", error);
             model.addAttribute("registration", dto);
             return "auth/register";
         }
-        model.addAttribute("success",
+        redirectAttributes.addFlashAttribute("success",
                 "Account created successfully! You can now log in.");
-        model.addAttribute("registration", new RegistrationDTO());
-        return "auth/register";
+        return "redirect:/login";
     }
 
     // ── DASHBOARD ROUTER ───────────────────────────────────────

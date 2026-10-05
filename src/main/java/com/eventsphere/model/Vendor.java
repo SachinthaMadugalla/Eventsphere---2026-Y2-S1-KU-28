@@ -3,10 +3,9 @@ package com.eventsphere.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Represents an external vendor (caterer, decorator, photographer, etc.).
- * Maps to the 'vendors' table in EventSphereDB.
- */
+
+ //Represents an external vendor (caterer, decorator, photographer, etc.).
+ //Maps to the 'vendors' table in EventSphereDB.
 public class Vendor {
 
     private int vendorId;
@@ -23,7 +22,7 @@ public class Vendor {
 
     public Vendor() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    // Getters & Setters
 
     public int getVendorId()                        { return vendorId; }
     public void setVendorId(int vendorId)           { this.vendorId = vendorId; }

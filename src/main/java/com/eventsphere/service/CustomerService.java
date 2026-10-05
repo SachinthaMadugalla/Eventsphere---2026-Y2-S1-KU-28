@@ -59,12 +59,18 @@ public class CustomerService {
      * @return null on success, error message on failure
      */
     public String updateCustomer(Customer customer) {
-        if (customer.getFullName() == null || customer.getFullName().trim().isEmpty()) {
-            return "Full name is required.";
+        if (!com.eventsphere.util.ValidationUtil.isValidPersonName(customer.getFullName())) {
+            return "Full name must be 2-100 characters and contain only letters, spaces, dots, apostrophes or hyphens.";
         }
-        if (customer.getEmail() == null || !customer.getEmail().contains("@")) {
+        if (!com.eventsphere.util.ValidationUtil.isValidEmail(customer.getEmail())) {
             return "A valid email address is required.";
         }
+        String phoneError = com.eventsphere.util.ValidationUtil.checkOptionalPhone(customer.getPhone());
+        if (phoneError != null) return phoneError;
+
+        customer.setFullName(customer.getFullName().trim());
+        customer.setEmail(customer.getEmail().trim());
+        customer.setPhone(com.eventsphere.util.ValidationUtil.trimToNull(customer.getPhone()));
 
         customerDAO.updateCustomer(customer);
 

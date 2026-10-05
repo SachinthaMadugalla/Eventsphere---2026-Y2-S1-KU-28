@@ -3,10 +3,10 @@ package com.eventsphere.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * Represents the assignment of a venue to an event.
- * Maps to the 'event_venues' table in EventSphereDB.
- */
+
+ //Represents the assignment of a venue to an event.
+ //Maps to the 'event_venues' table in EventSphereDB.
+
 public class EventVenue {
 
     private int eventVenueId;
@@ -21,7 +21,7 @@ public class EventVenue {
 
     public EventVenue() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    //Getters & Setters
 
     public int getEventVenueId()                        { return eventVenueId; }
     public void setEventVenueId(int eventVenueId)       { this.eventVenueId = eventVenueId; }

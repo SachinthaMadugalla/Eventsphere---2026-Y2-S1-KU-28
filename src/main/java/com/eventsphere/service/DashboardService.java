@@ -85,6 +85,8 @@ public class DashboardService {
         // Feedback & complaints
         stats.setOpenComplaints(complaintDAO.countOpen());
         stats.setTotalFeedback(feedbackDAO.findAll().size());
+        stats.setAverageRating(feedbackDAO.getAverageRating());
+        stats.setTotalGuests(eventDAO.getTotalGuests());
 
         return stats;
     }

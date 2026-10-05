@@ -15,14 +15,14 @@
             <div class="es-form-row">
                 <div class="es-form-group">
                     <label class="required">Event</label>
-                    <select name="eventId" class="es-select" required>
+                    <select name="eventId" id="eventIdSelect" class="es-select" required>
                         <option value="">-- Select Event --</option>
-                        <c:forEach var="e" items="${events}"><option value="${fn:escapeXml(e.eventId)}">${fn:escapeXml(e.eventName)}</option></c:forEach>
+                        <c:forEach var="e" items="${events}"><option value="${fn:escapeXml(e.eventId)}" data-customer-id="${fn:escapeXml(e.customerId)}">${fn:escapeXml(e.eventName)}</option></c:forEach>
                     </select>
                 </div>
                 <div class="es-form-group">
                     <label class="required">Customer</label>
-                    <select name="customerId" class="es-select" required>
+                    <select name="customerId" id="customerIdSelect" class="es-select" required>
                         <option value="">-- Select Customer --</option>
                         <c:forEach var="c" items="${customers}"><option value="${fn:escapeXml(c.customerId)}">${fn:escapeXml(c.fullName)}</option></c:forEach>
                     </select>
@@ -59,5 +59,40 @@
         </form>
     </div>
 </div>
-<%@ include file="/WEB-INF/views/common/footer.jsp" %>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eventSelect = document.getElementById('eventIdSelect');
+        const customerSelect = document.getElementById('customerIdSelect');
+        const amountInput = document.querySelector('input[name="totalAmount"]');
+        
+        const eventBudgets = {
+            <c:forEach var="entry" items="${budgetMap}">
+                "${entry.key}": ${entry.value},
+            </c:forEach>
+        };
+        
+        if (eventSelect) {
+            eventSelect.addEventListener('change', function() {
+                const selectedOption = eventSelect.options[eventSelect.selectedIndex];
+                const customerId = selectedOption ? selectedOption.getAttribute('data-customer-id') : null;
+                const eventId = eventSelect.value;
+                
+                // Auto-fill customer
+                if (customerId && customerSelect) {
+                    customerSelect.value = customerId;
+                    if (customerSelect.tomselect) {
+                        customerSelect.tomselect.setValue(customerId);
+                    }
+                }
+                
+                // Auto-fill budget
+                if (eventId && eventBudgets[eventId] && amountInput) {
+                    amountInput.value = eventBudgets[eventId];
+                }
+            });
+        }
+    });
+</script>
+
+<%@ include file="/WEB-INF/views/common/footer.jsp" %>

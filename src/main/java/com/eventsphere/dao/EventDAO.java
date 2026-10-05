@@ -284,6 +284,13 @@ public class EventDAO {
             "SELECT COUNT(*) FROM events " +
             "WHERE is_archived = 0 AND event_date >= CAST(GETDATE() AS DATE) " +
             "  AND status NOT IN ('Cancelled','Completed')";
-        return jdbcTemplate.queryForObject(sql, Integer.class);
+        Integer result = jdbcTemplate.queryForObject(sql, Integer.class);
+        return result != null ? result : 0;
+    }
+
+    public int getTotalGuests() {
+        String sql = "SELECT SUM(guest_count) FROM events WHERE is_archived = 0";
+        Integer result = jdbcTemplate.queryForObject(sql, Integer.class);
+        return result != null ? result : 0;
     }
 }

@@ -43,7 +43,7 @@ public class VenueController {
                 || "Operations Coordinator".equals(r) || "System Administrator".equals(r);
     }
 
-    // ── LIST ───────────────────────────────────────────────────
+    //LIST
 
     @GetMapping("/list")
     public String listVenues(HttpSession session, Model model) {
@@ -55,7 +55,7 @@ public class VenueController {
         return "venue-vendor/venue-list";
     }
 
-    // ── DETAIL ─────────────────────────────────────────────────
+    //DETAIL
 
     @GetMapping("/detail/{venueId}")
     public String venueDetail(@PathVariable int venueId,
@@ -72,7 +72,7 @@ public class VenueController {
         return "venue-vendor/venue-detail";
     }
 
-    // ── CREATE ─────────────────────────────────────────────────
+    //CREATE
 
     @GetMapping("/create")
     public String createForm(HttpSession session, Model model) {
@@ -111,7 +111,7 @@ public class VenueController {
         return "redirect:/venue/list";
     }
 
-    // ── EDIT ───────────────────────────────────────────────────
+    //EDIT
 
     @GetMapping("/edit/{venueId}")
     public String editForm(@PathVariable int venueId,
@@ -156,7 +156,7 @@ public class VenueController {
         return "redirect:/venue/list";
     }
 
-    // ── DEACTIVATE / ACTIVATE ─────────────────────────────────
+    //DEACTIVATE / ACTIVATE
 
     @PostMapping("/toggle/{venueId}")
     public String toggleStatus(@PathVariable int venueId,
@@ -172,7 +172,7 @@ public class VenueController {
         return "redirect:/venue/list";
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    //DELETE
 
     @PostMapping("/delete/{venueId}")
     public String deleteVenue(@PathVariable int venueId,
@@ -186,7 +186,7 @@ public class VenueController {
         return "redirect:/venue/list";
     }
 
-    // ── ASSIGN TO EVENT ───────────────────────────────────────
+    //ASSIGN TO EVENT
 
     @GetMapping("/assign")
     public String assignForm(@RequestParam int eventId,

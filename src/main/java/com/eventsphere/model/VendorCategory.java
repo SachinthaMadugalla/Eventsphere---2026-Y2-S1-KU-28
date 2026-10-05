@@ -1,9 +1,9 @@
 package com.eventsphere.model;
 
-/**
- * Represents a vendor category (Catering, Decorators, Photography, etc.).
- * Maps to the 'vendor_categories' table in EventSphereDB.
- */
+
+ //Represents a vendor category (Catering, Decorators, Photography, etc.).
+ //Maps to the 'vendor_categories' table in EventSphereDB.
+
 public class VendorCategory {
 
     private int vendorCatId;

@@ -10,10 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for Venue Management (Module 3).
- * All SQL queries are explicitly written here.
- */
+//DAO for Venue Management (Module 3).
+//All SQL queries are explicitly written here.
+
 @Repository
 public class VenueDAO {
 
@@ -23,7 +22,7 @@ public class VenueDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ── RowMappers ─────────────────────────────────────────────
+    //RowMappers
 
     private final RowMapper<Venue> venueRowMapper = (rs, rowNum) -> {
         Venue v = new Venue();
@@ -56,11 +55,9 @@ public class VenueDAO {
         return ev;
     };
 
-    // ── INSERT ─────────────────────────────────────────────────
+    //INSERT
 
-    /**
-     * Inserts a new venue into the database.
-     */
+    //Inserts a new venue into the database.
     public int addVenue(Venue venue) {
         String sql =
                 "INSERT INTO venues (venue_name, location, capacity, cost_per_day, description) " +
@@ -73,9 +70,7 @@ public class VenueDAO {
                 venue.getDescription());
     }
 
-    /**
-     * Assigns a venue to an event.
-     */
+    //Assigns a venue to an event.
     public int assignVenueToEvent(EventVenue ev) {
         String sql =
                 "INSERT INTO event_venues (event_id, venue_id, assigned_date, start_time, end_time, notes) " +
@@ -89,11 +84,9 @@ public class VenueDAO {
                 ev.getNotes());
     }
 
-    // ── SELECT ─────────────────────────────────────────────────
+    //SELECT
 
-    /**
-     * Returns all venues.
-     */
+    //Returns all venues.
     public List<Venue> findAll() {
         String sql =
                 "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
@@ -102,9 +95,7 @@ public class VenueDAO {
         return jdbcTemplate.query(sql, venueRowMapper);
     }
 
-    /**
-     * Returns only active venues (for assignment dropdowns).
-     */
+    //Returns only active venues (for assignment dropdowns).
     public List<Venue> findAllActive() {
         String sql =
                 "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
@@ -113,9 +104,7 @@ public class VenueDAO {
         return jdbcTemplate.query(sql, venueRowMapper);
     }
 
-    /**
-     * Finds a venue by its primary key.
-     */
+    //Finds a venue by its primary key.
     public Optional<Venue> findById(int venueId) {
         String sql =
                 "SELECT venue_id, venue_name, location, capacity, cost_per_day, " +
@@ -125,9 +114,7 @@ public class VenueDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
-    /**
-     * Returns all event-venue assignments for a specific event.
-     */
+    //Returns all event-venue assignments for a specific event.
     public List<EventVenue> findAssignmentsByEventId(int eventId) {
         String sql =
                 "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
@@ -140,9 +127,7 @@ public class VenueDAO {
         return jdbcTemplate.query(sql, eventVenueRowMapper, eventId);
     }
 
-    /**
-     * Returns all event-venue assignments for a specific venue.
-     */
+    //Returns all event-venue assignments for a specific venue.
     public List<EventVenue> findAssignmentsByVenueId(int venueId) {
         String sql =
                 "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
@@ -155,9 +140,7 @@ public class VenueDAO {
         return jdbcTemplate.query(sql, eventVenueRowMapper, venueId);
     }
 
-    /**
-     * Returns all event-venue assignments (for reports).
-     */
+    //Returns all event-venue assignments (for reports).
     public List<EventVenue> findAllAssignments() {
         String sql =
                 "SELECT ev.event_venue_id, ev.event_id, e.event_name, " +
@@ -170,20 +153,18 @@ public class VenueDAO {
         return jdbcTemplate.query(sql, eventVenueRowMapper);
     }
 
-    // ── CONFLICT DETECTION ────────────────────────────────────
-    //
+    // CONFLICT DETECTION
+
     // A venue conflict occurs when the same venue is already booked
     // on the same date and the time ranges overlap.
-    //
-    // Two time ranges [s1, e1] and [s2, e2] overlap when: s1 < e2 AND s2 < e1
-    //
 
-    /**
-     * Checks whether a venue is already booked for the given date and time range.
-     * Excludes a specific event_venue_id (pass 0 when creating new).
-     *
-     * @return number of conflicting bookings (0 = no conflict)
-     */
+    // Two time ranges [s1, e1] and [s2, e2] overlap when: s1 < e2 AND s2 < e1
+
+    //Checks whether a venue is already booked for the given date and time range.
+    //Excludes a specific event_venue_id (pass 0 when creating new).
+
+    //@return number of conflicting bookings (0 = no conflict)
+
     public int countVenueConflicts(int venueId, LocalDate date,
                                    String startTime, String endTime,
                                    int excludeEventVenueId) {
@@ -202,11 +183,10 @@ public class VenueDAO {
         return count != null ? count : 0;
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
+    //UPDATE
 
-    /**
-     * Updates venue details.
-     */
+    //Updates venue details.
+
     public int updateVenue(Venue venue) {
         String sql =
                 "UPDATE venues SET venue_name = ?, location = ?, capacity = ?, " +
@@ -221,27 +201,21 @@ public class VenueDAO {
                 venue.getVenueId());
     }
 
-    /**
-     * Activates or deactivates a venue.
-     */
+    //Activates or deactivates a venue.
     public int setActiveStatus(int venueId, boolean active) {
         String sql = "UPDATE venues SET is_active = ? WHERE venue_id = ?";
         return jdbcTemplate.update(sql, active ? 1 : 0, venueId);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    //DELETE
 
-    /**
-     * Deletes a venue by ID.
-     */
+    // Deletes a venue by ID.
     public int deleteVenue(int venueId) {
         String sql = "DELETE FROM venues WHERE venue_id = ?";
         return jdbcTemplate.update(sql, venueId);
     }
 
-    /**
-     * Removes a venue assignment from an event.
-     */
+    //Removes a venue assignment from an event.
     public int removeAssignment(int eventVenueId) {
         String sql = "DELETE FROM event_venues WHERE event_venue_id = ?";
         return jdbcTemplate.update(sql, eventVenueId);

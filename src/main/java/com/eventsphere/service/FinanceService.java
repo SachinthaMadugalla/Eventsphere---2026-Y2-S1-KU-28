@@ -71,6 +71,7 @@ public class FinanceService {
             return "A budget already exists for this event.";
         }
         if (budget.getEstimatedCost() == null) budget.setEstimatedCost(BigDecimal.ZERO);
+        if (budget.getEstimatedCost().compareTo(BigDecimal.ZERO) < 0) return "Estimated cost cannot be negative.";
         budget.setActualCost(expenseDAO.getTotalByEventId(budget.getEventId()));
         budgetDAO.addBudget(budget);
         return null;
@@ -86,6 +87,7 @@ public class FinanceService {
         Budget existing = budgetDAO.findById(budget.getBudgetId()).orElseThrow();
         budget.setEventId(existing.getEventId());
         if (budget.getEstimatedCost() == null) budget.setEstimatedCost(BigDecimal.ZERO);
+        if (budget.getEstimatedCost().compareTo(BigDecimal.ZERO) < 0) return "Estimated cost cannot be negative.";
         budget.setActualCost(expenseDAO.getTotalByEventId(existing.getEventId()));
         budgetDAO.updateBudget(budget);
         return null;
@@ -258,6 +260,48 @@ public class FinanceService {
         }
 
         return null;
+    }
+
+    /** Invoices for an event with paid / outstanding amounts filled in (used on the customer booking page). */
+    public List<Invoice> getInvoicesWithPaymentsByEvent(int eventId) {
+        List<Invoice> invoices = invoiceDAO.findByEventId(eventId);
+        for (Invoice invoice : invoices) {
+            BigDecimal paid = invoiceDAO.getTotalPaid(invoice.getInvoiceId());
+            invoice.setTotalPaid(paid);
+            invoice.setOutstanding(invoice.getTotalAmount().subtract(paid));
+        }
+        return invoices;
+    }
+
+    /**
+     * Records a completed Stripe Checkout payment. Safe to call more than once for the same
+     * session (success page and webhook can both arrive): the second call is a no-op.
+     *
+     * @param sessionId       Stripe Checkout session id
+     * @param invoiceId       invoice id taken from the session metadata we set when creating it
+     * @param amountMinor     amount actually paid, in the currency's minor unit (cents)
+     * @param paymentIntentId Stripe PaymentIntent id, stored as the reference number
+     * @return null on success (or already recorded), otherwise an error message
+     */
+    @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
+    public String recordStripePayment(String sessionId, int invoiceId, long amountMinor, String paymentIntentId) {
+        if (sessionId == null || sessionId.isBlank()) return "Missing Stripe session.";
+        if (paymentDAO.existsByStripeSessionId(sessionId)) return null; // already recorded
+
+        BigDecimal amount = BigDecimal.valueOf(amountMinor).movePointLeft(2);
+        Optional<Invoice> invoice = getInvoiceWithPayments(invoiceId);
+        if (invoice.isEmpty()) return "Invoice not found.";
+
+        Payment payment = new Payment();
+        payment.setInvoiceId(invoiceId);
+        payment.setAmount(amount);
+        payment.setPaymentDate(LocalDate.now());
+        payment.setPaymentType(amount.compareTo(invoice.get().getOutstanding()) >= 0 ? "Full Payment" : "Partial Payment");
+        payment.setPaymentMethod("Card (Stripe)");
+        payment.setStripeSessionId(sessionId);
+        payment.setReferenceNo(paymentIntentId);
+        payment.setNotes("Paid online by the customer via Stripe Checkout.");
+        return recordPayment(payment, 0);
     }
 
     public void deletePayment(int paymentId) {

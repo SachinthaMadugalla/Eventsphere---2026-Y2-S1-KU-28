@@ -45,8 +45,8 @@ public class AuthService {
     public String registerCustomer(RegistrationDTO dto) {
 
         // Basic validation
-        if (dto.getUsername() == null || dto.getUsername().trim().isEmpty()) {
-            return "Username is required.";
+        if (!com.eventsphere.util.ValidationUtil.isValidUsername(dto.getUsername())) {
+            return "Username must be 3-50 characters and can only contain letters, numbers, dots, dashes, and underscores.";
         }
         if (dto.getPassword() == null || dto.getPassword().length() < 6) {
             return "Password must be at least 6 characters.";
@@ -54,12 +54,14 @@ public class AuthService {
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             return "Passwords do not match.";
         }
-        if (dto.getEmail() == null || !dto.getEmail().contains("@")) {
+        if (!com.eventsphere.util.ValidationUtil.isValidEmail(dto.getEmail())) {
             return "A valid email address is required.";
         }
-        if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
-            return "Full name is required.";
+        if (!com.eventsphere.util.ValidationUtil.isValidPersonName(dto.getFullName())) {
+            return "Full name must be 2-100 characters and contain only letters, spaces, dots, apostrophes or hyphens.";
         }
+        String phoneError = com.eventsphere.util.ValidationUtil.checkOptionalPhone(dto.getPhone());
+        if (phoneError != null) return phoneError;
 
         // Uniqueness checks
         if (userDAO.existsByUsername(dto.getUsername().trim())) {

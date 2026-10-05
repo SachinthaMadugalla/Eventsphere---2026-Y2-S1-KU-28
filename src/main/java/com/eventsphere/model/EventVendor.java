@@ -2,10 +2,10 @@ package com.eventsphere.model;
 
 import java.time.LocalDate;
 
-/**
- * Represents the assignment of a vendor to an event.
- * Maps to the 'event_vendors' table in EventSphereDB.
- */
+
+ //Represents the assignment of a vendor to an event.
+ //Maps to the 'event_vendors' table in EventSphereDB.
+
 public class EventVendor {
 
     private int eventVendorId;
@@ -19,7 +19,7 @@ public class EventVendor {
 
     public EventVendor() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    //Getters & Setters
 
     public int getEventVendorId()                           { return eventVendorId; }
     public void setEventVendorId(int eventVendorId)         { this.eventVendorId = eventVendorId; }

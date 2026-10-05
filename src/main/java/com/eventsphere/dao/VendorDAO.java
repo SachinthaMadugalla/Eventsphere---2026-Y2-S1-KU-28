@@ -11,10 +11,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-/**
- DAO for Vendor Management (Module 3).
- * All SQL queries are explicitly written here.
- */
+
+ //DAO for Vendor Management (Module 3).
+ //All SQL queries are explicitly written here.
+
 @Repository
 public class VendorDAO {
 
@@ -24,7 +24,7 @@ public class VendorDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ── RowMappers ─────────────────────────────────────────────
+    //RowMappers
 
     private final RowMapper<Vendor> vendorRowMapper = (rs, rowNum) -> {
         Vendor v = new Vendor();
@@ -64,11 +64,10 @@ public class VendorDAO {
         return ev;
     };
 
-    // ── INSERT ─────────────────────────────────────────────────
+    //INSERT
 
-    /**
-     * Inserts a new vendor record.
-     */
+    //inserts a new vendor record.
+
     public int addVendor(Vendor vendor) {
         String sql =
                 "INSERT INTO vendors (vendor_name, vendor_cat_id, contact_person, phone, " +
@@ -84,9 +83,8 @@ public class VendorDAO {
                 vendor.getCost());
     }
 
-    /**
-     * Assigns a vendor to an event.
-     */
+
+    //Assigns a vendor to an event.
     public int assignVendorToEvent(EventVendor ev) {
         String sql =
                 "INSERT INTO event_vendors (event_id, vendor_id, service_date, notes) " +
@@ -98,11 +96,9 @@ public class VendorDAO {
                 ev.getNotes());
     }
 
-    // ── SELECT ─────────────────────────────────────────────────
+    //SELECT
 
-    /**
-     * Returns all vendors with their category names.
-     */
+    //returns all vendors with their category names.
     public List<Vendor> findAll() {
         String sql =
                 "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
@@ -114,9 +110,8 @@ public class VendorDAO {
         return jdbcTemplate.query(sql, vendorRowMapper);
     }
 
-    /**
-     * Returns only active vendors (for assignment dropdowns).
-     */
+
+    //Returns only active vendors (for assignment dropdowns).
     public List<Vendor> findAllActive() {
         String sql =
                 "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
@@ -128,9 +123,8 @@ public class VendorDAO {
         return jdbcTemplate.query(sql, vendorRowMapper);
     }
 
-    /**
-     * Finds a vendor by primary key.
-     */
+
+    //Finds a vendor by primary key.
     public Optional<Vendor> findById(int vendorId) {
         String sql =
                 "SELECT v.vendor_id, v.vendor_name, v.vendor_cat_id, vc.category_name, " +
@@ -143,18 +137,16 @@ public class VendorDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
-    /**
-     * Returns all vendor categories for dropdown menus.
-     */
+
+    //Returns all vendor categories for dropdown menus.
     public List<VendorCategory> findAllCategories() {
         String sql =
                 "SELECT vendor_cat_id, category_name FROM vendor_categories ORDER BY category_name";
         return jdbcTemplate.query(sql, catRowMapper);
     }
 
-    /**
-     * Returns all vendor assignments for a specific event.
-     */
+
+    //Returns all vendor assignments for a specific event.
     public List<EventVendor> findAssignmentsByEventId(int eventId) {
         String sql =
                 "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
@@ -168,9 +160,7 @@ public class VendorDAO {
         return jdbcTemplate.query(sql, eventVendorRowMapper, eventId);
     }
 
-    /**
-     * Returns all event assignments for a specific vendor.
-     */
+    //Returns all event assignments for a specific vendor.
     public List<EventVendor> findAssignmentsByVendorId(int vendorId) {
         String sql =
                 "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
@@ -184,9 +174,9 @@ public class VendorDAO {
         return jdbcTemplate.query(sql, eventVendorRowMapper, vendorId);
     }
 
-    /**
-     * Returns all event-vendor assignments (for reporting).
-     */
+
+    //Returns all event-vendor assignments (for reporting).
+
     public List<EventVendor> findAllAssignments() {
         String sql =
                 "SELECT ev.event_vendor_id, ev.event_id, e.event_name, " +
@@ -205,12 +195,11 @@ public class VendorDAO {
     // A vendor conflict occurs when the same vendor is already
     // assigned to a different event on the same service date.
 
-    /**
-     * Checks if a vendor is already booked on the given service date.
-     * Excludes cancelled events.
-     *
-     * @return count of conflicts (0 = no conflict)
-     */
+
+     //Checks if a vendor is already booked on the given service date.
+     //Excludes cancelled events.
+     //@return count of conflicts (0 = no conflict)
+
     public int countVendorConflicts(int vendorId, LocalDate serviceDate, int excludeEventId) {
         String sql =
                 "SELECT COUNT(*) " +
@@ -225,11 +214,9 @@ public class VendorDAO {
         return count != null ? count : 0;
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
+    //UPDATE
+    //Updates vendor details.
 
-    /**
-     * Updates vendor details.
-     */
     public int updateVendor(Vendor vendor) {
         String sql =
                 "UPDATE vendors SET vendor_name = ?, vendor_cat_id = ?, contact_person = ?, " +
@@ -246,27 +233,24 @@ public class VendorDAO {
                 vendor.getVendorId());
     }
 
-    /**
-     * Activates or deactivates a vendor.
-     */
+
+    //Activates or deactivates a vendor.
+
     public int setActiveStatus(int vendorId, boolean active) {
         String sql = "UPDATE vendors SET is_active = ? WHERE vendor_id = ?";
         return jdbcTemplate.update(sql, active ? 1 : 0, vendorId);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    //DELETE
+    //Deletes a vendor by ID.
 
-    /**
-     * Deletes a vendor by ID.
-     */
     public int deleteVendor(int vendorId) {
         String sql = "DELETE FROM vendors WHERE vendor_id = ?";
         return jdbcTemplate.update(sql, vendorId);
     }
 
-    /**
-     * Removes a vendor from a specific event.
-     */
+    //Removes a vendor from a specific event.
+
     public int removeAssignment(int eventVendorId) {
         String sql = "DELETE FROM event_vendors WHERE event_vendor_id = ?";
         return jdbcTemplate.update(sql, eventVendorId);

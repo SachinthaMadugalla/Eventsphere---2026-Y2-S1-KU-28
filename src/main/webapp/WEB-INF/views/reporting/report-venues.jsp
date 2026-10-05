@@ -15,23 +15,6 @@
             <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
             &rsaquo; Venue Usage
         </div>
- <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<c:set var="pageTitle" value="Venue Usage Report"/>
-<%@ include file="/WEB-INF/views/common/header.jsp" %>
-<%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
-<div class="es-main">
-<%@ include file="/WEB-INF/views/common/topbar.jsp" %>
-<div class="es-content">
-
-    <div class="page-header">
-        <h2>&#127968; Venue Usage Report</h2>
-        <div class="breadcrumb">
-            <a href="${fn:escapeXml(pageContext.request.contextPath)}/reporting/reports">Reports</a>
-            &rsaquo; Venue Usage
-        </div>
     </div>
 
     <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
