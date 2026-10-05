@@ -149,9 +149,9 @@ try {
             if ($stripeApiKey) {
                 $masked = if ($stripeApiKey.Length -gt 14) { $stripeApiKey.Substring(0, 12) + "..." + $stripeApiKey.Substring($stripeApiKey.Length - 4) } else { $stripeApiKey }
                 Write-Host "Current Stripe Key: $masked" -ForegroundColor Cyan
-                $inputKey = Read-Host "paste stripe api keys here (Press Enter to keep current)"
+                $inputKey = Read-Host "paste stripe api keys here (Press Enter to keep current) : "
             } else {
-                $inputKey = Read-Host "paste stripe api keys here :"
+                $inputKey = Read-Host "paste stripe api keys here : "
             }
             if ($inputKey -and $inputKey.Trim()) {
                 $stripeApiKey = $inputKey.Trim()
