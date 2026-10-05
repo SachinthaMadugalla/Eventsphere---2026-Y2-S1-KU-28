@@ -23,7 +23,7 @@ public class ReportingService {
         this.complaintDAO = complaintDAO;
     }
 
-    // ── FEEDBACK ───────────────────────────────────────────────
+    // FEEDBACK 
 
     public List<Feedback> getAllFeedback()                    { return feedbackDAO.findAll(); }
     public Optional<Feedback> getFeedbackById(int id)        { return feedbackDAO.findById(id); }
