@@ -2,11 +2,8 @@ package com.eventsphere.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a customer complaint.
- * Maps to the 'complaints' table in EventSphereDB.
- * Belongs to Module 7 – Reporting & Feedback Management.
- */
+//Represents a customer complaint.
+
 public class Complaint {
 
     private int complaintId;
@@ -24,7 +21,7 @@ public class Complaint {
 
     public Complaint() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    // Getters & Setters 
 
     public int getComplaintId()                         { return complaintId; }
     public void setComplaintId(int complaintId)         { this.complaintId = complaintId; }
