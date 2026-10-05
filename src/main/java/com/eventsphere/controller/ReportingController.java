@@ -11,13 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * Module 7 – Reporting & Feedback Management.
- *
- * Security note: customer identity is ALWAYS resolved from the
- * authenticated session. The browser never supplies a customerId
- * that is trusted for feedback or complaint submissions.
- */
+
 @Controller
 @RequestMapping("/reporting")
 public class ReportingController {
@@ -55,7 +49,7 @@ public class ReportingController {
         this.activityLogService  = activityLogService;
     }
 
-    // ── Helpers ───────────────────────────────────────────────
+    // Helpers 
 
     private User getUser(HttpSession session) {
         return (User) session.getAttribute("loggedInUser");
@@ -72,17 +66,14 @@ public class ReportingController {
             || "System Administrator".equals(r);
     }
 
-    /**
-     * Resolves the customer_id for the currently logged-in customer.
-     * Returns -1 if the session user has no linked customer record.
-     */
+  
     private int resolveCustomerId(User user) {
         return customerService.getCustomerByUserId(user.getUserId())
                 .map(Customer::getCustomerId)
                 .orElse(-1);
     }
 
-    // ── REPORTS INDEX ─────────────────────────────────────────
+    //REPORTS INDEX
 
     @GetMapping("/reports")
     public String reportsIndex(HttpSession session, Model model) {
@@ -92,7 +83,7 @@ public class ReportingController {
         return "reporting/reports-index";
     }
 
-    // ── EVENT REPORT ──────────────────────────────────────────
+    //EVENT REPORT
 
     @GetMapping("/reports/events")
     public String eventReport(HttpSession session, Model model,
@@ -112,7 +103,7 @@ public class ReportingController {
         return "reporting/report-events";
     }
 
-    // ── FINANCE REPORT ────────────────────────────────────────
+    //FINANCE REPORT
 
     @GetMapping("/reports/finance")
     public String financeReport(HttpSession session, Model model) {
@@ -129,7 +120,7 @@ public class ReportingController {
         return "reporting/report-finance";
     }
 
-    // ── VENUE USAGE REPORT ────────────────────────────────────
+    // VENUE USAGE REPORT 
 
     @GetMapping("/reports/venues")
     public String venueReport(HttpSession session, Model model) {
@@ -140,7 +131,7 @@ public class ReportingController {
         return "reporting/report-venues";
     }
 
-    // ── VENDOR USAGE REPORT ───────────────────────────────────
+    //VENDOR USAGE REPORT
 
     @GetMapping("/reports/vendors")
     public String vendorReport(HttpSession session, Model model) {
@@ -151,7 +142,7 @@ public class ReportingController {
         return "reporting/report-vendors";
     }
 
-    // ── STAFF ALLOCATION REPORT ───────────────────────────────
+    // STAFF ALLOCATION REPORT 
 
     @GetMapping("/reports/staff")
     public String staffReport(HttpSession session, Model model) {
@@ -162,7 +153,7 @@ public class ReportingController {
         return "reporting/report-staff";
     }
 
-    // ── RESOURCE USAGE REPORT ─────────────────────────────────
+    // RESOURCE USAGE REPORT 
 
     @GetMapping("/reports/resources")
     public String resourceReport(HttpSession session, Model model) {
@@ -174,7 +165,7 @@ public class ReportingController {
         return "reporting/report-resources";
     }
 
-    // ── FEEDBACK LIST (staff) ─────────────────────────────────
+    // FEEDBACK LIST (staff)
 
     @GetMapping("/feedback/list")
     public String feedbackList(HttpSession session, Model model) {
@@ -234,7 +225,7 @@ public class ReportingController {
         return "redirect:/reporting/feedback/list";
     }
 
-    // ── CUSTOMER SUBMIT FEEDBACK ──────────────────────────────
+    // CUSTOMER SUBMIT FEEDBACK
     // Customer identity is resolved from session — NOT from form input.
 
     @GetMapping("/feedback/submit")
@@ -269,7 +260,7 @@ public class ReportingController {
         User user = getUser(session);
         if (user == null) return "redirect:/login";
 
-        // ── Resolve customer from session (never trust browser input) ──
+        //  Resolve customer from session (never trust browser input)─
         int customerId = resolveCustomerId(user);
         if (customerId == -1) {
             ra.addFlashAttribute("error", "Customer profile not found.");
@@ -304,7 +295,7 @@ public class ReportingController {
         return "redirect:/customer/bookings";
     }
 
-    // ── COMPLAINT LIST (staff) ────────────────────────────────
+    //  COMPLAINT LIST (staff) 
 
     @GetMapping("/complaint/list")
     public String complaintList(HttpSession session, Model model) {
@@ -374,7 +365,7 @@ public class ReportingController {
         return "redirect:/reporting/complaint/detail/" + complaintId;
     }
 
-    // ── CUSTOMER SUBMIT COMPLAINT ─────────────────────────────
+    // CUSTOMER SUBMIT COMPLAINT
     // Customer identity resolved from session — NOT from browser form.
 
     @GetMapping("/complaint/submit")
@@ -404,7 +395,7 @@ public class ReportingController {
         User user = getUser(session);
         if (user == null) return "redirect:/login";
 
-        // ── Resolve customer from session (never trust browser input) ──
+        // Resolve customer from session (never trust browser input)
         int customerId = resolveCustomerId(user);
         if (customerId == -1) {
             ra.addFlashAttribute("error", "Customer profile not found.");
@@ -416,7 +407,7 @@ public class ReportingController {
         complaint.setStatus("Submitted");
         complaint.setEscalated(false);
         complaint.setResponse(null);
-        complaint.setCustomerId(customerId);   // ← from session, not form
+        complaint.setCustomerId(customerId);   //from session, not form
 
         String error = reportingService.submitComplaint(complaint);
         if (error != null) {
@@ -451,8 +442,7 @@ public class ReportingController {
         return "redirect:/reporting/complaint/list";
     }
 
-    // ── CRO DASHBOARD ─────────────────────────────────────────
-
+    // CRO DASHBOARD
     @GetMapping("/cro/dashboard")
     public String croDashboard(HttpSession session, Model model) {
         User user = getUser(session);
@@ -467,7 +457,7 @@ public class ReportingController {
         return "reporting/cro-dashboard";
     }
 
-    // ── MANAGING DIRECTOR DASHBOARD ───────────────────────────
+    //MANAGING DIRECTOR DASHBOARD 
 
     @GetMapping("/director/dashboard")
     public String directorDashboard(HttpSession session, Model model) {
