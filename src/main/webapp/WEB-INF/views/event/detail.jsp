@@ -61,10 +61,12 @@
                     <button type="submit" class="btn btn-success btn-sm">&#10003; Confirm Booking</button>
                 </form>
             </c:if>
-            <form action="${fn:escapeXml(pageContext.request.contextPath)}/event/delete/${fn:escapeXml(event.eventId)}" method="post" onsubmit="return confirmDelete('this event')">
+            <c:if test="${sessionScope.userRole != 'Operations Coordinator'}">
+                <form action="${fn:escapeXml(pageContext.request.contextPath)}/event/delete/${fn:escapeXml(event.eventId)}" method="post" onsubmit="return confirmDelete('this event')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                <button type="submit" class="btn btn-danger btn-sm">Delete Event</button>
-            </form>
+                    <button type="submit" class="btn btn-danger btn-sm">Delete Event</button>
+                </form>
+            </c:if>
         </div>
     </div>
 

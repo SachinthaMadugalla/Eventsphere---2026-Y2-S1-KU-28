@@ -141,6 +141,7 @@ public class EventController {
     public String createForm(HttpSession session, Model model) {
         User user = getUser(session);
         if (!hasAccess(user)) return "redirect:/access-denied";
+        if ("Operations Coordinator".equals(user.getRoleName())) return "redirect:/event/list";
 
         model.addAttribute("event",       new Event());
         model.addAttribute("categories",  eventService.getAllCategories());
@@ -156,6 +157,7 @@ public class EventController {
                               RedirectAttributes redirectAttributes) {
         User user = getUser(session);
         if (!hasAccess(user)) return "redirect:/access-denied";
+        if ("Operations Coordinator".equals(user.getRoleName())) return "redirect:/access-denied";
 
         String error = eventService.createEventByManager(event);
         if (error != null) {
@@ -177,6 +179,8 @@ public class EventController {
         Optional<Event> opt = eventService.getEventById(eventId);
         if (opt.isEmpty()) return "redirect:/event/list";
 
+        boolean isOpsCoordinator = "Operations Coordinator".equals(user.getRoleName());
+        model.addAttribute("isOpsCoordinator", isOpsCoordinator);
         model.addAttribute("event",      opt.get());
         model.addAttribute("categories", eventService.getAllCategories());
         model.addAttribute("customers",  customerService.getAllCustomers());
@@ -194,6 +198,23 @@ public class EventController {
         if (!hasAccess(user)) return "redirect:/access-denied";
 
         event.setEventId(eventId);
+
+        if ("Operations Coordinator".equals(user.getRoleName())) {
+            Optional<Event> opt = eventService.getEventById(eventId);
+            if (opt.isEmpty()) return "redirect:/event/list";
+            Event existing = opt.get();
+            // Preserve customer-provided fields from database
+            event.setEventName(existing.getEventName());
+            event.setCategoryId(existing.getCategoryId());
+            event.setCustomerId(existing.getCustomerId());
+            event.setEventDate(existing.getEventDate());
+            event.setStartTime(existing.getStartTime());
+            event.setEndTime(existing.getEndTime());
+            event.setGuestCount(existing.getGuestCount());
+            event.setRequirements(existing.getRequirements());
+            // Operations Coordinator updates managerUserId, status, location, and notes
+        }
+
         String error = eventService.updateEvent(event);
         if (error != null) {
             redirectAttributes.addFlashAttribute("error", error);
@@ -241,6 +262,7 @@ public class EventController {
                               RedirectAttributes redirectAttributes) {
         User user = getUser(session);
         if (!hasAccess(user)) return "redirect:/access-denied";
+        if ("Operations Coordinator".equals(user.getRoleName())) return "redirect:/access-denied";
 
         eventService.deleteEvent(eventId);
         redirectAttributes.addFlashAttribute("success", "Event deleted.");

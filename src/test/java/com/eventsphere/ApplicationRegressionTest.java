@@ -343,4 +343,52 @@ class ApplicationRegressionTest {
         complaint.setSubject("Question"); complaint.setDescription("Follow up");
         assertNull(reporting.submitComplaint(complaint));
     }
+
+    @Test void operationsCoordinatorEventEditPermissions() throws Exception {
+        HttpClient ops = login("ops1");
+
+        // 1. Check ops edit page renders with Operations Management notice and locked fields
+        var editPage = get(ops, "/event/edit/1");
+        assertEquals(200, editPage.statusCode());
+        assertTrue(editPage.body().contains("Operations Management View"));
+        assertTrue(editPage.body().contains("Customer Specified"));
+
+        // 2. Ops cannot access create page directly
+        assertEquals("/event/list", get(ops, "/event/create").uri().getPath());
+
+        // 3. Ops cannot POST to create an event
+        assertEquals("/access-denied", post(ops, "/event/create", "eventName=Hacked&categoryId=1&customerId=1").uri().getPath());
+
+        // 4. Ops cannot delete an event
+        assertEquals("/access-denied", post(ops, "/event/delete/1", "").uri().getPath());
+
+        // 5. When ops posts edit, customer fields cannot be modified, but managerUserId, status, location, notes CAN be modified
+        String originalName = jdbc.queryForObject("SELECT event_name FROM events WHERE event_id=1", String.class);
+        LocalDate originalDate = jdbc.queryForObject("SELECT event_date FROM events WHERE event_id=1", LocalDate.class);
+        int originalGuests = jdbc.queryForObject("SELECT guest_count FROM events WHERE event_id=1", Integer.class);
+        Integer originalManager = jdbc.queryForObject("SELECT manager_user_id FROM events WHERE event_id=1", Integer.class);
+        String originalLocation = jdbc.queryForObject("SELECT location FROM events WHERE event_id=1", String.class);
+        String originalNotes = jdbc.queryForObject("SELECT notes FROM events WHERE event_id=1", String.class);
+
+        try {
+            // Attempt to modify customer fields (eventName, eventDate, guestCount) while assigning manager 3
+            var updateResp = post(ops, "/event/edit/1",
+                    "eventName=MaliciousName&eventDate=2029-01-01&guestCount=9999&managerUserId=3&status=Planning&location=OperationsTestArea&notes=OperationsInternalNote");
+            assertEquals("/event/detail/1", updateResp.uri().getPath());
+
+            // Verify DB: Customer fields were NOT modified!
+            assertEquals(originalName, jdbc.queryForObject("SELECT event_name FROM events WHERE event_id=1", String.class));
+            assertEquals(originalDate, jdbc.queryForObject("SELECT event_date FROM events WHERE event_id=1", LocalDate.class));
+            assertEquals(originalGuests, jdbc.queryForObject("SELECT guest_count FROM events WHERE event_id=1", Integer.class));
+
+            // Verify DB: Operations fields WERE updated!
+            assertEquals(3, jdbc.queryForObject("SELECT manager_user_id FROM events WHERE event_id=1", Integer.class));
+            assertEquals("OperationsTestArea", jdbc.queryForObject("SELECT location FROM events WHERE event_id=1", String.class));
+            assertEquals("OperationsInternalNote", jdbc.queryForObject("SELECT notes FROM events WHERE event_id=1", String.class));
+        } finally {
+            // Restore original operational values
+            jdbc.update("UPDATE events SET manager_user_id=?, location=?, notes=? WHERE event_id=1",
+                    originalManager, originalLocation, originalNotes);
+        }
+    }
 }

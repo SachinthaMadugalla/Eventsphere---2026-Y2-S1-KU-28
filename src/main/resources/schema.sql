@@ -38,6 +38,7 @@ CREATE TABLE customers (
     email         NVARCHAR(150) NOT NULL,
     phone         NVARCHAR(20),
     address       NVARCHAR(255),
+    loyalty_points INT NOT NULL DEFAULT 0,
     registered_at DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_customers_users FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
@@ -248,6 +249,8 @@ CREATE TABLE payments (
     payment_type   NVARCHAR(50) NOT NULL DEFAULT 'Full Payment',
     -- Deposit, Partial Payment, Full Payment
     reference_no   NVARCHAR(100),
+    payment_method NVARCHAR(30) NOT NULL DEFAULT 'Cash',
+    stripe_session_id NVARCHAR(255) NULL,
     notes          NVARCHAR(255),
     recorded_by    INT,   -- user_id
     created_at     DATETIME2 NOT NULL DEFAULT GETDATE(),
@@ -333,28 +336,4 @@ CREATE INDEX IX_notifications_user  ON notifications(user_id);
 CREATE INDEX IX_feedback_event      ON feedback(event_id);
 CREATE INDEX IX_complaints_customer ON complaints(customer_id);
 
-GO
-
-SELECT * FROM feedback;
-GO
-
-DELETE FROM events
-WHERE event_id=4;
-
-INSERT INTO feedback(event_name,category_id,start_time,end_time,guest_count)
-VALUES ('dj night','10','2026-09-28','18:00:00','22:00:00',78);
-
-SELECT * FROM invoices;
-GO
-
-SELECT * FROM venues;
-GO
-
-INSERT INTO venues(venue_name,location,capacity,cost_per_day,description)
-VALUES('Swiss dail','kandy',1500,230000.00,'near to lake round');
-
-SELECT * FROM staff;
-GO
-
-SELECT * FROM events;
 GO

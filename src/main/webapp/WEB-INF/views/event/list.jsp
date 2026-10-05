@@ -22,7 +22,9 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/archive" class="btn btn-secondary btn-sm">Archive</a>
                 <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/list" class="btn btn-secondary btn-sm">Current Events</a>
-                <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/create" class="btn btn-accent btn-sm">+ Create Event</a>
+                <c:if test="${sessionScope.userRole != 'Operations Coordinator'}">
+                    <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/create" class="btn btn-accent btn-sm">+ Create Event</a>
+                </c:if>
             </div>
         </div>
 
@@ -77,10 +79,12 @@
                                             <button class="btn btn-secondary btn-xs">${e.archived ? 'Restore' : 'Archive'}</button>
                                         </form>
                                     </c:if>
-                                    <form action="${fn:escapeXml(pageContext.request.contextPath)}/event/delete/${fn:escapeXml(e.eventId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this event')">
+                                    <c:if test="${sessionScope.userRole != 'Operations Coordinator'}">
+                                        <form action="${fn:escapeXml(pageContext.request.contextPath)}/event/delete/${fn:escapeXml(e.eventId)}" method="post" style="display:inline;" onsubmit="return confirmDelete('this event')">
 <input type="hidden" name="_csrf" value="${fn:escapeXml(sessionScope.csrfToken)}">
-                                        <button type="submit" class="btn btn-danger btn-xs">Delete</button>
-                                    </form>
+                                            <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                                        </form>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>
