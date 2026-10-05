@@ -211,8 +211,14 @@ public class EventService {
             return "End time must be after start time.";
         if (event.getStatus() != null && !java.util.Set.of("Requested", "Pending", "Confirmed", "Planning", "In Progress", "Completed", "Cancelled").contains(event.getStatus()))
             return "Invalid event status.";
-        if (event.getGuestCount() <= 0) {
-            return "Guest count must be greater than zero.";
+        if (event.getGuestCount() < 1 || event.getGuestCount() > 5000) {
+            return "Guest count must be between 1 and 5000.";
+        }
+        if (event.getEventName().trim().length() > 200) {
+            return "Event name must not exceed 200 characters.";
+        }
+        if (event.getLocation() != null && event.getLocation().trim().length() > 255) {
+            return "Location must not exceed 255 characters.";
         }
         return null;
     }
