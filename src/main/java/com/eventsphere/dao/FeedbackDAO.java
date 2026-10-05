@@ -8,10 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for Feedback Management (Module 7 – Reporting & Feedback).
- * All SQL queries are explicitly written here.
- */
+
 @Repository
 public class FeedbackDAO {
 
@@ -21,7 +18,7 @@ public class FeedbackDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ── RowMapper ──────────────────────────────────────────────
+    // RowMapper
 
     private final RowMapper<Feedback> feedbackRowMapper = (rs, rowNum) -> {
         Feedback f = new Feedback();
@@ -39,7 +36,7 @@ public class FeedbackDAO {
         return f;
     };
 
-    // ── INSERT ─────────────────────────────────────────────────
+    // INSERT
 
     /**
      * Submits new feedback for a completed event.
@@ -55,11 +52,10 @@ public class FeedbackDAO {
                 feedback.getComment());
     }
 
-    // ── SELECT ─────────────────────────────────────────────────
+    // SELECT 
 
-    /**
-     * Returns all feedback entries.
-     */
+    // Returns all feedback entries.
+    
     public List<Feedback> findAll() {
         String sql =
             "SELECT f.feedback_id, f.event_id, e.event_name, " +
@@ -72,9 +68,8 @@ public class FeedbackDAO {
         return jdbcTemplate.query(sql, feedbackRowMapper);
     }
 
-    /**
-     * Finds feedback by its primary key.
-     */
+    //Finds feedback by its primary key.
+    
     public Optional<Feedback> findById(int feedbackId) {
         String sql =
             "SELECT f.feedback_id, f.event_id, e.event_name, " +
@@ -88,9 +83,8 @@ public class FeedbackDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
-    /**
-     * Returns feedback submitted by a specific customer.
-     */
+    // Returns feedback submitted by a specific customer.
+
     public List<Feedback> findByCustomerId(int customerId) {
         String sql =
             "SELECT f.feedback_id, f.event_id, e.event_name, " +
@@ -103,9 +97,8 @@ public class FeedbackDAO {
         return jdbcTemplate.query(sql, feedbackRowMapper, customerId);
     }
 
-    /**
-     * Returns feedback for a specific event.
-     */
+    //Returns feedback for a specific event.
+     
     public List<Feedback> findByEventId(int eventId) {
         String sql =
             "SELECT f.feedback_id, f.event_id, e.event_name, " +
@@ -118,9 +111,8 @@ public class FeedbackDAO {
         return jdbcTemplate.query(sql, feedbackRowMapper, eventId);
     }
 
-    /**
-     * Checks if a customer has already submitted feedback for a given event.
-     */
+    // Checks if a customer has already submitted feedback for a given event.
+    
     public boolean hasSubmittedFeedback(int customerId, int eventId) {
         String sql =
             "SELECT COUNT(*) FROM feedback WHERE customer_id = ? AND event_id = ?";
@@ -128,9 +120,8 @@ public class FeedbackDAO {
         return count != null && count > 0;
     }
 
-    /**
-     * Returns average rating across all active feedback.
-     */
+    //Returns average rating across all active feedback.
+
     public double getAverageRating() {
         String sql =
             "SELECT ISNULL(AVG(CAST(rating AS FLOAT)), 0) FROM feedback WHERE status = 'Active'";
@@ -138,22 +129,20 @@ public class FeedbackDAO {
         return avg != null ? avg : 0.0;
     }
 
-    // ── UPDATE ─────────────────────────────────────────────────
+    // UPDATE 
 
-    /**
-     * Moderates feedback (marks it as Moderated with a reason).
-     */
+    // Moderates feedback (marks it as Moderated with a reason).
+
     public int moderateFeedback(int feedbackId, String reason) {
         String sql =
             "UPDATE feedback SET status = 'Moderated', mod_reason = ? WHERE feedback_id = ?";
         return jdbcTemplate.update(sql, reason, feedbackId);
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
+    // DELETE 
 
-    /**
-     * Deletes a feedback entry by ID.
-     */
+    // Deletes a feedback entry by ID.
+
     public int deleteFeedback(int feedbackId) {
         String sql = "DELETE FROM feedback WHERE feedback_id = ?";
         return jdbcTemplate.update(sql, feedbackId);
