@@ -12,14 +12,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * Module 2 – Event Management.
- * Accessible by Event Manager, Managing Director and Operations Coordinator.
- */
+// Event Management Controller
 @Controller
 @RequestMapping("/event")
 public class EventController {
-
+// Services required for Event Management and system integration
     private final EventService        eventService;
     private final CustomerService     customerService;
     private final VenueService        venueService;
@@ -41,12 +38,12 @@ public class EventController {
         this.notificationService = notificationService;
     }
 
-    // ── SECURITY HELPER ───────────────────────────────────────
+// Get logged-in user
 
     private User getUser(HttpSession session) {
         return (User) session.getAttribute("loggedInUser");
     }
-
+// Check user access
     private boolean hasAccess(User user) {
         if (user == null) return false;
         String role = user.getRoleName();
@@ -56,7 +53,7 @@ public class EventController {
             || "System Administrator".equals(role);
     }
 
-    // ── DASHBOARD ─────────────────────────────────────────────
+   // Show event dashboard
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
@@ -74,7 +71,7 @@ public class EventController {
         return "event/dashboard";
     }
 
-    // ── LIST ───────────────────────────────────────────────────
+   // Show and filter events
 
     @GetMapping("/list")
     public String listEvents(HttpSession session, Model model,
@@ -96,7 +93,7 @@ public class EventController {
         return "event/list";
     }
 
-    // ── DETAIL ─────────────────────────────────────────────────
+   // Show archived events
 
     @GetMapping("/archive")
     public String archivedEvents(HttpSession session, Model model) {
@@ -107,7 +104,7 @@ public class EventController {
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "event/list";
     }
-
+// Archive or restore an event
     @PostMapping("/archive/{eventId}")
     public String archiveEvent(@PathVariable int eventId, @RequestParam boolean archived,
                                HttpSession session, RedirectAttributes flash) {
@@ -117,7 +114,7 @@ public class EventController {
                 error == null ? (archived ? "Event archived. History is preserved." : "Event restored.") : error);
         return archived ? "redirect:/event/list" : "redirect:/event/archive";
     }
-
+// Show event details
     @GetMapping("/detail/{eventId}")
     public String eventDetail(@PathVariable int eventId,
                               HttpSession session, Model model) {
@@ -135,8 +132,7 @@ public class EventController {
         return "event/detail";
     }
 
-    // ── CREATE ─────────────────────────────────────────────────
-
+   // Show create event form
     @GetMapping("/create")
     public String createForm(HttpSession session, Model model) {
         User user = getUser(session);
@@ -149,7 +145,7 @@ public class EventController {
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "event/form";
     }
-
+// Create a new event
     @PostMapping("/create")
     public String createEvent(@ModelAttribute Event event,
                               HttpSession session,
@@ -166,8 +162,7 @@ public class EventController {
         return "redirect:/event/list";
     }
 
-    // ── EDIT ───────────────────────────────────────────────────
-
+   // Show edit event form
     @GetMapping("/edit/{eventId}")
     public String editForm(@PathVariable int eventId,
                            HttpSession session, Model model) {
@@ -184,7 +179,7 @@ public class EventController {
         model.addAttribute("unreadCount", notificationService.countUnread(user.getUserId()));
         return "event/form";
     }
-
+// Update event details
     @PostMapping("/edit/{eventId}")
     public String updateEvent(@PathVariable int eventId,
                               @ModelAttribute Event event,
@@ -203,7 +198,7 @@ public class EventController {
         return "redirect:/event/detail/" + eventId;
     }
 
-    // ── STATUS UPDATE ─────────────────────────────────────────
+  // Update event status
 
     @PostMapping("/status/{eventId}")
     public String updateStatus(@PathVariable int eventId,
@@ -219,7 +214,7 @@ public class EventController {
         return "redirect:/event/detail/" + eventId;
     }
 
-    // ── CONFIRM BOOKING ───────────────────────────────────────
+   // Confirm event booking
 
     @PostMapping("/confirm/{eventId}")
     public String confirmBooking(@PathVariable int eventId,
@@ -233,8 +228,7 @@ public class EventController {
         return "redirect:/event/detail/" + eventId;
     }
 
-    // ── DELETE ─────────────────────────────────────────────────
-
+  // Delete an event
     @PostMapping("/delete/{eventId}")
     public String deleteEvent(@PathVariable int eventId,
                               HttpSession session,
