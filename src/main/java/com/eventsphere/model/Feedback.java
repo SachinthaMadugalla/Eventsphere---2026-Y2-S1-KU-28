@@ -2,11 +2,8 @@ package com.eventsphere.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents customer feedback for a completed event.
- * Maps to the 'feedback' table in EventSphereDB.
- * Belongs to Module 7 – Reporting & Feedback Management.
- */
+// Represents customer feedback for a completed event.
+
 public class Feedback {
 
     private int feedbackId;
@@ -22,7 +19,7 @@ public class Feedback {
 
     public Feedback() {}
 
-    // ── Getters & Setters ──────────────────────────────────────
+    // Getters & Setters 
 
     public int getFeedbackId()                          { return feedbackId; }
     public void setFeedbackId(int feedbackId)           { this.feedbackId = feedbackId; }
