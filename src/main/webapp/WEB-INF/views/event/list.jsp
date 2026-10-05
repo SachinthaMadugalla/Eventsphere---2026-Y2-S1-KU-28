@@ -67,7 +67,7 @@
                                     <c:set var="s" value="${e.status.toLowerCase().replace(' ','')}"/>
                                     <span class="es-badge badge-${fn:escapeXml(s)}">${fn:escapeXml(e.status)}</span>
                                 </td>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <a href="${fn:escapeXml(pageContext.request.contextPath)}/event/detail/${fn:escapeXml(e.eventId)}" class="btn btn-secondary btn-xs">View</a>
                                     <c:if test="${!e.archived}"><a href="${fn:escapeXml(pageContext.request.contextPath)}/event/edit/${fn:escapeXml(e.eventId)}" class="btn btn-primary btn-xs">Edit</a></c:if>
                                     <c:if test="${e.status == 'Completed' || e.status == 'Cancelled'}">

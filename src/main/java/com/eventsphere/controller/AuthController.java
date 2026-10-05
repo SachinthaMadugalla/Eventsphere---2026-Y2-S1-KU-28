@@ -35,7 +35,7 @@ public class AuthController {
         if (session.getAttribute("loggedInUser") != null) {
             return "redirect:/dashboard";
         }
-        return "redirect:/login";
+        return "index";
     }
 
     // ── LOGIN ──────────────────────────────────────────────────
