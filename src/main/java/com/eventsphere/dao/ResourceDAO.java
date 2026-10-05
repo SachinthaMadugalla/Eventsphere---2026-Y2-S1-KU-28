@@ -9,10 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for Resource Management (Module 4).
- * All SQL queries are explicitly written here.
- */
+
 @Repository
 public class ResourceDAO {
 
@@ -55,9 +52,7 @@ public class ResourceDAO {
 
     // ── INSERT ─────────────────────────────────────────────────
 
-    /**
-     * Inserts a new resource record.
-     */
+
     public int addResource(Resource resource) {
         String sql =
                 "INSERT INTO resources (resource_name, category, total_quantity, " +
@@ -72,10 +67,7 @@ public class ResourceDAO {
                 resource.getDescription());
     }
 
-    /**
-     * Allocates a quantity of a resource to an event
-     * and reduces available_quantity accordingly.
-     */
+
     public int allocateResource(ResourceAllocation allocation) {
         int reserved = jdbcTemplate.update(
                 "UPDATE resources SET available_quantity = available_quantity - ? " +
@@ -98,9 +90,6 @@ public class ResourceDAO {
 
     // ── SELECT ─────────────────────────────────────────────────
 
-    /**
-     * Returns all resources.
-     */
     public List<Resource> findAll() {
         String sql =
                 "SELECT resource_id, resource_name, category, total_quantity, " +
@@ -109,9 +98,7 @@ public class ResourceDAO {
         return jdbcTemplate.query(sql, resourceRowMapper);
     }
 
-    /**
-     * Returns only active resources (for allocation dropdowns).
-     */
+
     public List<Resource> findAllActive() {
         String sql =
                 "SELECT resource_id, resource_name, category, total_quantity, " +
@@ -120,9 +107,7 @@ public class ResourceDAO {
         return jdbcTemplate.query(sql, resourceRowMapper);
     }
 
-    /**
-     * Finds a resource by primary key.
-     */
+
     public Optional<Resource> findById(int resourceId) {
         String sql =
                 "SELECT resource_id, resource_name, category, total_quantity, " +
@@ -132,18 +117,14 @@ public class ResourceDAO {
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
-    /**
-     * Returns the current available quantity for a resource.
-     */
+
     public int getAvailableQuantity(int resourceId) {
         String sql = "SELECT available_quantity FROM resources WHERE resource_id = ?";
         Integer qty = jdbcTemplate.queryForObject(sql, Integer.class, resourceId);
         return qty != null ? qty : 0;
     }
 
-    /**
-     * Returns all allocations for a specific event.
-     */
+
     public List<ResourceAllocation> findAllocationsByEventId(int eventId) {
         String sql =
                 "SELECT ra.allocation_id, ra.event_id, e.event_name, " +
@@ -156,9 +137,7 @@ public class ResourceDAO {
         return jdbcTemplate.query(sql, allocationRowMapper, eventId);
     }
 
-    /**
-     * Returns all resource allocations (for operations overview).
-     */
+
     public List<ResourceAllocation> findAllAllocations() {
         String sql =
                 "SELECT ra.allocation_id, ra.event_id, e.event_name, " +
@@ -173,9 +152,7 @@ public class ResourceDAO {
 
     // ── UPDATE ─────────────────────────────────────────────────
 
-    /**
-     * Updates resource details.
-     */
+
     public int updateResource(Resource resource) {
         String sql =
                 "UPDATE resources SET resource_name = ?, category = ?, " +
@@ -192,9 +169,7 @@ public class ResourceDAO {
                 resource.getResourceId(), resource.getTotalQuantity());
     }
 
-    /**
-     * Activates or deactivates a resource.
-     */
+
     public int setActiveStatus(int resourceId, boolean active) {
         String sql = "UPDATE resources SET is_active = ? WHERE resource_id = ?";
         return jdbcTemplate.update(sql, active ? 1 : 0, resourceId);
@@ -202,17 +177,13 @@ public class ResourceDAO {
 
     // ── DELETE ─────────────────────────────────────────────────
 
-    /**
-     * Deletes a resource by ID.
-     */
+
     public int deleteResource(int resourceId) {
         String sql = "DELETE FROM resources WHERE resource_id = ?";
         return jdbcTemplate.update(sql, resourceId);
     }
 
-    /**
-     * Releases (removes) a resource allocation and restores available_quantity.
-     */
+
     public int releaseAllocation(int allocationId) {
         // First get the quantity to restore
         String selectSql =
