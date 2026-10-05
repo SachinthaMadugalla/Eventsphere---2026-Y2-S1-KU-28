@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for Resource Management (Module 4).
- * Handles resource CRUD and availability validation.
- */
+
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class ResourceService {
@@ -41,9 +38,7 @@ public class ResourceService {
 
     // ── CREATE ─────────────────────────────────────────────────
 
-    /**
-     * Adds a new resource. Returns null on success, error message on failure.
-     */
+
     public String addResource(Resource resource) {
         String error = validateResource(resource);
         if (error != null) return error;
@@ -54,14 +49,7 @@ public class ResourceService {
 
     // ── ALLOCATE ───────────────────────────────────────────────
 
-    /**
-     * Allocates resources to an event.
-     *
-     * Validates that requested quantity does not exceed available quantity.
-     * Deducts available_quantity on successful allocation.
-     *
-     * @return null on success, error message if insufficient stock
-     */
+
     public String allocateResource(ResourceAllocation allocation) {
         if (allocation.getQuantity() <= 0) {
             return "Quantity must be greater than zero.";
@@ -74,7 +62,6 @@ public class ResourceService {
     }
 
     // ── UPDATE ─────────────────────────────────────────────────
-  /**UPDATE **/
 
     public String updateResource(Resource resource) {
         String error = validateResource(resource);
@@ -93,9 +80,7 @@ public class ResourceService {
         resourceDAO.deleteResource(resourceId);
     }
 
-    /**
-     * Releases an allocation and restores available quantity.
-     */
+
     public void releaseAllocation(int allocationId) {
         resourceDAO.releaseAllocation(allocationId);
     }
