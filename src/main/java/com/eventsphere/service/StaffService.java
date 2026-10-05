@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for Staff Management (Module 4).
- * Handles staff CRUD, assignment and conflict detection.
- */
+
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class StaffService {
@@ -50,9 +47,7 @@ public class StaffService {
 
     // ── CREATE ─────────────────────────────────────────────────
 
-    /**
-     * Adds a new staff member. Returns null on success, error message on failure.
-     */
+
     public String addStaff(Staff staff) {
         String error = validateStaff(staff);
         if (error != null) return error;
@@ -62,14 +57,7 @@ public class StaffService {
 
     // ── ASSIGN ─────────────────────────────────────────────────
 
-    /**
-     * Assigns a staff member to an event with conflict checking.
-     *
-     * Conflict rule: same staff already assigned to a different non-cancelled
-     * event on the same date.
-     *
-     * @return null on success, error message if conflict
-     */
+
     @org.springframework.transaction.annotation.Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public String assignStaffToEvent(StaffAssignment sa) {
         if (staffDAO.findById(sa.getStaffId()).filter(v -> v.isActive()).isEmpty()) return "Selected entry is unavailable.";
@@ -97,9 +85,7 @@ public class StaffService {
 
     // ── UPDATE ─────────────────────────────────────────────────
 
-    /**
-     * Updates  THE staff member's details.
-     */
+
     public String updateStaff(Staff staff) {
         String error = validateStaff(staff);
         if (error != null) return error;
