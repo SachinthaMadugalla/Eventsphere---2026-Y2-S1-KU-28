@@ -16,10 +16,11 @@ import java.util.Optional;
  * Service for Event Management (Module 2).
  * Handles event lifecycle business logic.
  */
+// Event Management Service
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class EventService {
-
+ // Required DAOs
     private final com.eventsphere.dao.CustomerDAO customerDAO;
     private final com.eventsphere.dao.ResourceDAO resourceDAO;
     private final EventDAO eventDAO;
@@ -36,12 +37,12 @@ public class EventService {
         this.userDAO          = userDAO;
     }
 
-    // ── READ ───────────────────────────────────────────────────
+   // Get all events
 
     public List<Event> getAllEvents() {
         return eventDAO.findAll();
     }
-
+// Get event by ID
     public Optional<Event> getEventById(int eventId) {
         return eventDAO.findById(eventId);
     }
@@ -89,6 +90,7 @@ public class EventService {
      * Creates a new event (booking request from customer).
      * Returns null on success, error message on failure.
      */
+    // Create customer event request
     public String createEvent(Event event) {
         String error = validateEvent(event, true);
         if (error != null) return error;
@@ -164,7 +166,7 @@ public class EventService {
         eventDAO.updateStatus(eventId, status);
         releaseResourcesIfFinished(eventId, status);
     }
-
+// Release resources after completion or cancellation
     private void releaseResourcesIfFinished(int eventId, String status) {
         if ("Cancelled".equals(status) || "Completed".equals(status)) {
             for (var allocation : resourceDAO.findAllocationsByEventId(eventId)) {
