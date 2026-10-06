@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 @Repository
 public class EventDAO {
-
+// Database connection helper
     private final JdbcTemplate jdbcTemplate;
 
     public EventDAO(JdbcTemplate jdbcTemplate) {
@@ -23,7 +23,7 @@ public class EventDAO {
     }
 
     // ── RowMappers ─────────────────────────────────────────────
-
+// Convert database row to Event object
     private final RowMapper<Event> eventRowMapper = (rs, rowNum) -> {
         Event e = new Event();
         e.setEventId(rs.getInt("event_id"));
@@ -53,7 +53,7 @@ public class EventDAO {
                 ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
         return e;
     };
-
+// Convert database row to EventCategory object
     private final RowMapper<EventCategory> categoryRowMapper = (rs, rowNum) -> {
         EventCategory c = new EventCategory();
         c.setCategoryId(rs.getInt("category_id"));
@@ -116,13 +116,14 @@ public class EventDAO {
     /**
      * Returns all events.
      */
+    // Get all active events
     public List<Event> findAll() {
         String sql = BASE_SELECT + "WHERE e.is_archived = 0 ORDER BY e.event_date DESC";
         return jdbcTemplate.query(sql, eventRowMapper);
     }
 
     /**
-     * Finds a single event by its primary key.
+     * Finds a single event by  (ID)its primary key.
      */
     public Optional<Event> findById(int eventId) {
         String sql = BASE_SELECT + "WHERE e.event_id = ?";
@@ -133,7 +134,7 @@ public class EventDAO {
     public List<Event> findArchived() {
         return jdbcTemplate.query(BASE_SELECT + "WHERE e.is_archived = 1 ORDER BY e.event_date DESC", eventRowMapper);
     }
-
+// Archive or restore event
     public int setArchived(int eventId, boolean archived) {
         return jdbcTemplate.update("UPDATE events SET is_archived=?, updated_at=GETDATE() WHERE event_id=? AND status IN ('Completed','Cancelled')", archived, eventId);
     }
@@ -278,7 +279,7 @@ public class EventDAO {
         String sql = "SELECT COUNT(*) FROM events WHERE is_archived = 0";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
-
+// Count upcoming events
     public int countUpcoming() {
         String sql =
             "SELECT COUNT(*) FROM events " +
