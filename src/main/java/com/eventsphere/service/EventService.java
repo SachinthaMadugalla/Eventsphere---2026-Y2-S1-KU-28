@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @org.springframework.transaction.annotation.Transactional
 public class EventService {
-
+// Required database access objects
     private final com.eventsphere.dao.CustomerDAO customerDAO;
     private final com.eventsphere.dao.ResourceDAO resourceDAO;
     private final EventDAO eventDAO;
@@ -36,12 +36,12 @@ public class EventService {
         this.userDAO          = userDAO;
     }
 
-    // ── READ ───────────────────────────────────────────────────
+   // Get all events
 
     public List<Event> getAllEvents() {
         return eventDAO.findAll();
     }
-
+// Get event by ID
     public Optional<Event> getEventById(int eventId) {
         return eventDAO.findById(eventId);
     }
@@ -61,7 +61,7 @@ public class EventService {
     public List<Event> getUpcomingEvents() {
         return eventDAO.findUpcoming();
     }
-
+// Search events
     public List<Event> searchEvents(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return eventDAO.findAll();
@@ -164,7 +164,7 @@ public class EventService {
         eventDAO.updateStatus(eventId, status);
         releaseResourcesIfFinished(eventId, status);
     }
-
+// Release resources for cancelled or completed events
     private void releaseResourcesIfFinished(int eventId, String status) {
         if ("Cancelled".equals(status) || "Completed".equals(status)) {
             for (var allocation : resourceDAO.findAllocationsByEventId(eventId)) {
@@ -172,15 +172,15 @@ public class EventService {
             }
         }
     }
-
+// Check if event can be edited
     private Event requireEditable(int eventId) {
         Event event = eventDAO.findById(eventId).orElseThrow();
         if (event.isArchived()) throw new IllegalArgumentException("Restore the archived event before editing it.");
         return event;
     }
-
+// Get archived events
     public List<Event> getArchivedEvents() { return eventDAO.findArchived(); }
-
+// Archive or restore event
     public String setArchived(int eventId, boolean archived) {
         return eventDAO.setArchived(eventId, archived) == 1 ? null
                 : "Only completed or cancelled events can be archived or restored.";
@@ -192,7 +192,7 @@ public class EventService {
         eventDAO.deleteEvent(eventId);
     }
 
-    // ── VALIDATION ─────────────────────────────────────────────
+    // Validate event details before saving or updating
 
     private String validateEvent(Event event, boolean creating) {
         if (event.getEventName() == null || event.getEventName().trim().isEmpty()) {
